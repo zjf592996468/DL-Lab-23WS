@@ -2,7 +2,7 @@ import gin
 import tensorflow as tf
 
 @gin.configurable
-def preprocess(image, label, img_height, img_width):
+def preprocess(image, label, img_height=256, img_width=256):
     """Dataset preprocessing: Normalizing and resizing"""
 
     # Normalize image: `uint8` -> `float32`.

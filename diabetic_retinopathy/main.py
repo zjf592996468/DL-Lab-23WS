@@ -24,7 +24,7 @@ def main(argv):
     utils_params.save_config(run_paths['path_gin'], gin.config_str())
 
     # setup pipeline
-    ds_train, ds_val, ds_test, ds_info = datasets.load()
+    ds_train, ds_val, ds_test, ds_info = datasets.load('idrid',r'C:\Users\西门水羊\Desktop\DL Lab\idrid\IDRID_dataset')
 
     # model
     model = vgg_like(input_shape=ds_info.features["image"].shape, n_classes=ds_info.features["label"].num_classes)
