@@ -50,16 +50,16 @@ class Trainer(object):
         # behavior during training versus inference (e.g. Dropout).
         predictions = self.model(images, training=False)
         t_loss = self.loss_object(labels, predictions)
-
+        print(f"在 train_step 内的损失: {t_loss}")
         self.val_loss(t_loss)
         self.val_accuracy(labels, predictions)
+        return t_loss
 
     def train(self):
         for idx, (images, labels) in enumerate(self.ds_train):
 
             step = idx + 1
             self.train_step(images, labels)
-
             if step % self.log_interval == 0:
 
                 # Reset test metrics
