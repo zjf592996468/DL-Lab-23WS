@@ -2,6 +2,7 @@ import gin
 import tensorflow as tf
 import logging
 
+
 @gin.configurable
 class Trainer(object):
     def __init__(self, model, ds_train, ds_val, ds_info, run_paths, total_steps, log_interval, ckpt_interval):
@@ -41,6 +42,7 @@ class Trainer(object):
         gradients = tape.gradient(loss, self.model.trainable_variables)
         self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
 
+        tf.print("在 train_step 内的损失:", loss)
         self.train_loss(loss)
         self.train_accuracy(labels, predictions)
 
@@ -50,10 +52,10 @@ class Trainer(object):
         # behavior during training versus inference (e.g. Dropout).
         predictions = self.model(images, training=False)
         t_loss = self.loss_object(labels, predictions)
-        print(f"在 train_step 内的损失: {t_loss}")
+
         self.val_loss(t_loss)
         self.val_accuracy(labels, predictions)
-        return t_loss
+
 
     def train(self):
         for idx, (images, labels) in enumerate(self.ds_train):
