@@ -8,6 +8,7 @@ from input_pipeline import datasets
 from utils import utils_params, utils_misc
 from models.architectures import vgg_like
 
+
 FLAGS = flags.FLAGS
 flags.DEFINE_boolean('train', True, 'Specify whether to train or evaluate a model.')
 
@@ -26,11 +27,15 @@ def main(argv):
     # setup pipeline
     ds_train, ds_val, ds_test, ds_info = datasets.load('idrid',r'C:\Users\西门水羊\Desktop\DL Lab\idrid\IDRID_dataset')
 
+
     # model
     model = vgg_like(input_shape=(256, 256, 3), n_classes=2)
 
+
     if FLAGS.train:
         trainer = Trainer(model, ds_train, ds_val, ds_info, run_paths)
+        # load checkpoints
+        trainer.load_checkpoint()
         for _ in trainer.train():
             continue
     else:

@@ -10,7 +10,8 @@ class Trainer(object):
         # ....
 
         # Checkpoint Manager
-        # ...
+        self.ckpt = tf.train.Checkpoint(model=model, optimizer=tf.keras.optimizers.Adam())
+        self.manager = tf.train.CheckpointManager(self.ckpt, run_paths['path_ckpts_train'], max_to_keep=3)
 
         # Loss objective
         self.loss_object = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
@@ -56,6 +57,17 @@ class Trainer(object):
         self.val_loss(t_loss)
         self.val_accuracy(labels, predictions)
 
+    def load_checkpoint(self):
+        checkpoint_dir = self.run_paths["path_ckpts_train"]
+        print(f"Checking for checkpoint in: {checkpoint_dir}")
+        latest_ckpt = tf.train.latest_checkpoint(checkpoint_dir)
+        print(f"Latest checkpoint found: {latest_ckpt}")
+
+        if latest_ckpt:
+            self.ckpt.restore(latest_ckpt)
+            print(f"Restored from {latest_ckpt}")
+        else:
+            print("Initializing from scratch.")
 
     def train(self):
         for idx, (images, labels) in enumerate(self.ds_train):
@@ -88,9 +100,12 @@ class Trainer(object):
                 yield self.val_accuracy.result().numpy()
 
             if step % self.ckpt_interval == 0:
+                checkpoint_path = self.run_paths["path_ckpts_train"]
                 logging.info(f'Saving checkpoint to {self.run_paths["path_ckpts_train"]}.')
                 # Save checkpoint
-                # ...
+                save_path = self.manager.save()
+                print("我保存了")
+                print("Checkpoint path:", checkpoint_path)
 
             if step % self.total_steps == 0:
                 logging.info(f'Finished training after {step} steps.')
