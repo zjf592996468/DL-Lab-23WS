@@ -112,3 +112,6 @@ class Trainer(object):
                 # Save final checkpoint
                 # ...
                 return self.val_accuracy.result().numpy()
+def get_checkpoint_path():
+    # 返回检查点的保存路径，可以是固定的或根据某些逻辑生成的
+    return "path_to_checkpoints"
