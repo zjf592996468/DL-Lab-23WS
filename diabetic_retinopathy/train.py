@@ -104,14 +104,20 @@ class Trainer(object):
                 logging.info(f'Saving checkpoint to {self.run_paths["path_ckpts_train"]}.')
                 # Save checkpoint
                 save_path = self.manager.save()
-                print("我保存了")
                 print("Checkpoint path:", checkpoint_path)
 
             if step % self.total_steps == 0:
                 logging.info(f'Finished training after {step} steps.')
                 # Save final checkpoint
                 # ...
+                checkpoint_path = self.run_paths["path_ckpts_train"]
+                self.model.save_weights(checkpoint_path)
+                logging.info(f'Saved final checkpoint to {checkpoint_path}')
+
+                # 计算并返回验证集上的准确率
+                val_accuracy = self.val_accuracy.result().numpy()
+                logging.info(f'Validation accuracy: {val_accuracy * 100:.2f}%')
                 return self.val_accuracy.result().numpy()
 def get_checkpoint_path():
-    # 返回检查点的保存路径，可以是固定的或根据某些逻辑生成的
+    # 返回检查点的保存路径，可以是固定的或根据某些逻辑生成的 后期可以删除
     return "path_to_checkpoints"
