@@ -23,11 +23,11 @@ def create_and_compile_cnn_model():
         # 全连接层，128个节点，激活函数为ReLU
         Dense(128, activation='relu'),
 
-        # Dropout层，以防止过拟合，丢弃率为0.5
-        Dropout(0.5),
+        # Dropout层，以防止过拟合，丢弃率为0.3
+        Dropout(0.3),
 
-        # 输出层，2个节点（每个类别一个），激活函数为softmax
-        Dense(2, activation='softmax')
+        # 输出层，2个节点（每个类别一个），激活函数为sigmoid
+        Dense(2, activation='sigmoid')
     ])
 
     # 编译模型

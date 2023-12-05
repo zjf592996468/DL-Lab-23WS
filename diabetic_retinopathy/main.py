@@ -28,6 +28,7 @@ def main(argv):
     # setup pipeline
     ds_train, ds_val, ds_test, ds_info = datasets.load('idrid',r'C:\Users\西门水羊\Desktop\DL Lab\idrid\IDRID_dataset')
 
+    #creat checkpoints path
     checkpoint_path = get_checkpoint_path()
 
     # 创建 run_paths 字典
@@ -55,5 +56,4 @@ else:
     model = create_and_compile_cnn_model()
     ds_train, ds_val, ds_test, ds_info = datasets.load('idrid', r'C:\Users\西门水羊\Desktop\DL Lab\idrid\IDRID_dataset')
     # 训练模型
-    # 假设你已经有了训练数据 train_dataset 和验证数据 val_dataset
     model.fit(ds_train, epochs=10, validation_data=ds_val)
