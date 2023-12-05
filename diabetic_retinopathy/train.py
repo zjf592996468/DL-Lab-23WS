@@ -8,6 +8,19 @@ class Trainer(object):
     def __init__(self, model, ds_train, ds_val, ds_info, run_paths, total_steps, log_interval, ckpt_interval):
         # Summary Writer
         # ....
+        # 在类的构造函数或主函数中
+        '''train_summary_writer = tf.summary.create_file_writer('logs/train')
+        val_summary_writer = tf.summary.create_file_writer('logs/validation')
+
+        # 然后在训练循环中使用这些写入器记录数据
+        with train_summary_writer.as_default():
+            tf.summary.scalar('loss', self.train_loss.result(), step=step)
+            tf.summary.scalar('accuracy', self.train_accuracy.result(), step=step)
+
+        with val_summary_writer.as_default():
+            tf.summary.scalar('loss', self.val_loss.result(), step=step)
+            tf.summary.scalar('accuracy', self.val_accuracy.result(), step=step)'''
+
 
         # Checkpoint Manager
         self.ckpt = tf.train.Checkpoint(model=model, optimizer=tf.keras.optimizers.Adam())
@@ -33,18 +46,7 @@ class Trainer(object):
         self.log_interval = log_interval
         self.ckpt_interval = ckpt_interval
 
-    # 在类的构造函数或主函数中
-    '''train_summary_writer = tf.summary.create_file_writer('logs/train')
-    val_summary_writer = tf.summary.create_file_writer('logs/validation')
 
-    # 然后在训练循环中使用这些写入器记录数据
-    with train_summary_writer.as_default():
-        tf.summary.scalar('loss', self.train_loss.result(), step=step)
-        tf.summary.scalar('accuracy', self.train_accuracy.result(), step=step)
-
-    with val_summary_writer.as_default():
-        tf.summary.scalar('loss', self.val_loss.result(), step=step)
-        tf.summary.scalar('accuracy', self.val_accuracy.result(), step=step)'''
 
     @tf.function
     def train_step(self, images, labels):
@@ -104,15 +106,12 @@ class Trainer(object):
                                              self.val_accuracy.result() * 100))
                 
                 # Write summary to tensorboard
-                # ...
                 # 记录训练指标
                 '''with train_summary_writer.as_default():
                     tf.summary.scalar('loss', self.train_loss.result(), step=step)
                     tf.summary.scalar('accuracy', self.train_accuracy.result(), step=step)
 
                 if step % self.log_interval == 0:
-                    # ... 现有代码 ...
-
                     # 记录验证指标
                     with val_summary_writer.as_default():
                         tf.summary.scalar('loss', self.val_loss.result(), step=step)
@@ -138,11 +137,12 @@ class Trainer(object):
                 checkpoint_path = self.run_paths["path_ckpts_train"]
                 self.model.save_weights(checkpoint_path)
                 logging.info(f'Saved final checkpoint to {checkpoint_path}')
-
                 # 计算并返回验证集上的准确率
                 val_accuracy = self.val_accuracy.result().numpy()
                 logging.info(f'Validation accuracy: {val_accuracy * 100:.2f}%')
-                return self.val_accuracy.result().numpy()
+                #return self.val_accuracy.result().numpy()
+                return
+
 def get_checkpoint_path():
     # 返回检查点的保存路径，可以是固定的或根据某些逻辑生成的 后期可以删除
     return "path_to_checkpoints"

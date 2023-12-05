@@ -1,6 +1,4 @@
 import tensorflow as tf
-
-import tensorflow as tf
 import numpy as np
 
 class ConfusionMatrix(tf.keras.metrics.Metric):
