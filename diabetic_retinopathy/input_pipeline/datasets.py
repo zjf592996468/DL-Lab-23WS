@@ -83,10 +83,14 @@ def create_dataset(filepath):
 def load(name, data_dir):
     if name == "idrid":
         logging.info(f"Preparing dataset {name}...")
-
+        # define the path
+        train_csv_path = os.path.join(data_dir, "labels", "train.csv")
+        test_csv_path = os.path.join(data_dir, "labels", "test.csv")
+        test_image_path=os.path.join(data_dir, "images", "test")
+        train_image_path=os.path.join(data_dir, "images", "train")
         # 导入数据
-        train_df = pd.read_csv(r'C:\Users\西门水羊\Desktop\DL Lab\idrid\IDRID_dataset\labels\train.csv')
-        test_df = pd.read_csv(r'C:\Users\西门水羊\Desktop\DL Lab\idrid\IDRID_dataset\labels\test.csv')
+        train_df = pd.read_csv(train_csv_path)
+        test_df = pd.read_csv(test_csv_path)
 
         # 分割验证集
         valid_df = train_df.sample(frac=0.1)
@@ -97,9 +101,9 @@ def load(name, data_dir):
         test_tfrecord = os.path.join(data_dir, 'test.tfrecord')
 
         # 创建TFRecord文件
-        create_tfrecord(r'C:\Users\西门水羊\Desktop\DL Lab\idrid\IDRID_dataset\images\train', valid_df, valid_tfrecord)
-        create_tfrecord(r'C:\Users\西门水羊\Desktop\DL Lab\idrid\IDRID_dataset\images\train', train_df.drop(valid_df.index), train_tfrecord)
-        create_tfrecord(r'C:\Users\西门水羊\Desktop\DL Lab\idrid\IDRID_dataset\images\test', test_df, test_tfrecord)
+        create_tfrecord(train_image_path, valid_df, valid_tfrecord)
+        create_tfrecord(train_image_path, train_df.drop(valid_df.index), train_tfrecord)
+        create_tfrecord(test_image_path, test_df, test_tfrecord)
 
         # 解析TFRecord文件
         ds_train = tf.data.TFRecordDataset(train_tfrecord).map(_parse_function)
