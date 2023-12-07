@@ -51,9 +51,3 @@ def main(argv):
 
 if __name__ == "__main__":
     app.run(main)
-#else:
-    #创建并编译模型
-    #model = create_and_compile_cnn_model()
-    #ds_train, ds_val, ds_test, ds_info = datasets.load('idrid', r'C:\Users\西门水羊\Desktop\DL Lab\idrid\IDRID_dataset')
-    # 训练模型
-    #model.fit(ds_train, epochs=10, validation_data=ds_val)
