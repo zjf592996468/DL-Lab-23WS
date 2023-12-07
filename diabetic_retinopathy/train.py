@@ -91,7 +91,10 @@ class Trainer(object):
                                              self.val_accuracy.result() * 100))
                 
                 # Write summary to tensorboard
+                self.train_loss.reset_states()
+                self.train_accuracy.reset_states()
 
+                yield self.val_accuracy.result().numpy()
             if step % self.ckpt_interval == 0:
                 checkpoint_path = self.run_paths["path_ckpts_train"]
                 logging.info(f'Saving checkpoint to {self.run_paths["path_ckpts_train"]}.')

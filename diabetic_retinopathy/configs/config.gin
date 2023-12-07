@@ -14,7 +14,8 @@ Trainer.ckpt_interval = 1e4
 
 # Input pipeline
 load.name = 'idrid'
-load.data_dir = r'/home/data/idrid_dataset'
+#load.data_dir = r'/home/data/idrid_dataset'
+load.data_dir = r'C:\Users\西门水羊\Desktop\DL Lab\idrid\IDRID_dataset'
 preprocess.img_height = 256
 preprocess.img_width = 256
 prepare.batch_size = 32
