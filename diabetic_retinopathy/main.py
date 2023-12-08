@@ -26,7 +26,7 @@ def main(argv):
     utils_params.save_config(run_paths['path_gin'], gin.config_str())
 
     # setup pipeline
-    ds_train, ds_val, ds_test, ds_info = datasets.load('idrid',r'/home/data/idrid_dataset')
+    ds_train, ds_val, ds_test, ds_info = datasets.load('idrid',r'/home/data/IDRID_dataset')
 
     #creat checkpoints path
     checkpoint_path = get_checkpoint_path()
