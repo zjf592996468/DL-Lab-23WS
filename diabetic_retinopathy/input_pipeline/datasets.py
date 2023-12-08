@@ -96,9 +96,12 @@ def load(name, data_dir):
         valid_df = train_df.sample(frac=0.1)
 
         # TFRecord文件路径
-        valid_tfrecord = os.path.join(data_dir, 'valid.tfrecord')
-        train_tfrecord = os.path.join(data_dir, 'train.tfrecord')
-        test_tfrecord = os.path.join(data_dir, 'test.tfrecord')
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+
+        # 构建tfrecord文件的完整路径
+        valid_tfrecord = os.path.join(current_dir, 'valid.tfrecord')
+        train_tfrecord = os.path.join(current_dir, 'train.tfrecord')
+        test_tfrecord = os.path.join(current_dir, 'test.tfrecord')
 
         # 创建TFRecord文件
         create_tfrecord(train_image_path, valid_df, valid_tfrecord)
