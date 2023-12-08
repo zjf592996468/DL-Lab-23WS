@@ -2,11 +2,11 @@ from evaluation.metrics import ConfusionMatrix
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-def evaluate(model: object, checkpoint: object, ds_test: object, ds_info: object, run_paths: object) -> object:
+def evaluate(model: object, checkpoint: object, ds_test: object) -> object:
     model.load_weights(checkpoint)
 
     # 初始化混淆矩阵度量
-    confusion_matrix_metric = ConfusionMatrix(num_classes=ds_info.features['label'].num_classes)
+    confusion_matrix_metric = ConfusionMatrix(num_classes=2)
 
     # 在测试数据集上评估模型
     for x, y in ds_test:
@@ -23,4 +23,6 @@ def evaluate(model: object, checkpoint: object, ds_test: object, ds_info: object
     plt.ylabel('True labels')
     plt.title('Confusion Matrix')
     plt.show()
-    return
+    print("Confusion Matrix:")
+    print(conf_matrix)
+    return conf_matrix

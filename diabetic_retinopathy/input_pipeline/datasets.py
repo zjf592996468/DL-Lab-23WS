@@ -97,7 +97,7 @@ def load(name, data_dir):
 
         # TFRecord文件路径
         current_dir = os.path.dirname(os.path.abspath(__file__))
-
+        print(current_dir)
         # 构建tfrecord文件的完整路径
         valid_tfrecord = os.path.join(current_dir, 'valid.tfrecord')
         train_tfrecord = os.path.join(current_dir, 'train.tfrecord')

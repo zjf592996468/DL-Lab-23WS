@@ -56,17 +56,7 @@ class Trainer(object):
         self.val_loss(t_loss)
         self.val_accuracy(labels, predictions)
 
-    def load_checkpoint(self):
-        checkpoint_dir = self.run_paths["path_ckpts_train"]
-        print(f"Checking for checkpoint in: {checkpoint_dir}")
-        latest_ckpt = tf.train.latest_checkpoint(checkpoint_dir)
-        print(f"Latest checkpoint found: {latest_ckpt}")
 
-        if latest_ckpt:
-            self.ckpt.restore(latest_ckpt)
-            print(f"Restored from {latest_ckpt}")
-        else:
-            print("Initializing from scratch.")
 
     def train(self):
         for idx, (images, labels) in enumerate(self.ds_train):
@@ -96,24 +86,21 @@ class Trainer(object):
 
                 yield self.val_accuracy.result().numpy()
             if step % self.ckpt_interval == 0:
-                checkpoint_path = self.run_paths["path_ckpts_train"]
+                self.manager.save()
                 logging.info(f'Saving checkpoint to {self.run_paths["path_ckpts_train"]}.')
                 # Save checkpoint
-                save_path = self.manager.save()
-                print("Checkpoint path:", checkpoint_path)
+
+
 
             if step % self.total_steps == 0:
                 logging.info(f'Finished training after {step} steps.')
                 # Save final checkpoint
                 # ...
-                checkpoint_path = self.run_paths["path_ckpts_train"]
-                self.model.save_weights(checkpoint_path)
-                logging.info(f'Saved final checkpoint to {checkpoint_path}')
+                self.manager.save()
+                logging.info(f'Saving checkpoint to {self.run_paths["path_ckpts_train"]}.')
                 # 计算并返回验证集上的准确率
                 val_accuracy = self.val_accuracy.result().numpy()
                 logging.info(f'Validation accuracy: {val_accuracy * 100:.2f}%')
+
                 return self.val_accuracy.result().numpy()
 
-def get_checkpoint_path():
-    # 返回检查点的保存路径，可以是固定的或根据某些逻辑生成的 后期可以删除
-    return "path_to_checkpoints"

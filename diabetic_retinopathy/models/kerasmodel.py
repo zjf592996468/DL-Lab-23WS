@@ -26,7 +26,7 @@ def create_and_compile_cnn_model():
         # Dropout层，以防止过拟合，丢弃率为0.3
         Dropout(0.3),
 
-        # 输出层，2个节点（每个类别一个），激活函数为sigmoid
+        # 输出层，2个节点（每个类别一个），激活函数为softmax
         Dense(2, activation='sigmoid')
     ])
 
