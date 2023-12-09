@@ -44,9 +44,8 @@ class Trainer(object):
         self.train_loss(loss)
         self.train_accuracy(labels, predictions)
 
-    @tf.function
     def train(self):
-        start_step = self.ckpt.step.numpy()
+
         for idx, (images, labels) in enumerate(self.ds_train):
 
             step = idx + 1
