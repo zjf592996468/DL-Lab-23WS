@@ -29,8 +29,8 @@ def main(argv):
     ds_train, ds_val, ds_test, ds_info = datasets.load('idrid',r'/home/data/IDRID_dataset')
 
     # model
-    #model = vgg_like(input_shape=(256, 256, 3), n_classes=2)
-    model = create_and_compile_cnn_model()
+    model = vgg_like(input_shape=(256, 256, 3), n_classes=2)
+    #model = create_and_compile_cnn_model()
     # checkpoints
     ckpt = tf.train.Checkpoint(model=model, optimizer=tf.keras.optimizers.Adam())
     manager = tf.train.CheckpointManager(ckpt, run_paths['path_ckpts_train'], max_to_keep=3)

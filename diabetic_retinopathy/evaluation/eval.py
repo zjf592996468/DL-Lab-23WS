@@ -27,7 +27,7 @@ def evaluate(model: object, checkpoint: object, ds_test: object) -> object:
     print(conf_matrix)
     return conf_matrix
 
-def evaluate1(model: object, checkpoint: object, ds_test: object) -> object:
+def evaluate1(model: object, ds_test: object) -> object:
 
 
     # 初始化混淆矩阵度量
