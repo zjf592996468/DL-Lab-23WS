@@ -38,7 +38,7 @@ def main(argv):
     ckpt_restore_path = manager.latest_checkpoint
     print(ckpt_restore_path)
     if ckpt_restore_path:
-        ckpt.restore(ckpt_restore_path).assert_consumed()
+        ckpt.restore(ckpt_restore_path).expect_partial()
         print("Checkpoint restored from:", ckpt_restore_path)
     else:
         print("No checkpoint found at:",run_paths['path_ckpts_train'])

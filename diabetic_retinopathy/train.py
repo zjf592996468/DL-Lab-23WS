@@ -1,7 +1,7 @@
 import gin
 import tensorflow as tf
 import logging
-
+from tensorflow import keras
 @gin.configurable
 class Trainer(object):
     def __init__(self, model, ds_train, ds_val, ds_info, run_paths, total_steps, log_interval, ckpt_interval):
@@ -87,14 +87,14 @@ class Trainer(object):
                 yield self.val_accuracy.result().numpy()
 
             if step % self.ckpt_interval == 0:
-                save_path = self.manager.save()
+                save_path = self.model.save()
                 logging.info(f'Saving checkpoint to {save_path} at step {step}.')
                 # Save checkpoint
                 # ...
 
             if step % self.total_steps == 0:
                 logging.info(f'Finished training after {step} steps.')
-                save_path = self.manager.save()  # 保存最终的检查点
+                save_path = self.model.save()  # 保存最终的检查点
                 logging.info(f'Saving final checkpoint to {save_path}.')
                 val_accuracy = self.val_accuracy.result().numpy()
                 logging.info(f'Validation accuracy: {val_accuracy * 100:.2f}%')
