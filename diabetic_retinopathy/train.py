@@ -44,6 +44,16 @@ class Trainer(object):
         self.train_loss(loss)
         self.train_accuracy(labels, predictions)
 
+    @tf.function
+    def val_step(self, images, labels):
+        # training=False is only needed if there are layers with different
+        # behavior during training versus inference (e.g. Dropout).
+        predictions = self.model(images, training=False)
+        t_loss = self.loss_object(labels, predictions)
+
+        self.val_loss(t_loss)
+        self.val_accuracy(labels, predictions)
+
     def train(self):
 
         for idx, (images, labels) in enumerate(self.ds_train):
