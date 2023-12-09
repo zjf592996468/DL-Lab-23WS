@@ -17,6 +17,6 @@ def preprocess(image, label, img_height, img_width):
 def augment(image, label):
     """Data augmentation"""
     # 水平翻转图像
-    #mirrored_image = ImageOps.mirror(image)
-    #return mirrored_image, label
-    return image,label
+    mirrored_image = tf.image.flip_left_right(image)
+    return mirrored_image, label
+    #return image,label
