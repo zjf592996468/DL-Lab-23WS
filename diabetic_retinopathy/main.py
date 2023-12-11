@@ -10,7 +10,7 @@ from utils import utils_params, utils_misc
 from models.architectures import vgg_like
 from models.cnnmodel import create_cnn_nets
 import tensorflow as tf
-import wandb
+
 FLAGS = flags.FLAGS
 flags.DEFINE_boolean('train', True, 'Specify whether to train or evaluate a model.')
 
@@ -29,6 +29,7 @@ def main(argv):
 
     # setup pipeline
     ds_train, ds_val, ds_test, ds_info = datasets.load(group=True)
+
     # setup wandb
     wandb.login(key="f27c584f9e444901abf85615134f27d2da6e411d")
     wandb.init(project='idrid-cnn', name=run_paths['model_id'],
@@ -47,7 +48,6 @@ def main(argv):
     ckpt_restore_path = manager.latest_checkpoint
     print(ckpt_restore_path)
 
-
     if FLAGS.train:
         if ckpt_restore_path:
             ckpt.restore(ckpt_restore_path).expect_partial()
@@ -65,7 +65,6 @@ def main(argv):
                  ds_test,
                  run_paths
                  )
-
 
 
 if __name__ == "__main__":

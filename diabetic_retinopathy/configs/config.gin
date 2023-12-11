@@ -22,17 +22,17 @@ Trainer.log_interval = 1e4
 Trainer.ckpt_interval = 1e4
 
 # Input pipeline
-
 load.name = 'idrid'
-load.data_dir = r'/home/data/IDRID_dataset'
+load.split_frac = 0.9
+# load.data_dir = '/home/data/idrid_dataset'
 #load.data_dir = r'C:\DL-lab\IDRID_dataset'
-#load.data_dir = r'D:\idrid\IDRID_dataset'
-
-
-#load.tfrd_dir = r'D:\idrid\IDRID_dataset'
-#load.tfrd_dir = r'/home/RUS_CIP/st181366'
-load.tfrd_dir = r'/home/RUS_CIP/st186635'
+ load.data_dir = r'D:\idrid\IDRID_dataset'
+# load.tfrd_dir = '~'
+#load.tfrd_dir = r'C:\DL-lab\IDRID_dataset'
+ load.tfrd_dir = r'D:\idrid\IDRID_dataset'
 preprocess.img_height = 256
 preprocess.img_width = 256
-
-
+prepare.batch_size = 32
+prepare.caching = False
+augment.operation = ''
+augment.central_frac = 0.5
