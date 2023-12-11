@@ -11,7 +11,7 @@ from models.kerasmodel import create_and_compile_cnn_model
 import tensorflow as tf
 
 FLAGS = flags.FLAGS
-flags.DEFINE_boolean('train', False, 'Specify whether to train or evaluate a model.')
+flags.DEFINE_boolean('train', True, 'Specify whether to train or evaluate a model.')
 
 def main(argv):
 
