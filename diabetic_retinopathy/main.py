@@ -26,25 +26,25 @@ def main(argv):
     utils_params.save_config(run_paths['path_gin'], gin.config_str())
 
     # setup pipeline
-    ds_train, ds_val, ds_test, ds_info = datasets.load('idrid', r'/home/data/IDRID_dataset')
+    ds_train, ds_val, ds_test, ds_info = datasets.load('idrid',  r'/home/data/IDRID_dataset')
 
     # model
-    model = vgg_like(input_shape=(256, 256, 3), n_classes=2)
-    #model = create_and_compile_cnn_model()
+    # model = vgg_like(input_shape=(256, 256, 3), n_classes=2)
+    model = create_and_compile_cnn_model()
+
     # checkpoints
     ckpt = tf.train.Checkpoint(model=model, optimizer=tf.keras.optimizers.Adam())
     manager = tf.train.CheckpointManager(ckpt, run_paths['path_ckpts_train'], max_to_keep=3)
-
     # 加载最新的检查点
     ckpt_restore_path = manager.latest_checkpoint
     print(ckpt_restore_path)
-    if ckpt_restore_path:
-        ckpt.restore(ckpt_restore_path).expect_partial()
-        print("Checkpoint restored from:", ckpt_restore_path)
-    else:
-        print("No checkpoint found at:",run_paths['path_ckpts_train'])
 
     if FLAGS.train:
+        if ckpt_restore_path:
+            ckpt.restore(ckpt_restore_path).expect_partial()
+            print("Checkpoint restored from:", ckpt_restore_path)
+        else:
+            print("No checkpoint found at:", run_paths['path_ckpts_train'])
         trainer = Trainer(model, ds_train, ds_val, ds_info, run_paths)
         for _ in trainer.train():
             continue

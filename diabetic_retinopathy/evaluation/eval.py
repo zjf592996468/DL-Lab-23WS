@@ -4,8 +4,11 @@ import seaborn as sns
 import tensorflow as tf
 import numpy as np
 
-def evaluate(model: tf.keras.Model, checkpoint: str, ds_test: tf.data.Dataset, run_paths: dict) -> np.ndarray:
-    model.load_weights(checkpoint)
+def evaluate(model: tf.keras.Model, checkpoint:object, ds_test: tf.data.Dataset, run_paths: dict) -> np.ndarray:
+    ckpt = tf.train.Checkpoint(model=model, optimizer=tf.keras.optimizers.Adam())
+    manager = tf.train.CheckpointManager(ckpt, run_paths['path_ckpts_train'], max_to_keep=3)
+    ckpt_restore_path = manager.latest_checkpoint
+    ckpt.restore(ckpt_restore_path).expect_partial()
 
     # 初始化混淆矩阵度量
     confusion_matrix_metric = ConfusionMatrix(num_classes=2)

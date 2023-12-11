@@ -1,17 +1,20 @@
 import gin
 import tensorflow as tf
 import logging
-from tensorflow import keras
+
+
 @gin.configurable
 class Trainer(object):
     def __init__(self, model, ds_train, ds_val, ds_info, run_paths, total_steps, log_interval, ckpt_interval):
         # Summary Writer
+        # ....
+
+
+
         # Loss objective
         self.loss_object = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
         self.optimizer = tf.keras.optimizers.Adam()
-        # Checkpoint Manager
-        self.ckpt = tf.train.Checkpoint(model=model, optimizer=self.optimizer)
-        self.manager = tf.train.CheckpointManager(self.ckpt, run_paths['path_ckpts_train'], max_to_keep=3)
+
         # Metrics
         self.train_loss = tf.keras.metrics.Mean(name='train_loss')
         self.train_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='train_accuracy')
@@ -27,7 +30,10 @@ class Trainer(object):
         self.total_steps = total_steps
         self.log_interval = log_interval
         self.ckpt_interval = ckpt_interval
-
+        # Checkpoint Manager
+        # self.iterator = iter(self.ds_train)
+        self.ckpt = tf.train.Checkpoint(model=model, optimizer=self.optimizer)
+        self.manager = tf.train.CheckpointManager(self.ckpt, self.run_paths['path_ckpts_train'], max_to_keep=3)
 
 
     @tf.function
@@ -40,7 +46,6 @@ class Trainer(object):
         gradients = tape.gradient(loss, self.model.trainable_variables)
         self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
 
-        tf.print("在 train_step 内的损失:", loss)
         self.train_loss(loss)
         self.train_accuracy(labels, predictions)
 
@@ -54,10 +59,17 @@ class Trainer(object):
         self.val_loss(t_loss)
         self.val_accuracy(labels, predictions)
 
+    def checkpoint(net, manager):
+        net.ckpt.restore(manager.latest_checkpoint)
+        if manager.latest_checkpoint:
+            print("Restored from {}".format(manager.latest_checkpoint))
+        else:
+            print("Initializing from scratch.")
+
+
     def train(self):
-
         for idx, (images, labels) in enumerate(self.ds_train):
-
+            #example = next(self.iterator)
             step = idx + 1
             self.train_step(images, labels)
 
@@ -88,15 +100,14 @@ class Trainer(object):
 
             if step % self.ckpt_interval == 0:
                 save_path = self.manager.save()
-                logging.info(f'Saving checkpoint to {save_path} at step {step}.')
+                logging.info(f'Saving checkpoint to {self.run_paths["path_ckpts_train"]}.')
+                print("Saved checkpoint for step {}: {}".format(int(step), save_path))
                 # Save checkpoint
                 # ...
 
             if step % self.total_steps == 0:
                 logging.info(f'Finished training after {step} steps.')
+                # Save final checkpoint
                 save_path = self.manager.save()
-                # 保存最终的检查点
-                logging.info(f'Saving final checkpoint to {save_path}.')
-                val_accuracy = self.val_accuracy.result().numpy()
-                logging.info(f'Validation accuracy: {val_accuracy * 100:.2f}%')
+                print("Saved checkpoint for step {}: {}".format(int(step), save_path))
                 return self.val_accuracy.result().numpy()

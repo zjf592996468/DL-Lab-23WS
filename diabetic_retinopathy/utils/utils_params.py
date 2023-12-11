@@ -2,7 +2,7 @@ import os
 import datetime
 
 
-def gen_run_folder(path_model_id='ckpt'):
+def gen_run_folder(path_model_id='idrid'):
     run_paths = dict()
     #print("Received path_model_id:", path_model_id)
     #print("Is a directory:", os.path.isdir(path_model_id))
@@ -13,7 +13,7 @@ def gen_run_folder(path_model_id='ckpt'):
         #if path_model_id:
             #run_id += '_' + path_model_id
         #run_paths['path_model_id'] = os.path.join(path_model_root, run_id)
-        run_paths['path_model_id'] = os.path.join(path_model_root, 'ckpt')
+        run_paths['path_model_id'] = os.path.join(path_model_root, 'idrid')
     else:
         run_paths['path_model_id'] = path_model_id
 
