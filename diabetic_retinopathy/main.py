@@ -11,7 +11,7 @@ from models.kerasmodel import create_and_compile_cnn_model
 import tensorflow as tf
 
 FLAGS = flags.FLAGS
-flags.DEFINE_boolean('train', True, 'Specify whether to train or evaluate a model.')
+flags.DEFINE_boolean('train', False, 'Specify whether to train or evaluate a model.')
 
 def main(argv):
 
@@ -29,8 +29,8 @@ def main(argv):
     ds_train, ds_val, ds_test, ds_info = datasets.load('idrid',  r'/home/data/IDRID_dataset')
 
     # model
-    # model = vgg_like(input_shape=(256, 256, 3), n_classes=2)
-    model = create_and_compile_cnn_model()
+    model = vgg_like(input_shape=(256, 256, 3), n_classes=2)
+    #model = create_and_compile_cnn_model()
 
     # checkpoints
     ckpt = tf.train.Checkpoint(model=model, optimizer=tf.keras.optimizers.Adam())
@@ -48,7 +48,7 @@ def main(argv):
         trainer = Trainer(model, ds_train, ds_val, ds_info, run_paths)
         for _ in trainer.train():
             continue
-
+        evaluate1(model, ds_test)
     else:
         evaluate(model,
                  ckpt_restore_path,
