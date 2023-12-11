@@ -1,8 +1,10 @@
 from evaluation.metrics import ConfusionMatrix
 import matplotlib.pyplot as plt
 import seaborn as sns
+import tensorflow as tf
+import numpy as np
 
-def evaluate(model: object, checkpoint: object, ds_test: object) -> object:
+def evaluate(model: tf.keras.Model, checkpoint: str, ds_test: tf.data.Dataset, run_paths: dict) -> np.ndarray:
     model.load_weights(checkpoint)
 
     # 初始化混淆矩阵度量
@@ -27,7 +29,7 @@ def evaluate(model: object, checkpoint: object, ds_test: object) -> object:
     print(conf_matrix)
     return conf_matrix
 
-def evaluate1(model: object, ds_test: object) -> object:
+def evaluate1(model: tf.keras.Model, ds_test: tf.data.Dataset) -> np.ndarray:
 
 
     # 初始化混淆矩阵度量

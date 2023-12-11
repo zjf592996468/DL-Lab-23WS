@@ -26,7 +26,7 @@ def main(argv):
     utils_params.save_config(run_paths['path_gin'], gin.config_str())
 
     # setup pipeline
-    ds_train, ds_val, ds_test, ds_info = datasets.load('idrid',r'/home/data/IDRID_dataset')
+    ds_train, ds_val, ds_test, ds_info = datasets.load('idrid', r'/home/data/IDRID_dataset')
 
     # model
     model = vgg_like(input_shape=(256, 256, 3), n_classes=2)
@@ -48,11 +48,12 @@ def main(argv):
         trainer = Trainer(model, ds_train, ds_val, ds_info, run_paths)
         for _ in trainer.train():
             continue
-            evaluate1(model,ds_test)
+
     else:
         evaluate(model,
                  ckpt_restore_path,
-                 ds_test
+                 ds_test,
+                 run_paths
                  )
 
 
