@@ -39,6 +39,7 @@ def main(argv):
     # model cnn
     model = create_and_compile_cnn_model()
     logging.info("model initialization finished")
+    logging.info(model.summary())
 
     # checkpoints
     ckpt = tf.train.Checkpoint(model=model, optimizer=tf.keras.optimizers.Adam())
@@ -56,7 +57,7 @@ def main(argv):
         trainer = Trainer(model, ds_train, ds_val, ds_info, run_paths)
         for _ in trainer.train():
             continue
-        evaluate1(model, ds_test)
+        evaluate1(model, ds_test, run_paths)
     else:
         evaluate(model,
                  ckpt_restore_path,

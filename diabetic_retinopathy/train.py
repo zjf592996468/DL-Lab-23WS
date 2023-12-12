@@ -8,9 +8,6 @@ class Trainer(object):
     def __init__(self, model, ds_train, ds_val, ds_info, run_paths, total_steps, log_interval, ckpt_interval):
         # Summary Writer
         # ....
-
-
-
         # Loss objective
         self.loss_object = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
         self.optimizer = tf.keras.optimizers.Adam()

@@ -97,7 +97,6 @@ def load(name, data_dir, tfrd_dir, group):
         create_tfrecord(val_tfrd_path, train_img_dir, val_labels, group)
         create_tfrecord(test_tfrd_path, test_img_dir, test_labels, group)
 
-
         # read TFRecord files and create origin dataset
         ds_train = tf.data.TFRecordDataset(train_tfrd_path).map(_parse_tfrd_function)
         ds_test = tf.data.TFRecordDataset(test_tfrd_path).map(_parse_tfrd_function)

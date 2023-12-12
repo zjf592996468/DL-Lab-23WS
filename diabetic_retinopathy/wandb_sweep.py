@@ -8,7 +8,7 @@ from models.architectures import vgg_like
 from train import Trainer
 from utils import utils_params, utils_misc
 from models.kerasmodel import create_and_compile_cnn_model
-wandb.login(KEY="f27c584f9e444901abf85615134f27d2da6e411d")
+
 
 def train_func():
     with wandb.init() as run:
