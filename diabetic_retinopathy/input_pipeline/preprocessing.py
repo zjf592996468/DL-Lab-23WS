@@ -15,7 +15,7 @@ def resample(dataset):
 
 
 @gin.configurable
-def preprocess(image, label, img_height, img_width):
+def preprocess(image, label, img_height=256, img_width=256):
     """Dataset preprocessing: Normalizing and resizing"""
 
     # Normalize image: `uint8` -> `float32`.
@@ -28,7 +28,7 @@ def preprocess(image, label, img_height, img_width):
 
 
 @gin.configurable()
-def augment(image, label, operation, central_frac):
+def augment(image, label, operation='Flippinglr', central_frac=0.5):
     """Data augmentation"""
     if 'Rotation90' in operation:  # rotate 90 degree
         image = tf.image.rot90(image)
