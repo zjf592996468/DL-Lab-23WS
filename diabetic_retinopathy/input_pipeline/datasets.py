@@ -66,54 +66,43 @@ def _parse_tfrd_function(example_proto):
 
 
 @gin.configurable
-def load(name, data_dir, split_frac, tfrd_dir, group):
+def load(name, data_dir, tfrd_dir, group):
     if name == "idrid":
         logging.info(f"Preparing dataset {name}...")
 
-        # data directories
+        # 设置图片和标签的目录
         train_img_dir = os.path.join(data_dir, "images", "train")
         test_img_dir = os.path.join(data_dir, "images", "test")
         labels_dir = os.path.join(data_dir, "labels")
 
-        # read label files, only read rows of "Image name" and "Retinopathy grade"
+        # 读取标签文件
         train_labels = pd.read_csv(os.path.join(labels_dir, "train.csv"), usecols=["Image name", "Retinopathy grade"])
         test_labels = pd.read_csv(os.path.join(labels_dir, "test.csv"), usecols=["Image name", "Retinopathy grade"])
 
-        # path to create TFRecord
+        # 随机打乱数据集
+        train_labels = train_labels.sample(frac=1).reset_index(drop=True)
+
+        # 分割训练集和验证集
+        val_size = int(len(train_labels) * 0.1)
+        val_labels = train_labels[:val_size]
+        train_labels = train_labels[val_size:]
+
+        # 设置TFRecord文件的路径
+        val_tfrd_path = os.path.join(tfrd_dir, "val.tfrecord")
         train_tfrd_path = os.path.join(tfrd_dir, "train.tfrecord")
         test_tfrd_path = os.path.join(tfrd_dir, "test.tfrecord")
 
-        # create TFRecord files for origin train and test
+        # 创建TFRecord文件
         create_tfrecord(train_tfrd_path, train_img_dir, train_labels, group)
+        create_tfrecord(val_tfrd_path, train_img_dir, val_labels, group)
         create_tfrecord(test_tfrd_path, test_img_dir, test_labels, group)
 
+
         # read TFRecord files and create origin dataset
-        train_data = tf.data.TFRecordDataset(train_tfrd_path).map(_parse_tfrd_function)
+        ds_train = tf.data.TFRecordDataset(train_tfrd_path).map(_parse_tfrd_function)
         ds_test = tf.data.TFRecordDataset(test_tfrd_path).map(_parse_tfrd_function)
+        ds_val=tf.data.TFRecordDataset(val_tfrd_path).map(_parse_tfrd_function)
 
-        # preprocess dataset with resizing and normalization
-        train_data = train_data.map(
-            preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-        ds_test = ds_test.map(
-            preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-
-        ''''# resample train_data
-        # 对训练数据做重采样，并在plot_path保存重采样前数据分布图表，输出重采样后的训练数据量和class数量
-        (train_data, num_train_samples, num_classes) = resample(train_data)
-        logging.info(f"train data resampled")'''
-
-        def class_func(dataset_element):
-            # Assuming the label is the second element in the dataset
-            return dataset_element[1]
-        train_data = tf.data.experimental.rejection_resample(
-            class_func=class_func(train_data),target_dist= [0.5,0.5], initial_dist=None, seed=None
-        )
-        # split train and validation dataset with split_frac = 0.9
-        num_train_samples = train_labels.shape[0]  # 注销resample时使用
-        train_size = int(split_frac * num_train_samples)
-        ds_train = train_data.take(train_size)
-        ds_val = train_data.skip(train_size)
-        logging.info(f"dataset is divided into train and validation")
 
         # 构建数据集信息
         # 使用 take(1) 获取数据集中的一个元素
@@ -122,19 +111,13 @@ def load(name, data_dir, split_frac, tfrd_dir, group):
         image, label = next(iter(sample_element))
         img_height, img_width, img_channels = image.shape
         ds_info = {
-            'train_size': train_size,
-            'val_size': num_train_samples - train_size,
-            'test_size': test_labels.shape[0],
+            'train_size': 400,
+            'val_size': 40,
+            'test_size': 103,
             # 其他信息
-            'num_classes': num_classes,
-            'shape': (img_height, img_width, img_channels),
-            'img_height': img_height,
-            'img_width': img_width,
-            'img_channels': img_channels,
         }
-        logging.info(f"ds_info recorded")
 
-        return prepare(ds_train, ds_val, ds_test, ds_info)
+        return prepare(ds_train, ds_val, ds_test, ds_info, batch_size=32, caching=False)
 
     elif name == "eyepacs":
         logging.info(f"Preparing dataset {name}...")
@@ -175,28 +158,28 @@ def load(name, data_dir, split_frac, tfrd_dir, group):
 @gin.configurable
 def prepare(ds_train, ds_val, ds_test, ds_info, batch_size, caching):
     # Prepare training dataset
-    # ds_train = ds_train.map(
-    #     preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+    ds_train = ds_train.map(
+        preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
     if caching:
         ds_train = ds_train.cache()
     ds_train = ds_train.map(
         augment, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-    ds_train = ds_train.shuffle(ds_info['train_size'] // 10)
+    ds_train = ds_train.shuffle(371// 10)
     ds_train = ds_train.batch(batch_size)
     ds_train = ds_train.repeat(-1)
     ds_train = ds_train.prefetch(tf.data.experimental.AUTOTUNE)
 
     # Prepare validation dataset
-    # ds_val = ds_val.map(
-    #     preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+    ds_val = ds_val.map(
+        preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
     ds_val = ds_val.batch(batch_size)
     if caching:
         ds_val = ds_val.cache()
     ds_val = ds_val.prefetch(tf.data.experimental.AUTOTUNE)
 
     # Prepare test dataset
-    # ds_test = ds_test.map(
-    #     preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+    ds_test = ds_test.map(
+        preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
     ds_test = ds_test.batch(batch_size)
     if caching:
         ds_test = ds_test.cache()

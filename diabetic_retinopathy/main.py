@@ -28,11 +28,12 @@ def main(argv):
     # setup pipeline
     ds_train, ds_val, ds_test, ds_info = datasets.load(group=True)
     # setup wandb
+    wandb.login(KEY="f27c584f9e444901abf85615134f27d2da6e411d")
     wandb.init(project='idrid', name=run_paths['model_id'],
                config=utils_params.gin_config_to_readable_dictionary(gin.config._CONFIG))
     # model
     logging.info(f"start model initialization")
-    model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info["num_classes"])
+    model = vgg_like(input_shape=[256,256,3], n_classes=2)
     logging.info("model initialization finished")
 
     # model cnn
