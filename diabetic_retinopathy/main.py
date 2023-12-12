@@ -9,7 +9,7 @@ from utils import utils_params, utils_misc
 from models.architectures import vgg_like
 from models.kerasmodel import create_and_compile_cnn_model
 import tensorflow as tf
-
+import wandb
 FLAGS = flags.FLAGS
 flags.DEFINE_boolean('train', True, 'Specify whether to train or evaluate a model.')
 
@@ -27,7 +27,9 @@ def main(argv):
 
     # setup pipeline
     ds_train, ds_val, ds_test, ds_info = datasets.load(group=True)
-
+    # setup wandb
+    wandb.init(project='idrid', name=run_paths['model_id'],
+               config=utils_params.gin_config_to_readable_dictionary(gin.config._CONFIG))
     # model
     logging.info(f"start model initialization")
     model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info["num_classes"])

@@ -5,7 +5,7 @@ import tensorflow_datasets as tfds
 import os
 import pandas as pd
 
-from input_pipeline.preprocessing import preprocess, augment, resample
+from input_pipeline.preprocessing import preprocess, augment
 
 
 # create tfrecord and load datasets
@@ -97,13 +97,19 @@ def load(name, data_dir, split_frac, tfrd_dir, group):
         ds_test = ds_test.map(
             preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
 
-        # resample train_data
+        ''''# resample train_data
         # 对训练数据做重采样，并在plot_path保存重采样前数据分布图表，输出重采样后的训练数据量和class数量
         (train_data, num_train_samples, num_classes) = resample(train_data)
-        logging.info(f"train data resampled")
+        logging.info(f"train data resampled")'''
 
+        def class_func(dataset_element):
+            # Assuming the label is the second element in the dataset
+            return dataset_element[1]
+        train_data = tf.data.experimental.rejection_resample(
+            class_func=class_func(train_data),target_dist= [0.5,0.5], initial_dist=None, seed=None
+        )
         # split train and validation dataset with split_frac = 0.9
-        # num_train_samples = train_labels.shape[0]  # 注销resample时使用
+        num_train_samples = train_labels.shape[0]  # 注销resample时使用
         train_size = int(split_frac * num_train_samples)
         ds_train = train_data.take(train_size)
         ds_val = train_data.skip(train_size)

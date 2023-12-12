@@ -2,20 +2,19 @@ import os
 import datetime
 
 
-def gen_run_folder(path_model_id='idrid'):
+def gen_run_folder(path_model_id=''):
     run_paths = dict()
-    #print("Received path_model_id:", path_model_id)
-    #print("Is a directory:", os.path.isdir(path_model_id))
+
     if not os.path.isdir(path_model_id):
         path_model_root = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, 'experiments'))
-        #date_creation = datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S-%f')
-        #run_id = 'run_' + date_creation
-        #if path_model_id:
-            #run_id += '_' + path_model_id
-        #run_paths['path_model_id'] = os.path.join(path_model_root, run_id)
-        run_paths['path_model_id'] = os.path.join(path_model_root, 'idrid')
+        date_creation = datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S-%f')
+        run_id = 'run_' + date_creation
+        if path_model_id:
+            run_id += '_' + path_model_id
+        run_paths['path_model_id'] = os.path.join(path_model_root, run_id)
     else:
         run_paths['path_model_id'] = path_model_id
+    run_paths['model_id'] = run_paths['path_model_id'].split(os.sep)[-1]
 
     run_paths['path_logs_train'] = os.path.join(run_paths['path_model_id'], 'logs', 'run.log')
     #run_paths['path_logs_eval'] = os.path.join(run_paths['path_model_id'], 'logs', 'eval', 'run.log')
@@ -43,3 +42,20 @@ def gen_run_folder(path_model_id='idrid'):
 def save_config(path_gin, config):
     with open(path_gin, 'w') as f_config:
         f_config.write(config)
+
+
+# https://github.com/google/gin-config/issues/154
+def gin_config_to_readable_dictionary(gin_config: dict):
+    """
+    Parses the gin configuration to a dictionary. Useful for logging to e.g. W&B
+    :param gin_config: the gin's config dictionary. Can be obtained by gin.config._OPERATIVE_CONFIG
+    :return: the parsed (mainly: cleaned) dictionary
+    """
+    data = {}
+    for key in gin_config.keys():
+        name = key[1].split(".")[1]
+        values = gin_config[key]
+        for k, v in values.items():
+            data["/".join([name, k])] = v
+
+    return data

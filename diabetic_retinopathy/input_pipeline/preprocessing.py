@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import os
 
 # must run imbalanced-learn==0.7.0 scikit-learn==0.23.2 numpy==1.23.4
-from imblearn.over_sampling import RandomOverSampler
+#from imblearn.over_sampling import RandomOverSampler
 
 
 def plot_imb(label, plot_path, plot_name):
@@ -37,30 +37,7 @@ def plot_imb(label, plot_path, plot_name):
     return unique
 
 
-@gin.configurable()
-def resample(dataset, plot_path):
-    """Dataset resampling: check and output data imbalance, then resample dataset"""
-    # 获取原始数据，转换为 NumPy 数组
-    img = np.array([image.numpy() for image, _ in dataset])
-    lb = np.array([label.numpy() for _, label in dataset])
 
-    # check data imbalance and plot imbalance situation
-    label_class = plot_imb(lb, plot_path, 'Class Distribution Before Resampling')
-
-    # random resample data
-    # 使用 RandomOverSampler 进行重采样
-    ros = RandomOverSampler(random_state=18)  # 定义重采样器
-    img_flat = img.reshape(img.shape[0], -1)  # 将图片数组转换成二维数组
-    img_resampled_flat, lb_resampled = ros.fit_resample(img_flat, lb)  # 重采样
-    img_resampled = img_resampled_flat.reshape(-1, img.shape[1], img.shape[2], img.shape[3])  # 将二维图片数组还原
-
-    # output distribution of resampled dataset
-    plot_imb(lb_resampled, plot_path, 'Class Distribution After Resampling')
-
-    # 将结果转换回 TensorFlow Dataset
-    resampled_ds = tf.data.Dataset.from_tensor_slices((img_resampled, lb_resampled))
-
-    return resampled_ds, lb_resampled.shape[0], label_class.shape[0]
 
 
 @gin.configurable
