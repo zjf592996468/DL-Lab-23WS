@@ -28,8 +28,8 @@ def main(argv):
     # setup pipeline
     ds_train, ds_val, ds_test, ds_info = datasets.load(group=True)
     # model
-    model = vgg_like(input_shape=(256, 256, 3), n_classes=2)
-    #model = create_and_compile_cnn_model()
+    #model = vgg_like(input_shape=(256, 256, 3), n_classes=2)
+    model = create_and_compile_cnn_model()
 
     # checkpoints
     ckpt = tf.train.Checkpoint(model=model, optimizer=tf.keras.optimizers.Adam())
