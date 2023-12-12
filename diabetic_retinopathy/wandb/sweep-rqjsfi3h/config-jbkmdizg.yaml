@@ -1,0 +1,12 @@
+wandb_version: 1
+
+Trainer.total_steps:
+  value: 50000
+vgg_like.base_filters:
+  value: 14
+vgg_like.dense_units:
+  value: 35
+vgg_like.dropout_rate:
+  value: 0.24711134395376977
+vgg_like.n_blocks:
+  value: 5

@@ -7,7 +7,7 @@ from input_pipeline.datasets import load
 from models.architectures import vgg_like
 from train import Trainer
 from utils import utils_params, utils_misc
-
+from models.kerasmodel import create_and_compile_cnn_model
 
 def train_func():
     with wandb.init() as run:
@@ -28,10 +28,10 @@ def train_func():
         utils_params.save_config(run_paths['path_gin'], gin.config_str())
 
         # setup pipeline
-        ds_train, ds_val, ds_test, ds_info = load()
+        ds_train, ds_val, ds_test, ds_info = load(group=True)
 
         # model
-        model = vgg_like(input_shape=ds_info.features["image"].shape, n_classes=ds_info.features["label"].num_classes)
+        model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info["num_classes"])
 
         trainer = Trainer(model, ds_train, ds_val, ds_info, run_paths)
         for _ in trainer.train():
@@ -39,7 +39,7 @@ def train_func():
 
 
 sweep_config = {
-    'name': 'mnist-example-sweep',
+    'name': 'idrid-sweep',
     'method': 'random',
     'metric': {
         'name': 'val_acc',
@@ -74,6 +74,45 @@ sweep_config = {
         }
     }
 }
+
+'''model = create_and_compile_cnn_model()
+sweep_config = {
+    'name': 'idrid-sweep',
+    'method': 'random',
+    'metric': {
+        'name': 'val_acc',
+        'goal': 'maximize'
+    },
+    'parameters': {
+        'Trainer.total_steps': {
+            'values': [5e4]
+        },
+        'create_cnn_nets.filters': {
+            'distribution': 'q_log_uniform',
+            'q': 1,
+            'min': math.log(8),
+            'max': math.log(128)
+        },
+        'create_cnn_nets.num_blocks': {
+            'distribution': 'q_uniform',
+            'q': 1,
+            'min': 2,
+            'max': 6
+        },
+        'create_cnn_nets.dense_units': {
+            'distribution': 'q_log_uniform',
+            'q': 1,
+            'min': math.log(16),
+            'max': math.log(256)
+        },
+        'create_cnn_nets.dropout_rate': {
+            'distribution': 'uniform',
+            'min': 0.1,
+            'max': 0.9
+        }
+    }
+}'''
+
 sweep_id = wandb.sweep(sweep_config)
 
 wandb.agent(sweep_id, function=train_func, count=50)
