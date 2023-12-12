@@ -95,11 +95,15 @@ def load(name, data_dir, split_frac, tfrd_dir, group):
         # 对训练数据做重采样，并在plot_path保存重采样前数据分布图表，输出重采样后的训练数据量和class数量
         plot_path = os.path.join(tfrd_dir, 'class_distribution_before_resampling.png')
         (train_data, train_samples, num_classes) = resample(train_data, plot_path)
+        print("resample finished")
+        logging.info(f"train data resampled")
 
         # split train and validation dataset with split_frac = 0.9
         train_size = int(split_frac * train_samples)
         ds_train = train_data.take(train_size)
         ds_val = train_data.skip(train_size)
+        print("dataset split finished")
+        logging.info(f"split dataset into train and validation")
 
         # 构建数据集信息
         ds_info = {
@@ -109,14 +113,10 @@ def load(name, data_dir, split_frac, tfrd_dir, group):
             # 其他信息
             'num_classes': num_classes,
         }
+        print("setup ds_info finished")
+        logging.info(f"ds_info established")
 
-        # 准备数据集
-        ds_train, ds_val, ds_test, ds_info = prepare(ds_train, ds_val, ds_test, ds_info)
-
-        # 数据集准备完毕输出标志
-        logging.info(f"Dataset {name} is successfully loaded")
-
-        return ds_train, ds_val, ds_test, ds_info
+        return prepare(ds_train, ds_val, ds_test, ds_info)
 
     elif name == "eyepacs":
         logging.info(f"Preparing dataset {name}...")

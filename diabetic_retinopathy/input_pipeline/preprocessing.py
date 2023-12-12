@@ -10,12 +10,12 @@ from imblearn.over_sampling import RandomOverSampler
 def resample(dataset, plot_path):
     """Dataset resampling: check and output data imbalance, then resample dataset"""
     # 获取原始数据，转换为 NumPy 数组
-    X = np.array([image.numpy() for image, _ in dataset])
-    y = np.array([label.numpy() for _, label in dataset])
+    img = np.array([image.numpy() for image, _ in dataset])
+    lb = np.array([label.numpy() for _, label in dataset])
 
     # check data imbalance and plot imbalance situation
     # 获取原始数据的类别分布
-    unique_original, counts_original = np.unique(y, return_counts=True)
+    unique_original, counts_original = np.unique(lb, return_counts=True)
 
     # 绘制柱状图
     plt.bar(unique_original, counts_original)  # color='skyblue'
@@ -41,12 +41,12 @@ def resample(dataset, plot_path):
     # random resample data
     # 使用 RandomOverSampler 进行重采样
     ros = RandomOverSampler(random_state=18)  # 定义重采样器
-    X_flat = X.reshape(X.shape[0], -1)  # 将图片数组转换成二维数组
-    X_resampled_flat, y_resampled = ros.fit_resample(X_flat, y)  # 重采样
-    X_resampled = X_resampled_flat.reshape(-1, X.shape[1], X.shape[2], X.shape[3])  # 将二维图片数组还原
+    img_flat = img.reshape(img.shape[0], -1)  # 将图片数组转换成二维数组
+    img_resampled_flat, y_resampled = ros.fit_resample(img_flat, lb)  # 重采样
+    img_resampled = img_resampled_flat.reshape(-1, img.shape[1], img.shape[2], img.shape[3])  # 将二维图片数组还原
 
     # 将结果转换回 TensorFlow Dataset
-    resampled_ds = tf.data.Dataset.from_tensor_slices((X_resampled, y_resampled))
+    resampled_ds = tf.data.Dataset.from_tensor_slices((img_resampled, y_resampled))
 
     return resampled_ds, y_resampled.shape[0], unique_original.shape[0]
 

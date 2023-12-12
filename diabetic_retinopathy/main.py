@@ -31,6 +31,8 @@ def main(argv):
 
     # setup pipeline
     ds_train, ds_val, ds_test, ds_info = datasets.load(group=True)
+    print("Dataset IDRID is successfully loaded")
+    logging.info(f"Dataset IDRID loaded")
 
     # # 下面的代码仅用于debug时查看ds中的数据是否正常
     # import matplotlib.pyplot as plt
@@ -49,8 +51,11 @@ def main(argv):
     #     ax.axis('off')
     # plt.show()
 
+    print("start to initialize model")
+    logging.info(f"start model initialization")
     # model
     model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info["num_classes"])
+    print("model initialization finished")
 
     if FLAGS.train:
         trainer = Trainer(model, ds_train, ds_val, ds_info, run_paths)
