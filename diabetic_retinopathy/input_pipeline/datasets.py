@@ -99,7 +99,7 @@ def load(name, data_dir, split_frac, tfrd_dir, group):
         logging.info(f"train data resampled")
 
         # split train and validation dataset with split_frac = 0.9
-        train_samples = train_labels.shpe[0]
+        train_samples = train_labels.shape[0]
         train_size = int(split_frac * train_samples)
         ds_train = train_data.take(train_size)
         ds_val = train_data.skip(train_size)
