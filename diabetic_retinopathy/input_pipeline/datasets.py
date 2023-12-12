@@ -91,7 +91,7 @@ def load(name, data_dir, split_frac, tfrd_dir, group):
         train_data = tf.data.TFRecordDataset(train_tfrd_path).map(_parse_tfrd_function)
         ds_test = tf.data.TFRecordDataset(test_tfrd_path).map(_parse_tfrd_function)
 
-        # preprocess dataset
+        # preprocess dataset with resizing and normalization
         train_data = train_data.map(
             preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
         ds_test = ds_test.map(
@@ -99,26 +99,34 @@ def load(name, data_dir, split_frac, tfrd_dir, group):
 
         # resample train_data
         # 对训练数据做重采样，并在plot_path保存重采样前数据分布图表，输出重采样后的训练数据量和class数量
-        plot_path = os.path.join(tfrd_dir, 'class_distribution_before_resampling.png')
-        (train_data, train_samples, num_classes) = resample(train_data, plot_path)
+        (train_data, num_train_samples, num_classes) = resample(train_data)
         logging.info(f"train data resampled")
 
         # split train and validation dataset with split_frac = 0.9
-        # train_samples = train_labels.shape[0]  # 注销resample时使用
-        train_size = int(split_frac * train_samples)
+        # num_train_samples = train_labels.shape[0]  # 注销resample时使用
+        train_size = int(split_frac * num_train_samples)
         ds_train = train_data.take(train_size)
         ds_val = train_data.skip(train_size)
-        logging.info(f"split dataset into train and validation")
+        logging.info(f"dataset is divided into train and validation")
 
         # 构建数据集信息
+        # 使用 take(1) 获取数据集中的一个元素
+        sample_element = ds_train.take(1)
+        # 直接获取第一个元素的图像形状
+        image, label = next(iter(sample_element))
+        img_height, img_width, img_channels = image.shape
         ds_info = {
             'train_size': train_size,
-            'val_size': train_samples - train_size,
+            'val_size': num_train_samples - train_size,
             'test_size': test_labels.shape[0],
             # 其他信息
             'num_classes': num_classes,
+            'shape': (img_height, img_width, img_channels),
+            'img_height': img_height,
+            'img_width': img_width,
+            'img_channels': img_channels,
         }
-        logging.info(f"ds_info established")
+        logging.info(f"ds_info recorded")
 
         return prepare(ds_train, ds_val, ds_test, ds_info)
 
@@ -167,20 +175,6 @@ def prepare(ds_train, ds_val, ds_test, ds_info, batch_size, caching):
         ds_train = ds_train.cache()
     ds_train = ds_train.map(
         augment, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-
-    # 将处理过后的图像信息录入ds_info
-    # 使用 take(1) 获取数据集中的一个元素
-    sample_element = ds_train.take(1)
-    # 直接获取第一个元素的图像形状
-    image, label = next(iter(sample_element))
-    img_height, img_width, img_channels = image.shape
-    ds_info.update({
-        'shape': (img_height, img_width, img_channels),
-        'img_height': img_height,
-        'img_width': img_width,
-        'img_channels': img_channels,
-    })
-
     ds_train = ds_train.shuffle(ds_info['train_size'] // 10)
     ds_train = ds_train.batch(batch_size)
     ds_train = ds_train.repeat(-1)

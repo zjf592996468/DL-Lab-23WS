@@ -27,5 +27,6 @@ preprocess.img_height = 256
 preprocess.img_width = 256
 prepare.batch_size = 32
 prepare.caching = False
+resample.plot_path = r'../../'
 augment.operation = ''
 augment.central_frac = 0.5
