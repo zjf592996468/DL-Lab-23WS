@@ -19,7 +19,7 @@ load.split_frac = 0.9
 load.data_dir = r'C:\DL-lab\IDRID_dataset'
 # load.data_dir = r'D:\idrid\IDRID_dataset'
 
-load.tfrd_dir = r'C:\DL-lab\IDRID_dataset'
+load.tfrd_dir = r'../../'
 # load.tfrd_dir = r'D:\idrid\IDRID_dataset'
 # load.tfrd_dir = r'/home/RUS_CIP/st181366'
 # load.tfrd_dir = r'/home/RUS_CIP/st186635'
