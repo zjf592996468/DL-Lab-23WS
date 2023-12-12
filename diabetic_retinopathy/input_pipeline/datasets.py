@@ -91,14 +91,15 @@ def load(name, data_dir, split_frac, tfrd_dir, group):
         train_data = tf.data.TFRecordDataset(train_tfrd_path).map(_parse_tfrd_function)
         ds_test = tf.data.TFRecordDataset(test_tfrd_path).map(_parse_tfrd_function)
 
-        # resample train_data
-        # 对训练数据做重采样，并在plot_path保存重采样前数据分布图表，输出重采样后的训练数据量和class数量
-        plot_path = os.path.join(tfrd_dir, 'class_distribution_before_resampling.png')
-        (train_data, train_samples, num_classes) = resample(train_data, plot_path)
+        # # resample train_data
+        # # 对训练数据做重采样，并在plot_path保存重采样前数据分布图表，输出重采样后的训练数据量和class数量
+        # plot_path = os.path.join(tfrd_dir, 'class_distribution_before_resampling.png')
+        # (train_data, train_samples, num_classes) = resample(train_data, plot_path)
         print("resample finished")
         logging.info(f"train data resampled")
 
         # split train and validation dataset with split_frac = 0.9
+        train_samples = train_labels.shpe[0]
         train_size = int(split_frac * train_samples)
         ds_train = train_data.take(train_size)
         ds_val = train_data.skip(train_size)
@@ -111,7 +112,7 @@ def load(name, data_dir, split_frac, tfrd_dir, group):
             'val_size': train_samples - train_size,
             'test_size': test_labels.shape[0],
             # 其他信息
-            'num_classes': num_classes,
+            # 'num_classes': num_classes,
         }
         print("setup ds_info finished")
         logging.info(f"ds_info established")
