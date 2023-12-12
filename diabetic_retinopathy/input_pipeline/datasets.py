@@ -117,7 +117,7 @@ def load(name, data_dir, tfrd_dir, group):
             # 其他信息
         }
 
-        return prepare(ds_train, ds_val, ds_test, ds_info, batch_size=32, caching=False)
+        return prepare(ds_train, ds_val, ds_test, ds_info, batch_size=32, caching=True)
 
     elif name == "eyepacs":
         logging.info(f"Preparing dataset {name}...")
