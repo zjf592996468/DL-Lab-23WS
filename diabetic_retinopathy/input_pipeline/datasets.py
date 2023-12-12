@@ -5,7 +5,7 @@ import tensorflow_datasets as tfds
 import os
 import pandas as pd
 
-from input_pipeline.preprocessing import preprocess, augment
+# from input_pipeline.preprocessing import preprocess, augment
 
 
 # todo: create tfrecord and load datasets
