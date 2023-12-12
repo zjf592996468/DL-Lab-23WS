@@ -11,7 +11,7 @@ def gen_run_folder(path_model_id='ckpt'):
         #run_id = 'run_' + date_creation
         #if path_model_id:
             #run_id += '_' + path_model_id
-        run_paths['path_model_id'] = os.path.join(path_model_root)
+        run_paths['path_model_id'] = os.path.join(path_model_root , 'ckpt')
     else:
         run_paths['path_model_id'] = path_model_id
     run_paths['model_id'] = run_paths['path_model_id'].split(os.sep)[-1]

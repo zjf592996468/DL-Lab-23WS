@@ -35,4 +35,3 @@ preprocess.img_height = 256
 preprocess.img_width = 256
 
 
-augment.operation = 'Flippinglr'
