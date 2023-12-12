@@ -15,13 +15,18 @@ Trainer.ckpt_interval = 1e4
 # Input pipeline
 load.name = 'idrid'
 load.split_frac = 0.9
-load.data_dir = '/home/data/IDRID_dataset'
-#load.data_dir = r'C:\DL-lab\IDRID_dataset'
-#load.data_dir = r'D:\idrid\IDRID_dataset'
-load.tfrd_dir = r'/home/RUS_CIP/st186635/dl-lab-23w-team14/diabetic_retinopathy'
-#load.tfrd_dir = r'C:\DL-lab\IDRID_dataset'
-#load.tfrd_dir = r'D:\idrid\IDRID_dataset'
-#preprocess.img_height = 256
-#preprocess.img_width = 256
+load.data_dir = r'/home/data/IDRID_dataset'
+# load.data_dir = r'C:\DL-lab\IDRID_dataset'
+# load.data_dir = r'D:\idrid\IDRID_dataset'
+
+load.tfrd_dir = r'../../'
+# load.tfrd_dir = r'D:\idrid\IDRID_dataset'
+# load.tfrd_dir = r'/home/RUS_CIP/st181366'
+# load.tfrd_dir = r'/home/RUS_CIP/st186635'
+preprocess.img_height = 256
+preprocess.img_width = 256
 prepare.batch_size = 32
 prepare.caching = False
+resample.plot_path = r'../../'
+augment.operation = ''
+augment.central_frac = 0.5
