@@ -104,12 +104,12 @@ def load(name, data_dir, tfrd_dir, group):
         ds_val=tf.data.TFRecordDataset(val_tfrd_path).map(_parse_tfrd_function)
 
 
-        # 构建数据集信息
+        ''''# 构建数据集信息
         # 使用 take(1) 获取数据集中的一个元素
         sample_element = ds_train.take(1)
         # 直接获取第一个元素的图像形状
         image, label = next(iter(sample_element))
-        img_height, img_width, img_channels = image.shape
+        img_height, img_width, img_channels = image.shape'''
         ds_info = {
             'train_size': 400,
             'val_size': 40,

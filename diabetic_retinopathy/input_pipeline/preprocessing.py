@@ -3,7 +3,7 @@ import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 import os
-
+import random
 
 def plot_imb(label, plot_path, plot_name):
     """plot the distribution of labels and return labels' class"""
@@ -48,27 +48,22 @@ def preprocess(image, label, img_height, img_width):
 
 
 @gin.configurable()
-def augment(image, label, operation):
-    """Data augmentation"""
-    if 'Rotation90' in operation:  # rotate 90 degree
-        image = tf.image.rot90(image)
+def augment(image, label):
+    operations = ['Rotation90', 'Rotation180', 'Rotation270', 'Flippinglr', 'Flippingud', 'Cropping']
+    chosen_operations = random.sample(operations, k=random.randint(1, len(operations))) # Randomly choose one or more operations
 
-    elif 'Rotation180' in operation:  # rotate 180 degree
-        image = tf.image.rot90(image, 2)
-
-    elif 'Rotation270' in operation:  # rotate 270 degree
-        image = tf.image.rot90(image, 3)
-
-    elif 'Flippinglr' in operation:  # flip left and right
-        image = tf.image.flip_left_right(image)
-
-    elif 'Flippingud' in operation:  # flip up and down
-        image = tf.image.flip_up_down(image)
-
-    elif 'Cropping' in operation:  # crop the central region of the image
-        image = tf.image.central_crop(image, central_frac=0.5)
-
-    # elif 'Shearing' in operation:  # shear the image
-    #     image = tf.image.shear(image)  # no such method in tf.image
+    for operation in chosen_operations:
+        if operation == 'Rotation90':
+            image = tf.image.rot90(image)
+        elif operation == 'Rotation180':
+            image = tf.image.rot90(image, 2)
+        elif operation == 'Rotation270':
+            image = tf.image.rot90(image, 3)
+        elif operation == 'Flippinglr':
+            image = tf.image.flip_left_right(image)
+        elif operation == 'Flippingud':
+            image = tf.image.flip_up_down(image)
+        '''elif operation == 'Cropping':
+            image = tf.image.central_crop(image, central_frac=0.5)有点单线表现'''
 
     return image, label
