@@ -8,13 +8,13 @@ vgg_like.dropout_rate = 0.4
 vgg_block.kernel_size = (3, 3)
 
 # cnn Models
-#create_cnn_nets.input_shape = (256, 256, 3)
-#create_cnn_nets.num_classes = 2
-#create_cnn_nets.num_blocks = 3
-#create_cnn_nets.filters = 8
-#create_cnn_nets.kernel_size = (3, 3)
-#create_cnn_nets.dense_units = 128
-#create_cnn_nets.dropout_rate=0.4
+create_cnn_nets.input_shape = (256, 256, 3)
+create_cnn_nets.num_classes = 2
+create_cnn_nets.num_blocks = 3
+create_cnn_nets.filters = 8
+create_cnn_nets.kernel_size = (3, 3)
+create_cnn_nets.dense_units = 128
+create_cnn_nets.dropout_rate=0.4
 
 # Training
 Trainer.total_steps = 1e5
@@ -27,7 +27,7 @@ load.data_dir = r'/home/data/IDRID_dataset'
 #load.data_dir = r'C:\DL-lab\IDRID_dataset'
 #load.data_dir = r'D:\idrid\IDRID_dataset'
 
-#load.tfrd_dir = r'../../'
+
 #load.tfrd_dir = r'D:\idrid\IDRID_dataset'
 #load.tfrd_dir = r'/home/RUS_CIP/st181366'
 load.tfrd_dir = r'/home/RUS_CIP/st186635'

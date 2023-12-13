@@ -2,17 +2,12 @@ import gin
 import tensorflow as tf
 import random
 
-def resmaple (datasete):
-    class_0_ds = datasete.filter(lambda image, label: label == 0)
-    class_1_ds = datasete.filter(lambda image, label: label == 1)
-
-    # 设置重采样权重
-    weights = [0.5, 0.5]
-
-    # 重采样
+def resample(datasets):
+    class_0_ds = datasets.filter(lambda image, label: label == 0)
+    class_1_ds = datasets.filter(lambda image, label: label == 1)
+    weights = [0.5, 0.5]  # 重采样权重
     resampled_ds = tf.data.experimental.sample_from_datasets([class_0_ds, class_1_ds], weights)
     return resampled_ds
-
 
 @gin.configurable
 def preprocess(image, label, img_height, img_width):
@@ -29,7 +24,7 @@ def preprocess(image, label, img_height, img_width):
 
 @gin.configurable()
 def augment(image, label):
-    operations = ['Rotation90', 'Rotation180', 'Rotation270', 'Flippinglr', 'Flippingud', 'Cropping', 'Noise']
+    operations = ['Rotation90', 'Rotation180', 'Rotation270', 'Flippinglr', 'Flippingud', 'Noise']
     chosen_operations = random.sample(operations, k=random.randint(1, len(operations)))  # Randomly choose one or more operations
 
     for operation in chosen_operations:
@@ -43,8 +38,6 @@ def augment(image, label):
             image = tf.image.flip_left_right(image)
         elif operation == 'Flippingud':
             image = tf.image.flip_up_down(image)
-        elif operation == 'Cropping':
-            image = tf.image.central_crop(image, central_frac=0.5)
         elif operation == 'Noise':
             noise = tf.random.normal(shape=tf.shape(image), mean=0.0, stddev=1.0, dtype=tf.float32)
             image = tf.add(image, noise)

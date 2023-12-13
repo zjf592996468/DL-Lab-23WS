@@ -59,7 +59,7 @@ def evaluate(model: tf.keras.Model, checkpoint:object, ds_test: tf.data.Dataset,
 
 def evaluate1(model: tf.keras.Model, ds_test: tf.data.Dataset, run_paths) -> np.ndarray:
     # Initialize Weights & Biases
-    wandb.init(project='idrid', name=run_paths['model_id'])
+    wandb.init(project='idrid-cnn', name=run_paths['model_id'])
 
     true_labels = []
     pred_probs = []

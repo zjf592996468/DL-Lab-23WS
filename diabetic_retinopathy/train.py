@@ -56,13 +56,6 @@ class Trainer(object):
         self.val_loss(t_loss)
         self.val_accuracy(labels, predictions)
 
-    def checkpoint(net, manager):
-        net.ckpt.restore(manager.latest_checkpoint)
-        if manager.latest_checkpoint:
-            print("Restored from {}".format(manager.latest_checkpoint))
-        else:
-            print("Initializing from scratch.")
-
 
     def train(self):
         for idx, (images, labels) in enumerate(self.ds_train):
@@ -86,8 +79,6 @@ class Trainer(object):
                                              self.val_loss.result(),
                                              self.val_accuracy.result() * 100))
 
-                # Write summary to tensorboard
-                # ...
 
                 # Reset train metrics
                 self.train_loss.reset_states()
