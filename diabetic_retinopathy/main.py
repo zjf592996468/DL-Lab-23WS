@@ -57,6 +57,7 @@ def main(argv):
         for _ in trainer.train():
             continue
         evaluate1(model, ds_test, run_paths)
+        wandb.finish()
     else:
         evaluate(model,
                  ckpt_restore_path,

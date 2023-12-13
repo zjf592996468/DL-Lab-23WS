@@ -38,7 +38,6 @@ def train_func():
         for _ in trainer.train():
             continue
 
-
 sweep_config = {
     'name': 'idrid-sweep',
     'method': 'random',

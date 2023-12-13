@@ -1,7 +1,7 @@
 import gin
 import tensorflow as tf
 import logging
-
+import wandb
 
 @gin.configurable
 class Trainer(object):
@@ -59,7 +59,8 @@ class Trainer(object):
 
     def train(self):
         for idx, (images, labels) in enumerate(self.ds_train):
-            #example = next(self.iterator)
+            wandb.init(project='idrid-cnn', name=self.run_paths['model_id'])
+
             step = idx + 1
             self.train_step(images, labels)
 
@@ -78,7 +79,7 @@ class Trainer(object):
                                              self.train_accuracy.result() * 100,
                                              self.val_loss.result(),
                                              self.val_accuracy.result() * 100))
-
+                wandb.log({'step':self.train_step,'val_acc':self.val_accuracy.result()*100})
 
                 # Reset train metrics
                 self.train_loss.reset_states()
@@ -99,3 +100,4 @@ class Trainer(object):
                 save_path = self.manager.save()
                 print("Saved checkpoint for step {}: {}".format(int(step), save_path))
                 return self.val_accuracy.result().numpy()
+            wandb.finish()
