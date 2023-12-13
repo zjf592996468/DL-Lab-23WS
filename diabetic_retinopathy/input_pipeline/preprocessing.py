@@ -1,37 +1,17 @@
 import gin
 import tensorflow as tf
-import numpy as np
-import matplotlib.pyplot as plt
-import os
 import random
 
-def plot_imb(label, plot_path, plot_name):
-    """plot the distribution of labels and return labels' class"""
-    # 获取原始数据的类别分布
-    unique, counts = np.unique(label, return_counts=True)
+def resmaple (datasete):
+    class_0_ds = datasete.filter(lambda image, label: label == 0)
+    class_1_ds = datasete.filter(lambda image, label: label == 1)
 
-    # 绘制柱状图
-    plt.bar(unique, counts)  # color='skyblue'
-    plt.xlabel('Class')
-    plt.ylabel('Number of Samples')
-    plt.title(plot_name)
+    # 设置重采样权重
+    weights = [0.5, 0.5]
 
-    # 设置 x 轴的标签为类别标签
-    plt.xticks(unique)
-
-    # 在柱状图上显示数据标签
-    for i, count in enumerate(counts):
-        plt.text(unique[i], count, str(count), ha='center', va='bottom')
-
-    # 保存图表到文件（如果提供了保存路径）
-    if plot_path:
-        plt.savefig(os.path.join(plot_path, plot_name + '.png'))
-        plt.close()  # 关闭图表，释放资源
-    else:
-        plt.show()
-        plt.close()  # 关闭图表，释放资源
-
-    return unique
+    # 重采样
+    resampled_ds = tf.data.experimental.sample_from_datasets([class_0_ds, class_1_ds], weights)
+    return resampled_ds
 
 
 @gin.configurable
@@ -49,8 +29,8 @@ def preprocess(image, label, img_height, img_width):
 
 @gin.configurable()
 def augment(image, label):
-    operations = ['Rotation90', 'Rotation180', 'Rotation270', 'Flippinglr', 'Flippingud', 'Cropping']
-    chosen_operations = random.sample(operations, k=random.randint(1, len(operations))) # Randomly choose one or more operations
+    operations = ['Rotation90', 'Rotation180', 'Rotation270', 'Flippinglr', 'Flippingud', 'Cropping', 'Noise']
+    chosen_operations = random.sample(operations, k=random.randint(1, len(operations)))  # Randomly choose one or more operations
 
     for operation in chosen_operations:
         if operation == 'Rotation90':
@@ -63,7 +43,9 @@ def augment(image, label):
             image = tf.image.flip_left_right(image)
         elif operation == 'Flippingud':
             image = tf.image.flip_up_down(image)
-        '''elif operation == 'Cropping':
-            image = tf.image.central_crop(image, central_frac=0.5)有点单线表现'''
-
+        elif operation == 'Cropping':
+            image = tf.image.central_crop(image, central_frac=0.5)
+        elif operation == 'Noise':
+            noise = tf.random.normal(shape=tf.shape(image), mean=0.0, stddev=1.0, dtype=tf.float32)
+            image = tf.add(image, noise)
     return image, label

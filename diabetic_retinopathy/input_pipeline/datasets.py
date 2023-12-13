@@ -5,7 +5,7 @@ import tensorflow_datasets as tfds
 import os
 import pandas as pd
 
-from input_pipeline.preprocessing import preprocess, augment
+from input_pipeline.preprocessing import preprocess, augment,resample
 
 
 # create tfrecord and load datasets
@@ -31,7 +31,6 @@ def create_tfrecord(tfrd_path, img_dir, labels, group):
                 img_path = os.path.join(img_dir, row['Image name'] + '.jpg')
                 img = open(img_path, 'rb').read()
                 label = row['Retinopathy grade']
-
                 # according to task to group labels into 2 groups
                 if group:
                     label = 0 if label in [0, 1] else 1
@@ -102,13 +101,6 @@ def load(name, data_dir, tfrd_dir, group):
         ds_test = tf.data.TFRecordDataset(test_tfrd_path).map(_parse_tfrd_function)
         ds_val=tf.data.TFRecordDataset(val_tfrd_path).map(_parse_tfrd_function)
 
-
-        ''''# 构建数据集信息
-        # 使用 take(1) 获取数据集中的一个元素
-        sample_element = ds_train.take(1)
-        # 直接获取第一个元素的图像形状
-        image, label = next(iter(sample_element))
-        img_height, img_width, img_channels = image.shape'''
         ds_info = {
             'train_size': 400,
             'val_size': 40,
@@ -161,6 +153,8 @@ def prepare(ds_train, ds_val, ds_test, ds_info, batch_size, caching):
         preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
     if caching:
         ds_train = ds_train.cache()
+    ds_train=ds_train.map(
+        resample, num_parallel_calls=tf.data.experimental.AUTOTUNE)
     ds_train = ds_train.map(
         augment, num_parallel_calls=tf.data.experimental.AUTOTUNE)
     ds_train = ds_train.shuffle(371// 10)

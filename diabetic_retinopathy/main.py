@@ -7,7 +7,7 @@ from evaluation.eval import evaluate1
 from input_pipeline import datasets
 from utils import utils_params, utils_misc
 from models.architectures import vgg_like
-from models.kerasmodel import create_and_compile_cnn_model
+from models.cnnmodel import create_cnn_nets
 import tensorflow as tf
 import wandb
 FLAGS = flags.FLAGS
@@ -37,7 +37,7 @@ def main(argv):
     #logging.info("model initialization finished")
 
     # model cnn
-    model = create_and_compile_cnn_model()
+    model = create_cnn_nets()
     logging.info("model initialization finished")
     logging.info(model.summary())
 

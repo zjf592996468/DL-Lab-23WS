@@ -7,7 +7,7 @@ from input_pipeline.datasets import load
 from models.architectures import vgg_like
 from train import Trainer
 from utils import utils_params, utils_misc
-from models.kerasmodel import create_and_compile_cnn_model
+from models.cnnmodel import create_cnn_nets
 
 
 def train_func():
@@ -76,7 +76,7 @@ sweep_config = {
     }
 }
 
-'''model = create_and_compile_cnn_model()
+'''model = create_cnn_nets()
 sweep_config = {
     'name': 'idrid-sweep',
     'method': 'random',
