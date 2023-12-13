@@ -1,5 +1,6 @@
 import gin
 import logging
+import wandb
 from absl import app, flags
 
 from train import Trainer
@@ -22,6 +23,10 @@ def main(argv):
     # gin-config
     gin.parse_config_files_and_bindings(['configs/config.gin'], [])
     utils_params.save_config(run_paths['path_gin'], gin.config_str())
+
+    # setup wandb
+    wandb.init(project='mnist-example', name=run_paths['model_id'],
+               config=utils_params.gin_config_to_readable_dictionary(gin.config._CONFIG))
 
     # setup pipeline
     ds_train, ds_val, ds_test, ds_info = datasets.load()

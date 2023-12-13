@@ -1,7 +1,5 @@
 import logging
 import gin
-
-import ray
 from ray import tune
 
 from input_pipeline.datasets import load
@@ -23,7 +21,7 @@ def train_func(config):
     utils_misc.set_loggers(run_paths['path_logs_train'], logging.INFO)
 
     # gin-config
-    gin.parse_config_files_and_bindings(['/absolute/path/to/configs/config.gin'], bindings) # change path to absolute path of config file
+    gin.parse_config_files_and_bindings(['/mnt/home/repos/dl-lab-skeleton/diabetic_retinopathy/configs/config.gin'], bindings)
     utils_params.save_config(run_paths['path_gin'], gin.config_str())
 
     # setup pipeline
@@ -37,9 +35,8 @@ def train_func(config):
         tune.report(val_accuracy=val_accuracy)
 
 
-ray.init(num_cpus=10, num_gpus=1)
 analysis = tune.run(
-    train_func, num_samples=2, resources_per_trial={"cpu": 10, "gpu": 1},
+    train_func, num_samples=2, resources_per_trial={'gpu': 1, 'cpu': 4},
     config={
         "Trainer.total_steps": tune.grid_search([1e4]),
         "vgg_like.base_filters": tune.choice([8, 16]),
@@ -48,7 +45,7 @@ analysis = tune.run(
         "vgg_like.dropout_rate": tune.uniform(0, 0.9),
     })
 
-print("Best config: ", analysis.get_best_config(metric="val_accuracy", mode="max"))
+print("Best config: ", analysis.get_best_config(metric="val_accuracy"))
 
 # Get a dataframe for analyzing trial results.
 df = analysis.dataframe()
