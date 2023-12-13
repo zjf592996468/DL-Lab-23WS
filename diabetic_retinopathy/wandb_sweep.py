@@ -32,7 +32,7 @@ def train_func():
         ds_train, ds_val, ds_test, ds_info = load(group=True)
 
         # model
-        model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info["num_classes"])
+        model = vgg_like(input_shape=[256,256,3], n_classes=2)
 
         trainer = Trainer(model, ds_train, ds_val, ds_info, run_paths)
         for _ in trainer.train():

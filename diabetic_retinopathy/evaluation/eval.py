@@ -8,9 +8,7 @@ from sklearn.metrics import confusion_matrix, accuracy_score, roc_auc_score, rec
 
 def evaluate(model: tf.keras.Model, checkpoint:object, ds_test: tf.data.Dataset, run_paths: dict) -> np.ndarray:
     ckpt = tf.train.Checkpoint(model=model, optimizer=tf.keras.optimizers.Adam())
-    manager = tf.train.CheckpointManager(ckpt, run_paths['path_ckpts_train'], max_to_keep=3)
-    ckpt_restore_path = manager.latest_checkpoint
-    ckpt.restore(ckpt_restore_path).expect_partial()
+    ckpt.restore(checkpoint).expect_partial()
     wandb.init(project='idrid', name=run_paths['model_id'])
 
     true_labels = []
@@ -59,7 +57,7 @@ def evaluate(model: tf.keras.Model, checkpoint:object, ds_test: tf.data.Dataset,
     return conf_matrix
 
 
-def evaluate1(model: tf.keras.Model, ds_test: tf.data.Dataset, run_name: str) -> np.ndarray:
+def evaluate1(model: tf.keras.Model, ds_test: tf.data.Dataset, run_paths) -> np.ndarray:
     # Initialize Weights & Biases
     wandb.init(project='idrid', name=run_paths['model_id'])
 
