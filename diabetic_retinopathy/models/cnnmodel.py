@@ -22,12 +22,11 @@ def create_cnn_nets(input_shape, num_blocks, filters, kernel_size, dense_units, 
 
     # Increasing the number of filters with each block for more complex feature extraction
     for i in range(num_blocks):
-        x = cnn_block(x,filters * (2 ** i), kernel_size, use_batch_norm=True, max_pool=True)
+        x = cnn_block(x,filters * (2 ** i), kernel_size)
 
-    x = tf.keras.layers.GlobalAveragePooling2D()(x)
-    x = tf.keras.layers.Dense(dense_units, activation='relu')(x)
-    x = tf.keras.layers.Dropout(dropout_rate)(x)
-    outputs = tf.keras.layers.Dense(1, activation='sigmoid')(x)  # Binary classification output
 
-    model = tf.keras.Model(inputs=inputs, outputs=outputs)
-    return model
+    out = tf.keras.layers.GlobalAveragePooling2D()(x)
+    out = tf.keras.layers.Dense(dense_units, activation=tf.nn.relu)(out)
+    out = tf.keras.layers.Dropout(dropout_rate)(out)
+    outputs = tf.keras.layers.Dense(2)(out)
+    return tf.keras.Model(inputs=inputs, outputs=outputs, name='cnn_like')

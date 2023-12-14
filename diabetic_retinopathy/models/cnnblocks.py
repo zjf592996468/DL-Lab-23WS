@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 
-def cnn_block(inputs, filters, kernel_size, use_batch_norm=True, max_pool=True, pool_size=(2, 2)):
+def cnn_block(inputs, filters, kernel_size, pool_size=(2, 2)):
     """
     Creates a CNN block with convolution, activation, optional batch normalization and max pooling.
 
@@ -17,8 +17,6 @@ def cnn_block(inputs, filters, kernel_size, use_batch_norm=True, max_pool=True, 
         Tensor: Output tensor of the CNN block.
     """
     x = tf.keras.layers.Conv2D(filters, kernel_size, padding='same', activation='relu')(inputs)
-    if use_batch_norm:
-        x = tf.keras.layers.BatchNormalization()(x)
-    if max_pool:
-        x = tf.keras.layers.MaxPooling2D(pool_size)(x)
+    x = tf.keras.layers.BatchNormalization()(x)
+    x = tf.keras.layers.MaxPooling2D(pool_size)(x)
     return x

@@ -2,7 +2,6 @@ import gin
 import logging
 from absl import app, flags
 from train import Trainer
-from train1 import Trainer
 from evaluation.eval import evaluate
 from evaluation.eval import evaluate1
 from input_pipeline import datasets
@@ -31,11 +30,10 @@ def main(argv):
     wandb.login(key="f27c584f9e444901abf85615134f27d2da6e411d")
     wandb.init(project='idrid-cnn', name=run_paths['model_id'],
                config=utils_params.gin_config_to_readable_dictionary(gin.config._CONFIG))
-    # model
-    model = vgg_like(input_shape=[256,256,3], n_classes=2)
-
+    # model vgg
+    #model = vgg_like(input_shape=[256,256,3], n_classes=2)
     # model cnn
-    #model = create_cnn_nets()
+    model = create_cnn_nets()
     logging.info("model initialization finished")
     logging.info(model.summary())
 
