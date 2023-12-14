@@ -47,7 +47,7 @@ sweep_config = {
     },
     'parameters': {
         'Trainer.total_steps': {
-            'values': [5e4]
+            'values': [1000]
         },
         'vgg_like.base_filters': {
             'distribution': 'q_log_uniform',
@@ -75,7 +75,7 @@ sweep_config = {
     }
 }
 
-
+wandb.login(key="f27c584f9e444901abf85615134f27d2da6e411d")
 sweep_id = wandb.sweep(sweep_config)
 
-wandb.agent(sweep_id, function=train_func, count=50)
+wandb.agent(sweep_id, function=train_func, count=20)
