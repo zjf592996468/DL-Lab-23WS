@@ -2,6 +2,7 @@ import gin
 import logging
 from absl import app, flags
 from train import Trainer
+from train1 import Trainer
 from evaluation.eval import evaluate
 from evaluation.eval import evaluate1
 from input_pipeline import datasets
