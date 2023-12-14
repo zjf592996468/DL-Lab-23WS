@@ -59,7 +59,7 @@ class Trainer(object):
 
     def train(self):
         for idx, (images, labels) in enumerate(self.ds_train):
-            wandb.init(project='idrid-cnn', name=self.run_paths['model_id'])
+
 
             step = idx + 1
             self.train_step(images, labels)
