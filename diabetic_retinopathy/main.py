@@ -26,12 +26,12 @@ def main(argv):
     utils_params.save_config(run_paths['path_gin'], gin.config_str())
 
     # setup wandb
-    wandb.init(project='mnist-example', name=run_paths['model_id'],
-               config=utils_params.gin_config_to_readable_dictionary(gin.config._CONFIG))
+    # wandb.init(project='idrid-example', name=run_paths['model_id'],
+    #            config=utils_params.gin_config_to_readable_dictionary(gin.config._CONFIG))
 
     # setup pipeline
     ds_train, ds_val, ds_test, ds_info = datasets.load(group=True)
-    logging.info(f"Dataset IDRID is successfully loaded")
+    logging.info("Dataset IDRID is successfully loaded")
 
     # # 下面的代码仅用于debug时查看ds中的数据是否正常
     # import matplotlib.pyplot as plt
@@ -52,7 +52,7 @@ def main(argv):
 
     # model
     logging.info(f"start model initialization")
-    model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info["num_classes"])
+    model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
     logging.info("model initialization finished")
 
     if FLAGS.train:

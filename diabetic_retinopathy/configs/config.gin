@@ -2,7 +2,7 @@
 vgg_like.base_filters = 8
 vgg_like.n_blocks = 3
 vgg_like.dense_units = 32
-vgg_like.dropout_rate = 0.2
+vgg_like.dropout_rate = 0.5
 
 # Layers
 vgg_block.kernel_size = (3, 3)
@@ -13,20 +13,17 @@ Trainer.log_interval = 1e4
 Trainer.ckpt_interval = 1e4
 
 # Input pipeline
+# Dataset
 load.name = 'idrid'
 load.split_frac = 0.9
 load.data_dir = r'/home/data/IDRID_dataset'
 # load.data_dir = r'C:\DL-lab\IDRID_dataset'
 # load.data_dir = r'D:\idrid\IDRID_dataset'
 
-load.tfrd_dir = r'../../'
-# load.tfrd_dir = r'D:\idrid\IDRID_dataset'
-# load.tfrd_dir = r'/home/RUS_CIP/st181366'
-# load.tfrd_dir = r'/home/RUS_CIP/st186635'
+# Preprocessing
 preprocess.img_height = 256
 preprocess.img_width = 256
 prepare.batch_size = 32
-prepare.caching = False
-resample.plot_path = r'../../'
-augment.operation = ''
+prepare.caching = True
+augment.operation = 'Flippinglr'
 augment.central_frac = 0.5
