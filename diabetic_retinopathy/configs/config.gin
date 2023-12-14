@@ -2,14 +2,14 @@
 vgg_like.base_filters = 8
 vgg_like.n_blocks = 3
 vgg_like.dense_units = 32
-vgg_like.dropout_rate = 0.4
+vgg_like.dropout_rate = 0.2
 
 # Layers
 vgg_block.kernel_size = (3, 3)
 
 # cnn Models
 create_cnn_nets.input_shape = (256, 256, 3)
-create_cnn_nets.num_classes = 2
+#create_cnn_nets.num_classes = 2
 create_cnn_nets.num_blocks = 3
 create_cnn_nets.filters = 8
 create_cnn_nets.kernel_size = (3, 3)

@@ -31,18 +31,16 @@ def main(argv):
     wandb.init(project='idrid-cnn', name=run_paths['model_id'],
                config=utils_params.gin_config_to_readable_dictionary(gin.config._CONFIG))
     # model
-    #logging.info(f"start model initialization")
-    #model = vgg_like(input_shape=[256,256,3], n_classes=2)
-    #logging.info("model initialization finished")
+    model = vgg_like(input_shape=[256,256,3], n_classes=2)
 
     # model cnn
-    model = create_cnn_nets()
+    #model = create_cnn_nets()
     logging.info("model initialization finished")
     logging.info(model.summary())
 
     # checkpoints
     ckpt = tf.train.Checkpoint(model=model, optimizer=tf.keras.optimizers.Adam())
-    manager = tf.train.CheckpointManager(ckpt, run_paths['path_ckpts_train'], max_to_keep=3)
+    manager = tf.train.CheckpointManager(ckpt, run_paths['path_ckpts_train'], max_to_keep=5)
     # 加载最新的检查点
     ckpt_restore_path = manager.latest_checkpoint
     print(ckpt_restore_path)

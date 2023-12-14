@@ -45,7 +45,7 @@ class Trainer(object):
 
         self.train_loss(loss)
         self.train_accuracy(labels, predictions)
-        tf.print("Training Loss:", loss)
+
     @tf.function
     def val_step(self, images, labels):
         # training=False is only needed if there are layers with different

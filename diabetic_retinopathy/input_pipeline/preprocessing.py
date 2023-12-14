@@ -1,7 +1,7 @@
 import gin
 import tensorflow as tf
 import random
-
+import tensorflow_addons as tfa
 def resample(datasets):
     class_0_ds = datasets.filter(lambda image, label: label == 0)
     class_1_ds = datasets.filter(lambda image, label: label == 1)
@@ -24,7 +24,7 @@ def preprocess(image, label, img_height, img_width):
 
 @gin.configurable()
 def augment(image, label):
-    operations = ['Rotation90', 'Rotation180', 'Rotation270', 'Flippinglr', 'Flippingud', 'Noise']
+    operations = ['Rotation90', 'Rotation180', 'Rotation270', 'Flippinglr', 'Flippingud', 'Cropping','Shearing']
     chosen_operations = random.sample(operations, k=random.randint(1, len(operations)))  # Randomly choose one or more operations
 
     for operation in chosen_operations:
@@ -38,7 +38,15 @@ def augment(image, label):
             image = tf.image.flip_left_right(image)
         elif operation == 'Flippingud':
             image = tf.image.flip_up_down(image)
-        elif operation == 'Noise':
-            noise = tf.random.normal(shape=tf.shape(image), mean=0.0, stddev=1.0, dtype=tf.float32)
-            image = tf.add(image, noise)
+        elif operation == 'Cropping':
+            # Randomly crop and resize back to 256x256
+            cropped_size = [tf.random.uniform([], minval=180, maxval=256, dtype=tf.int32) for _ in range(2)]
+            image = tf.image.random_crop(image, size=[cropped_size[0], cropped_size[1], 3])
+            image = tf.image.resize(image, [256, 256])
+        elif operation == 'Shearing':
+            # Shearing using affine transformation, keeping image size constant
+            shear_x = random.uniform(-0.3, 0.3)  # Shear magnitude along x-axis
+            shear_y = random.uniform(-0.3, 0.3)  # Shear magnitude along y-axis
+            image = tfa.image.transform(image, [1.0, shear_x, 0.0, shear_y, 1.0, 0.0, 0.0, 0.0],
+                                        interpolation='NEAREST')
     return image, label

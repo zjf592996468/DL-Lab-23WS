@@ -2,13 +2,12 @@ from models.cnnblocks import cnn_block
 import tensorflow as tf
 import gin
 @gin.configurable
-def create_cnn_nets(input_shape, num_classes, num_blocks, filters, kernel_size, dense_units, dropout_rate):
+def create_cnn_nets(input_shape, num_blocks, filters, kernel_size, dense_units, dropout_rate):
     """
-    Builds a CNN network with multiple CNN blocks followed by a dense layer with dropout for classification.
+    Builds a binary classification CNN network with multiple CNN blocks followed by a dense layer with dropout.
 
     Parameters:
         input_shape (tuple): Shape of the input images.
-        num_classes (int): Number of classes for the output layer.
         num_blocks (int): Number of CNN blocks to be used.
         filters (int): Number of filters for the first CNN block (doubles with each block).
         kernel_size (tuple): Size of the kernel for the CNN blocks.
@@ -16,7 +15,7 @@ def create_cnn_nets(input_shape, num_classes, num_blocks, filters, kernel_size, 
         dropout_rate (float): Dropout rate to be used before the dense layer.
 
     Returns:
-        keras.Model: Constructed Keras model.
+        keras.Model: Constructed Keras model for binary classification.
     """
     inputs = tf.keras.Input(shape=input_shape)
     x = inputs
@@ -26,8 +25,8 @@ def create_cnn_nets(input_shape, num_classes, num_blocks, filters, kernel_size, 
 
     x = tf.keras.layers.GlobalAveragePooling2D()(x)
     x = tf.keras.layers.Dense(dense_units, activation='relu')(x)
-    x = tf.keras.layers.Dropout(dropout_rate)(x)  # 添加 Dropout 层
-    outputs = tf.keras.layers.Dense(num_classes, activation='softmax')(x)
+    x = tf.keras.layers.Dropout(dropout_rate)(x)
+    outputs = tf.keras.layers.Dense(1, activation='sigmoid')(x)  # Binary classification output
 
     model = tf.keras.Model(inputs=inputs, outputs=outputs)
     return model
