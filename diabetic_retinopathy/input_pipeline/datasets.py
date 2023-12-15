@@ -10,23 +10,20 @@ import matplotlib.pyplot as plt
 from input_pipeline.preprocessing import preprocess, augment
 
 
-# create tfrecord and load datasets
-# define TFRecord assist func
 def _bytes_feature(value):
-    """Returns a bytes_list from a string / byte."""
+    """TFRecord assist func: Returns a bytes_list from a string / byte."""
     if isinstance(value, type(tf.constant(0))):
         value = value.numpy()  # BytesList won't unpack a string from an EagerTensor.
     return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
 
 
 def _int64_feature(value):
-    """Returns an int64_list from a bool / enum / int / uint."""
+    """TFRecord assist func: Returns an int64_list from a bool / enum / int / uint."""
     return tf.train.Feature(int64_list=tf.train.Int64List(value=[value]))
 
 
-# define func to create tfrecorder files
 def create_tfrecord(tfrd_path, img_dir, labels, group):
-    """Create a tfrecord at tfrd_path with datas img_dir and labels"""
+    """Create a tfrecord at 'tfrd_path' with datas from 'img_dir' and 'labels'"""
     with tf.io.TFRecordWriter(str(tfrd_path)) as writer:
         # according to labels to read files
         for index, row in labels.iterrows():
@@ -52,9 +49,8 @@ def create_tfrecord(tfrd_path, img_dir, labels, group):
                 print(f"Error processing file {img_path}: {e}")
 
 
-# parse tfrecord files
 def _parse_tfrd_function(example_proto):
-    """Parse the example_proto"""
+    """Parse the example_proto from TensorFlow Examples"""
     # 定义你的 `features`
     feature_description = {
         'image': tf.io.FixedLenFeature([], tf.string),
@@ -70,7 +66,7 @@ def _parse_tfrd_function(example_proto):
 
 
 def check_imb(dataset):
-    """check and plot imbalance situation, return number of classes and number of samples in each class"""
+    """check and plot imbalance situation, return num of classes and num of samples in each class"""
     # 获取原始数据，转换为 NumPy 数组
     lb = np.array([label.numpy() for _, label in dataset])
 
@@ -106,6 +102,36 @@ def check_imb(dataset):
     plt.close()  # 关闭图表，释放资源
 
     return label_class.shape[0], counts
+
+
+def resample(dataset, ds_info):
+    """resample the dataset to equal distribution and return it"""
+    # method: rejection resample
+    dataset_re = dataset.rejection_resample(
+        class_func=lambda image, label: label,
+        target_dist=[1.0/ds_info['num_classes']]*ds_info['num_classes'],
+        seed=18)
+    # 使用 map 删除多余的标签副本
+    dataset_re = dataset_re.map(lambda extra_label, image_and_label: image_and_label)
+
+    # # method: sample from datasets
+    # # 根据标签拆分数据集
+    # datasets_by_label = []
+    # for label in range(ds_info['num_classes']):
+    #     filtered_dataset = dataset.filter(lambda image, lbl: tf.equal(lbl, label))
+    #     datasets_by_label.append(filtered_dataset)
+    # # 使用 sample_from_datasets 进行重采样
+    # weight = [1.0 / ds_info['num_classes']] * ds_info['num_classes']
+    # dataset_re = tf.data.Dataset.sample_from_datasets(datasets_by_label, seed=18)
+
+    # 更新重采样后训练集大小
+    train_size_re = np.array([label.numpy() for _, label in dataset_re]).shape[0]
+    ds_info.update({
+        'train_size': train_size_re,
+    })
+    logging.info("train_size updated.")
+
+    return dataset_re, ds_info
 
 
 @gin.configurable
@@ -147,8 +173,8 @@ def load(name, data_dir, split_frac, group):
         ds_test = tf.data.TFRecordDataset(test_tfrd_path).map(_parse_tfrd_function)
         logging.info("Train, val and test datasets are created from tfrecord.")
 
-        # check and plot ds_train imbalance situation, get num of classes and num od samples in each class
-        (num_classes, counts) = check_imb(ds_train)
+        # check and plot ds_train imbalance situation, get num of classes and num of samples in each class
+        num_classes, counts = check_imb(ds_train)
 
         # 构建数据集信息
         ds_info = {
@@ -218,32 +244,15 @@ def prepare(ds_train, ds_val, ds_test, ds_info, batch_size, caching):
     })
     logging.info("ds_info updated.")
 
-    # # resample ds_train
-    # ds_train_re = ds_train.rejection_resample(
-    #     class_func=lambda image, label: label,
-    #     target_dist=[1.0/ds_info['num_classes']]*ds_info['num_classes'],
-    #     seed=18)
-    # # 使用 map 删除多余的标签副本
-    # ds_train = ds_train_re.map(lambda extra_label, image_and_label: image_and_label)
-    # # 使用check_img查看分布
-    # (num_classes_re, counts_re) = check_imb(ds_train)
-    # # debug,显示拒绝重采样后的前几个样本
-    # for features, labels in ds_train.take(10):
-    #     print(labels.numpy())
-    # logging.info("ds_train resampled.")
-    # # 更新重采样后训练集大小
-    # train_size_re = sum(1 for _ in ds_train)
-    # print(train_size_re)
-    # ds_info.update({
-    #     'train_size': train_size_re,
-    # })
-    # logging.info("train_size updated.")
+    # resample ds_train
+    ds_train, ds_info = resample(ds_train, ds_info)
+    logging.info("ds_train resampled.")
 
     if caching:
         ds_train = ds_train.cache()
     ds_train = ds_train.map(
         augment, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-    ds_train = ds_train.shuffle(ds_info['train_size'] // 10)
+    ds_train = ds_train.shuffle(ds_info['train_size'] // 10)  # todo: Q: will here with smaller num better?
     ds_train = ds_train.batch(batch_size)
     ds_train = ds_train.repeat(-1)
     ds_train = ds_train.prefetch(tf.data.experimental.AUTOTUNE)

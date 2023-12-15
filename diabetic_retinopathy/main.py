@@ -1,6 +1,6 @@
 import gin
 import logging
-# import wandb
+import wandb
 from absl import app, flags
 
 from train import Trainer
