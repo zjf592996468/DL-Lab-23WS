@@ -7,7 +7,7 @@ from input_pipeline.datasets import load
 from models.architectures import vgg_like
 from train import Trainer
 from utils import utils_params, utils_misc
-from models.cnnmodel import create_cnn_nets
+
 
 
 def train_func():
@@ -37,6 +37,8 @@ def train_func():
         trainer = Trainer(model, ds_train, ds_val, ds_info, run_paths)
         for _ in trainer.train():
             continue
+        original_val_acc, original_test_acc = trainer.evaluate(ds_val, ds_test)
+        wandb.log({"original_val_acc": original_val_acc, "original_test_acc": original_test_acc})
 
 sweep_config = {
     'name': 'idrid-sweep',
@@ -77,5 +79,5 @@ sweep_config = {
 
 wandb.login(key="f27c584f9e444901abf85615134f27d2da6e411d")
 sweep_id = wandb.sweep(sweep_config)
-
+train_func()
 wandb.agent(sweep_id, function=train_func, count=20)

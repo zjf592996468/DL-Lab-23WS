@@ -4,7 +4,6 @@ import gin
 import math
 
 from input_pipeline.datasets import load
-from models.architectures import vgg_like
 from train import Trainer
 from utils import utils_params, utils_misc
 from models.cnnmodel import create_cnn_nets
@@ -38,6 +37,7 @@ def train_func():
         for _ in trainer.train():
             continue
 
+train_func()
 
 sweep_config = {
     'name': 'idrid-sweep',
@@ -48,7 +48,7 @@ sweep_config = {
     },
     'parameters': {
         'Trainer.total_steps': {
-            'values': [5e4]
+            'values': [1e5]
         },
         'create_cnn_nets.filters': {
             'distribution': 'q_log_uniform',
@@ -60,7 +60,7 @@ sweep_config = {
             'distribution': 'q_uniform',
             'q': 1,
             'min': 2,
-            'max': 6
+            'max': 4
         },
         'create_cnn_nets.dense_units': {
             'distribution': 'q_log_uniform',
@@ -70,12 +70,13 @@ sweep_config = {
         },
         'create_cnn_nets.dropout_rate': {
             'distribution': 'uniform',
-            'min': 0.1,
-            'max': 0.9
+            'min': 0.2,
+            'max': 0.5
         }
     }
 }
-
+wandb.login(key="f27c584f9e444901abf85615134f27d2da6e411d")
 sweep_id = wandb.sweep(sweep_config)
 
-wandb.agent(sweep_id, function=train_func, count=50)
+wandb.agent(sweep_id, function=train_func, count=20)
+wandb.finish()
