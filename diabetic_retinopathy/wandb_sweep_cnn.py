@@ -61,7 +61,7 @@ sweep_config = {
             'distribution': 'q_uniform',
             'q': 1,
             'min': 2,
-            'max': 4
+            'max': 5
         },
         'create_cnn_nets.dense_units': {
             'distribution': 'q_log_uniform',

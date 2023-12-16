@@ -1,6 +1,5 @@
 import numpy as np
 import tensorflow as tf
-import matplotlib.pyplot as plt
 
 
 def grad_cam(model, image, category_index, layer_name):
@@ -25,7 +24,6 @@ def grad_cam(model, image, category_index, layer_name):
 
     cam = np.maximum(cam, 0)
     heatmap = (cam - cam.min()) / (cam.max() - cam.min())
-
     return heatmap
 
 
