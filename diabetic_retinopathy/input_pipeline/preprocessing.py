@@ -9,6 +9,7 @@ def resample(datasets):
     resampled_ds = tf.data.experimental.sample_from_datasets([class_0_ds, class_1_ds], weights)
     return resampled_ds
 
+
 @gin.configurable
 def preprocess(image, label, img_height, img_width):
     """Dataset preprocessing: Normalizing and resizing"""
@@ -23,6 +24,7 @@ def preprocess(image, label, img_height, img_width):
 
 
 @gin.configurable()
+
 def augment(image, label):
     operations = ['Rotation90', 'Rotation180', 'Rotation270', 'Flippinglr', 'Flippingud', 'Cropping','Shearing']
     chosen_operations = random.sample(operations, k=random.randint(1, len(operations)))  # Randomly choose one or more operations
@@ -50,3 +52,4 @@ def augment(image, label):
             image = tfa.image.transform(image, [1.0, shear_x, 0.0, shear_y, 1.0, 0.0, 0.0, 0.0],
                                         interpolation='NEAREST')
     return image, label
+

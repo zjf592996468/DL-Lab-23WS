@@ -1,5 +1,6 @@
 import gin
 import logging
+import wandb
 from absl import app, flags
 from train import Trainer
 from evaluation.eval import evaluate
@@ -13,6 +14,7 @@ import wandb
 FLAGS = flags.FLAGS
 flags.DEFINE_boolean('train', True, 'Specify whether to train or evaluate a model.')
 
+
 def main(argv):
 
     # generate folder structures
@@ -24,6 +26,7 @@ def main(argv):
     # gin-config
     gin.parse_config_files_and_bindings(['configs/config.gin'], [])
     utils_params.save_config(run_paths['path_gin'], gin.config_str())
+
     # setup pipeline
     ds_train, ds_val, ds_test, ds_info = datasets.load(group=True)
     # setup wandb
@@ -44,6 +47,7 @@ def main(argv):
     ckpt_restore_path = manager.latest_checkpoint
     print(ckpt_restore_path)
 
+
     if FLAGS.train:
         if ckpt_restore_path:
             ckpt.restore(ckpt_restore_path).expect_partial()
@@ -61,6 +65,7 @@ def main(argv):
                  ds_test,
                  run_paths
                  )
+
 
 
 if __name__ == "__main__":

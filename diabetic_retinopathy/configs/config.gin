@@ -2,7 +2,7 @@
 vgg_like.base_filters = 8
 vgg_like.n_blocks = 3
 vgg_like.dense_units = 32
-vgg_like.dropout_rate = 0.2
+vgg_like.dropout_rate = 0.4
 
 # Layers
 vgg_block.kernel_size = (3, 3)
@@ -22,6 +22,7 @@ Trainer.log_interval = 1e4
 Trainer.ckpt_interval = 1e4
 
 # Input pipeline
+
 load.name = 'idrid'
 load.data_dir = r'/home/data/IDRID_dataset'
 #load.data_dir = r'C:\DL-lab\IDRID_dataset'
