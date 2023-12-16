@@ -2,12 +2,69 @@ import gin
 import logging
 import tensorflow as tf
 import tensorflow_datasets as tfds
-from pathlib import Path
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 
-from input_pipeline.preprocessing import preprocess, augment
+import os
+import pandas as pd
+
+from input_pipeline.preprocessing import preprocess, augment,resample
+
+
+# create tfrecord and load datasets
+# define TFRecord assist func
+def _bytes_feature(value):
+    """返回一个bytes_list从一个字符串 / 字节"""
+    if isinstance(value, type(tf.constant(0))):
+        value = value.numpy()  # BytesList won't unpack a string from an EagerTensor.
+    return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
+
+
+def _int64_feature(value):
+    """返回一个int64_list从一个布尔值/整数"""
+    return tf.train.Feature(int64_list=tf.train.Int64List(value=[value]))
+
+
+# define func to create tfrecorder files
+def create_tfrecord(tfrd_path, img_dir, labels, group):
+    with tf.io.TFRecordWriter(tfrd_path) as writer:
+        # according to labels to read files
+        for index, row in labels.iterrows():
+            try:
+                img_path = os.path.join(img_dir, row['Image name'] + '.jpg')
+                img = open(img_path, 'rb').read()
+                label = row['Retinopathy grade']
+                # according to task to group labels into 2 groups
+                if group:
+                    label = 0 if label in [0, 1] else 1
+
+                feature = {
+                    'image': _bytes_feature(img),
+                    'label': _int64_feature(label),
+                }
+
+                example = tf.train.Example(features=tf.train.Features(feature=feature))
+                writer.write(example.SerializeToString())
+            except FileNotFoundError:
+                print(f"File not found: {img_path}")
+            except Exception as e:
+                print(f"Error processing file {img_path}: {e}")
+
+
+# parse tfrecord files
+def _parse_tfrd_function(example_proto):
+    # 定义你的 `features`
+    feature_description = {
+        'image': tf.io.FixedLenFeature([], tf.string),
+        'label': tf.io.FixedLenFeature([], tf.int64),
+    }
+    # 从 proto 解析出 features
+    example = tf.io.parse_single_example(example_proto, feature_description)
+
+    # 对 JPEG 图像数据进行解码
+    example['image'] = tf.io.decode_jpeg(example['image'], channels=3)
+
+    return example['image'], example['label']
+
+
 
 
 def _bytes_feature(value):
@@ -65,127 +122,54 @@ def _parse_tfrd_function(example_proto):
     return example['image'], example['label']
 
 
-def check_imb(dataset):
-    """check and plot imbalance situation, return num of classes and num of samples in each class"""
-    # 获取原始数据，转换为 NumPy 数组
-    lb = np.array([label.numpy() for _, label in dataset])
-
-    # 获取原始数据的类别分布
-    label_class, counts = np.unique(lb, return_counts=True)
-
-    # 为每个类别设置不同的颜色
-    colors = plt.cm.get_cmap('tab10')(np.arange(label_class.shape[0]))
-
-    # 绘制柱状图
-    bars = plt.bar(label_class, counts, color=colors, label='Class percentages')  # color='skyblue'
-    plt.xlabel('Class')
-    plt.ylabel('Number of Samples')
-    plt.title('Class Distribution Before Resampling')
-
-    # 设置 x 轴的标签为类别标签
-    plt.xticks(label_class)
-
-    # 在柱状图上显示数据标签
-    for i, count in enumerate(counts):
-        plt.text(label_class[i], count, str(count), ha='center', va='bottom')
-
-    # 显示图例在左上角，并且里面包含每个类别的占比信息
-    total_samples = lb.shape[0]
-    percents = [count / total_samples * 100 for count in counts]
-    legend_labels = [f'Class {label_class[i]}: {percents[i]:.2f}%' for i in range(label_class.shape[0])]
-    plt.legend(bars, legend_labels)
-
-    # 保存图表到文件
-    plot_path = Path.cwd().parent.parent
-    plt.savefig(plot_path / ('Class distribution before resampling' + '.png'))
-    logging.info(f"Class distribution plot before resampling is drawn in {plot_path.resolve()}.")
-    plt.close()  # 关闭图表，释放资源
-
-    return label_class.shape[0], counts
-
-
-def resample(dataset, ds_info):
-    """resample the dataset to equal distribution and return it"""
-    # method: rejection resample
-    dataset_re = dataset.rejection_resample(
-        class_func=lambda image, label: label,
-        target_dist=[1.0/ds_info['num_classes']]*ds_info['num_classes'],
-        seed=18)
-    # 使用 map 删除多余的标签副本
-    dataset_re = dataset_re.map(lambda extra_label, image_and_label: image_and_label)
-
-    # # method: sample from datasets
-    # # 根据标签拆分数据集
-    # datasets_by_label = []
-    # for label in range(ds_info['num_classes']):
-    #     filtered_dataset = dataset.filter(lambda image, lbl: tf.equal(lbl, label))
-    #     datasets_by_label.append(filtered_dataset)
-    # # 使用 sample_from_datasets 进行重采样
-    # weight = [1.0 / ds_info['num_classes']] * ds_info['num_classes']
-    # dataset_re = tf.data.Dataset.sample_from_datasets(datasets_by_label, seed=18)
-
-    # 更新重采样后训练集大小
-    train_size_re = np.array([label.numpy() for _, label in dataset_re]).shape[0]
-    ds_info.update({
-        'train_size': train_size_re,
-    })
-    logging.info("train_size updated.")
-
-    return dataset_re, ds_info
-
 
 @gin.configurable
-def load(name, data_dir, split_frac, group):
-    """Load the dataset"""
+
+def load(name, data_dir, tfrd_dir, group):
     if name == "idrid":
         logging.info(f"Preparing dataset {name}...")
 
-        # Data directory path
-        train_img_dir = Path(data_dir) / "images" / "train"
-        test_img_dir = Path(data_dir) / "images" / "test"
-        labels_dir = Path(data_dir) / "labels"
-        tfrd_dir = Path.cwd().parent.parent
+        # 设置图片和标签的目录
+        train_img_dir = os.path.join(data_dir, "images", "train")
+        test_img_dir = os.path.join(data_dir, "images", "test")
+        labels_dir = os.path.join(data_dir, "labels")
 
-        # read label files, only read rows of "Image name" and "Retinopathy grade"
-        train_labels = pd.read_csv(Path(labels_dir) / "train.csv", usecols=["Image name", "Retinopathy grade"])
-        test_labels = pd.read_csv(Path(labels_dir) / "test.csv", usecols=["Image name", "Retinopathy grade"])
+        # 读取标签文件
+        train_labels = pd.read_csv(os.path.join(labels_dir, "train.csv"), usecols=["Image name", "Retinopathy grade"])
+        test_labels = pd.read_csv(os.path.join(labels_dir, "test.csv"), usecols=["Image name", "Retinopathy grade"])
 
-        # path to create TFRecord
-        train_tfrd_path = tfrd_dir / "train.tfrecord"
-        val_tfrd_path = tfrd_dir / "val.tfrecord"
-        test_tfrd_path = tfrd_dir / "test.tfrecord"
+        # 随机打乱数据集
+        train_labels = train_labels.sample(frac=1).reset_index(drop=True)
 
-        # split train and validation dataset with split_frac = 0.9
-        train_size = int(split_frac * train_labels.shape[0])
-        train_dataset = train_labels[:train_size]
-        val_dataset = train_labels[train_size:]
-        logging.info("Dataset is divided into train and validation.")
+        # 分割训练集和验证集
+        val_size = int(len(train_labels) * 0.1)
+        val_labels = train_labels[:val_size]
+        train_labels = train_labels[val_size:]
 
-        # create TFRecord files for origin train and test
-        create_tfrecord(train_tfrd_path, train_img_dir, train_dataset, group)
-        create_tfrecord(val_tfrd_path, train_img_dir, val_dataset, group)
+        # 设置TFRecord文件的路径
+        val_tfrd_path = os.path.join(tfrd_dir, "val.tfrecord")
+        train_tfrd_path = os.path.join(tfrd_dir, "train.tfrecord")
+        test_tfrd_path = os.path.join(tfrd_dir, "test.tfrecord")
+
+        # 创建TFRecord文件
+        create_tfrecord(train_tfrd_path, train_img_dir, train_labels, group)
+        create_tfrecord(val_tfrd_path, train_img_dir, val_labels, group)
         create_tfrecord(test_tfrd_path, test_img_dir, test_labels, group)
-        logging.info(f"Tfrecord files are created in {tfrd_dir.resolve()}.")
 
         # read TFRecord files and create origin dataset
         ds_train = tf.data.TFRecordDataset(train_tfrd_path).map(_parse_tfrd_function)
-        ds_val = tf.data.TFRecordDataset(val_tfrd_path).map(_parse_tfrd_function)
         ds_test = tf.data.TFRecordDataset(test_tfrd_path).map(_parse_tfrd_function)
-        logging.info("Train, val and test datasets are created from tfrecord.")
+        ds_val=tf.data.TFRecordDataset(val_tfrd_path).map(_parse_tfrd_function)
 
-        # check and plot ds_train imbalance situation, get num of classes and num of samples in each class
-        num_classes, counts = check_imb(ds_train)
-
-        # 构建数据集信息
         ds_info = {
-            'train_size': train_size,
-            'val_size': train_labels.shape[0] - train_size,
-            'test_size': test_labels.shape[0],
-            'num_classes': num_classes,
+            'train_size': 400,
+            'val_size': 40,
+            'test_size': 103,
+            # 其他信息
         }
-        logging.info("ds_info recorded.")
 
-        return prepare(ds_train, ds_val, ds_test, ds_info)
+        return prepare(ds_train, ds_val, ds_test, ds_info, batch_size=32, caching=True)
+
 
     elif name == "eyepacs":
         logging.info(f"Preparing dataset {name}...")
@@ -230,19 +214,6 @@ def prepare(ds_train, ds_val, ds_test, ds_info, batch_size, caching):
     ds_train = ds_train.map(
         preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
 
-    # update ds_info
-    # 使用 take(1) 获取数据集中的一个元素
-    sample_element = ds_train.take(1)
-    # 直接获取第一个元素的图像形状
-    image, label = next(iter(sample_element))
-    img_height, img_width, img_channels = image.shape
-    ds_info.update({
-        'shape': (img_height, img_width, img_channels),
-        'img_height': img_height,
-        'img_width': img_width,
-        'img_channels': img_channels,
-    })
-    logging.info("ds_info updated.")
 
     # resample ds_train
     ds_train, ds_info = resample(ds_train, ds_info)
@@ -250,9 +221,12 @@ def prepare(ds_train, ds_val, ds_test, ds_info, batch_size, caching):
 
     if caching:
         ds_train = ds_train.cache()
+    ds_train = resample(ds_train)
     ds_train = ds_train.map(
         augment, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-    ds_train = ds_train.shuffle(ds_info['train_size'] // 10)  # todo: Q: will here with smaller num better?
+
+    ds_train = ds_train.shuffle(40)
+
     ds_train = ds_train.batch(batch_size)
     ds_train = ds_train.repeat(-1)
     ds_train = ds_train.prefetch(tf.data.experimental.AUTOTUNE)
