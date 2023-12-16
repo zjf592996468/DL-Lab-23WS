@@ -20,8 +20,8 @@ class Trainer(object):
         self.train_loss = tf.keras.metrics.Mean(name='train_loss')
         self.train_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='train_accuracy')
 
-        self.val_loss = tf.keras.metrics.Mean(name='test_loss')
-        self.val_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='test_accuracy')
+        self.val_loss = tf.keras.metrics.Mean(name='val_loss')
+        self.val_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='val_accuracy')
 
         self.model = model
         self.ds_train = ds_train

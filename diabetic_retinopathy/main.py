@@ -10,6 +10,8 @@ from models.architectures import vgg_like
 from models.cnnmodel import create_cnn_nets
 import tensorflow as tf
 import wandb
+import matplotlib.pyplot as plt
+
 FLAGS = flags.FLAGS
 flags.DEFINE_boolean('train', True, 'Specify whether to train or evaluate a model.')
 
@@ -54,14 +56,14 @@ def main(argv):
         for _ in trainer.train():
             continue
         evaluate1(model, ds_test, run_paths)
-        wandb.finish()
+
     else:
         evaluate(model,
                  ckpt_restore_path,
                  ds_test,
                  run_paths
                  )
-
+    wandb.finish()
 
 if __name__ == "__main__":
     app.run(main)

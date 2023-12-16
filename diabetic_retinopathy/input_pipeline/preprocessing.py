@@ -24,8 +24,9 @@ def preprocess(image, label, img_height, img_width):
 
 @gin.configurable()
 def augment(image, label):
-    operations = ['Rotation90', 'Rotation180', 'Rotation270', 'Flippinglr', 'Flippingud', 'Cropping','Shearing']
-    chosen_operations = random.sample(operations, k=random.randint(1, len(operations)))  # Randomly choose one or more operations
+    operations = ['Rotation90', 'Rotation180', 'Rotation270', 'Flippinglr', 'Flippingud', 'Cropping', 'Shearing', 'AdjustContrast', 'AdjustBrightness']
+    # 确保每次最多选择两种操作
+    chosen_operations = random.sample(operations, k=min(3, len(operations)))
 
     for operation in chosen_operations:
         if operation == 'Rotation90':
@@ -39,14 +40,23 @@ def augment(image, label):
         elif operation == 'Flippingud':
             image = tf.image.flip_up_down(image)
         elif operation == 'Cropping':
-            # Randomly crop and resize back to 256x256
+            # 随机裁剪并调整大小至256x256
             cropped_size = [tf.random.uniform([], minval=180, maxval=256, dtype=tf.int32) for _ in range(2)]
             image = tf.image.random_crop(image, size=[cropped_size[0], cropped_size[1], 3])
             image = tf.image.resize(image, [256, 256])
         elif operation == 'Shearing':
-            # Shearing using affine transformation, keeping image size constant
-            shear_x = random.uniform(-0.3, 0.3)  # Shear magnitude along x-axis
-            shear_y = random.uniform(-0.3, 0.3)  # Shear magnitude along y-axis
+            # 利用仿射变换进行剪切，保持图像大小不变
+            shear_x = random.uniform(-0.3, 0.3)  # x轴剪切幅度
+            shear_y = random.uniform(-0.3, 0.3)  # y轴剪切幅度
             image = tfa.image.transform(image, [1.0, shear_x, 0.0, shear_y, 1.0, 0.0, 0.0, 0.0],
                                         interpolation='NEAREST')
+        elif operation == 'AdjustContrast':
+            # 随机调整对比度
+            contrast_factor = random.uniform(0.5, 1.5)  # 可根据需要调整这个范围
+            image = tf.image.adjust_contrast(image, contrast_factor)
+        elif operation == 'AdjustBrightness':
+            # 随机调整亮度
+            brightness_delta = random.uniform(-0.3, 0.3)  # 可根据需要调整这个范围
+            image = tf.image.adjust_brightness(image, brightness_delta)
+
     return image, label
