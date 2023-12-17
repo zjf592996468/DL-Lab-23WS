@@ -17,7 +17,7 @@ create_cnn_nets.dense_units = 49
 create_cnn_nets.dropout_rate=0.5378443402110621
 
 # Training
-Trainer.total_steps = 4e5
+Trainer.total_steps = 5e4
 Trainer.log_interval = 1e4
 Trainer.ckpt_interval = 1e4
 

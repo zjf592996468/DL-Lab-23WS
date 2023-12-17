@@ -49,7 +49,7 @@ sweep_config = {
     },
     'parameters': {
         'Trainer.total_steps': {
-            'values': [1e5]
+            'values': [5e4]
         },
         'create_cnn_nets.filters': {
             'distribution': 'q_log_uniform',
@@ -72,7 +72,7 @@ sweep_config = {
         'create_cnn_nets.dropout_rate': {
             'distribution': 'uniform',
             'min': 0.2,
-            'max': 0.5
+            'max': 0.8
         }
     }
 }
