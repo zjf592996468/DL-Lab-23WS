@@ -21,8 +21,8 @@ class Trainer(object):
         self.train_loss = tf.keras.metrics.Mean(name='train_loss')
         self.train_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='train_accuracy')
 
-        self.val_loss = tf.keras.metrics.Mean(name='test_loss')
-        self.val_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='test_accuracy')
+        self.val_loss = tf.keras.metrics.Mean(name='val_loss')
+        self.val_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='val_accuracy')
 
         self.model = model
         self.ds_train = ds_train
@@ -52,14 +52,14 @@ class Trainer(object):
         print(loss)
 
     @tf.function
-    def test_step(self, images, labels):
+    def val_step(self, images, labels):
         # training=False is only needed if there are layers with different
         # behavior during training versus inference (e.g. Dropout).
         predictions = self.model(images, training=False)
         t_loss = self.loss_object(labels, predictions)
 
-        self.test_loss(t_loss)
-        self.test_accuracy(labels, predictions)
+        self.val_loss(t_loss)
+        self.val_accuracy(labels, predictions)
 
     def train(self):
         wandb.init(project='idrid-cnn', name=self.run_paths['model_id'])
@@ -70,15 +70,15 @@ class Trainer(object):
 
             if step % self.log_interval == 0:
 
-                # Reset test metrics
-                self.test_loss.reset_states()
-                self.test_accuracy.reset_states()
+                # Reset val metrics
+                self.val_loss.reset_states()
+                self.val_accuracy.reset_states()
 
-                for test_images, test_labels in self.ds_val:
+                for val_images, val_labels in self.ds_val:
 
-                    self.val_step(test_images, test_labels)
+                    self.val_step(val_images, val_labels)
 
-                template = 'Step {}, Loss: {}, Accuracy: {}, Test Loss: {}, Test Accuracy: {}'
+                template = 'Step {}, Loss: {}, Accuracy: {}, Val Loss: {}, Val Accuracy: {}'
                 logging.info(template.format(step,
                                              self.train_loss.result(),
                                              self.train_accuracy.result() * 100,
