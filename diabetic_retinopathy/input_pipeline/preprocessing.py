@@ -76,7 +76,12 @@ def resample(dataset, ds_info):
 
     return dataset_re, ds_info
 
-
+def resample1(datasets):
+    class_0_ds = datasets.filter(lambda image, label: label == 0)
+    class_1_ds = datasets.filter(lambda image, label: label == 1)
+    weights = [0.5, 0.5]  # 重采样权重
+    resampled_ds = tf.data.experimental.sample_from_datasets([class_0_ds, class_1_ds], weights)
+    return resampled_ds
 @gin.configurable
 def preprocess(image, label, img_height, img_width):
     """Dataset preprocessing: Normalizing and resizing"""

@@ -5,7 +5,7 @@ import tensorflow_datasets as tfds
 from pathlib import Path
 import pandas as pd
 
-from input_pipeline.preprocessing import preprocess, augment, check_imb, resample
+from input_pipeline.preprocessing import preprocess, augment, check_imb, resample1
 
 
 def _bytes_feature(value):
@@ -158,27 +158,28 @@ def prepare(ds_train, ds_val, ds_test, ds_info, batch_size, caching):
     ds_train = ds_train.map(
         preprocess, num_parallel_calls=tf.data.AUTOTUNE)
 
-    # update ds_info
-    # 使用 take(1) 获取数据集中的一个元素
-    sample_element = ds_train.take(1)
-    # 直接获取第一个元素的图像形状
-    image, label = next(iter(sample_element))
-    img_height, img_width, img_channels = image.shape
-    ds_info.update({
-        'shape': (img_height, img_width, img_channels),
-        'img_height': img_height,
-        'img_width': img_width,
-        'img_channels': img_channels,
-    })
-
-    # resample ds_train
-    ds_train, ds_info = resample(ds_train, ds_info)
+    # # update ds_info
+    # # 使用 take(1) 获取数据集中的一个元素
+    # sample_element = ds_train.take(1)
+    # # 直接获取第一个元素的图像形状
+    # image, label = next(iter(sample_element))
+    # img_height, img_width, img_channels = image.shape
+    # ds_info.update({
+    #     'shape': (img_height, img_width, img_channels),
+    #     'img_height': img_height,
+    #     'img_width': img_width,
+    #     'img_channels': img_channels,
+    # })
+    #
+    # # resample ds_train
+    # ds_train, ds_info = resample(ds_train, ds_info)
 
     if caching:
         ds_train = ds_train.cache()
+    ds_train=resample1(ds_train)
     ds_train = ds_train.map(
         augment, num_parallel_calls=tf.data.AUTOTUNE)
-    ds_train = ds_train.shuffle(ds_info['train_size'] // 10)  # todo: Q: will here with smaller num better?
+    ds_train = ds_train.shuffle(45)  # todo: Q: will here with smaller num better?
     ds_train = ds_train.batch(batch_size)
     ds_train = ds_train.repeat(-1)
     ds_train = ds_train.prefetch(tf.data.AUTOTUNE)
