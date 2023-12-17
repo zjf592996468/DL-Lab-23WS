@@ -77,7 +77,7 @@ def resample(dataset, ds_info, method):
     ds_info.update({
         'train_size': train_size_re,
     })
-    logging.info("ds_train resampled and train_size updated.")
+    logging.info(f"ds_train resampled with '{method}' and train_size updated.")
 
     return dataset_re, ds_info
 
