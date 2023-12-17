@@ -88,7 +88,7 @@ def load(name, data_dir, split_frac, group):
         train_size = int(split_frac * train_labels.shape[0])
         train_dataset = train_labels[:train_size]
         val_dataset = train_labels[train_size:]
-        logging.info("Dataset is divided into train and validation.")
+        logging.info(f"Dataset is divided into train and validation with rate = {split_frac}.")
 
         # create TFRecord files for origin train and test
         create_tfrecord(train_tfrd_path, train_img_dir, train_dataset, group)
@@ -112,7 +112,6 @@ def load(name, data_dir, split_frac, group):
             'test_size': test_labels.shape[0],
             'num_classes': num_classes,
         }
-        logging.info("ds_info recorded.")
 
         return prepare(ds_train, ds_val, ds_test, ds_info)
 
@@ -129,9 +128,9 @@ def load(name, data_dir, split_frac, group):
         def _preprocess(img_label_dict):
             return img_label_dict['image'], img_label_dict['label']
 
-        ds_train = ds_train.map(_preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-        ds_val = ds_val.map(_preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-        ds_test = ds_test.map(_preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        ds_train = ds_train.map(_preprocess, num_parallel_calls=tf.data.AUTOTUNE)
+        ds_val = ds_val.map(_preprocess, num_parallel_calls=tf.data.AUTOTUNE)
+        ds_test = ds_test.map(_preprocess, num_parallel_calls=tf.data.AUTOTUNE)
 
         return prepare(ds_train, ds_val, ds_test, ds_info)
 
@@ -157,7 +156,7 @@ def prepare(ds_train, ds_val, ds_test, ds_info, batch_size, caching):
     """Prepare the dataset for training, validation and test"""
     # Prepare training dataset
     ds_train = ds_train.map(
-        preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        preprocess, num_parallel_calls=tf.data.AUTOTUNE)
 
     # update ds_info
     # 使用 take(1) 获取数据集中的一个元素
@@ -171,39 +170,36 @@ def prepare(ds_train, ds_val, ds_test, ds_info, batch_size, caching):
         'img_width': img_width,
         'img_channels': img_channels,
     })
-    logging.info("ds_info updated.")
 
     # resample ds_train
     ds_train, ds_info = resample(ds_train, ds_info)
-    logging.info("ds_train resampled.")
 
     if caching:
         ds_train = ds_train.cache()
-    ds_train = resample(ds_train)
     ds_train = ds_train.map(
-        augment, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        augment, num_parallel_calls=tf.data.AUTOTUNE)
     ds_train = ds_train.shuffle(ds_info['train_size'] // 10)  # todo: Q: will here with smaller num better?
     ds_train = ds_train.batch(batch_size)
     ds_train = ds_train.repeat(-1)
-    ds_train = ds_train.prefetch(tf.data.experimental.AUTOTUNE)
+    ds_train = ds_train.prefetch(tf.data.AUTOTUNE)
     logging.info("ds_train prepared.")
 
     # Prepare validation dataset
     ds_val = ds_val.map(
-        preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        preprocess, num_parallel_calls=tf.data.AUTOTUNE)
     ds_val = ds_val.batch(batch_size)
     if caching:
         ds_val = ds_val.cache()
-    ds_val = ds_val.prefetch(tf.data.experimental.AUTOTUNE)
+    ds_val = ds_val.prefetch(tf.data.AUTOTUNE)
     logging.info("ds_val prepared.")
 
     # Prepare test dataset
     ds_test = ds_test.map(
-        preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        preprocess, num_parallel_calls=tf.data.AUTOTUNE)
     ds_test = ds_test.batch(batch_size)
     if caching:
         ds_test = ds_test.cache()
-    ds_test = ds_test.prefetch(tf.data.experimental.AUTOTUNE)
+    ds_test = ds_test.prefetch(tf.data.AUTOTUNE)
     logging.info("ds_test prepared.")
 
     return ds_train, ds_val, ds_test, ds_info

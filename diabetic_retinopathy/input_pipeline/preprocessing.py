@@ -41,8 +41,8 @@ def check_imb(dataset):
     # 保存图表到文件
     plot_path = Path.cwd().parent.parent
     plt.savefig(plot_path / ('Class distribution before resampling' + '.png'))
-    logging.info(f"Class distribution plot before resampling is drawn in {plot_path.resolve()}.")
     plt.close()  # 关闭图表，释放资源
+    logging.info(f"Class distribution plot before resampling is created in {plot_path.resolve()}.")
 
     return label_class.shape[0], counts
 
@@ -52,7 +52,7 @@ def resample(dataset, ds_info):
     # method: rejection resample
     dataset_re = dataset.rejection_resample(
         class_func=lambda image, label: label,
-        target_dist=[1.0/ds_info['num_classes']]*ds_info['num_classes'],
+        target_dist=[1.0 / ds_info['num_classes']] * ds_info['num_classes'],
         seed=18)
     # 使用 map 删除多余的标签副本
     dataset_re = dataset_re.map(lambda extra_label, image_and_label: image_and_label)
@@ -64,15 +64,15 @@ def resample(dataset, ds_info):
     #     filtered_dataset = dataset.filter(lambda image, lbl: tf.equal(lbl, label))
     #     datasets_by_label.append(filtered_dataset)
     # # 使用 sample_from_datasets 进行重采样
-    # weight = [1.0 / ds_info['num_classes']] * ds_info['num_classes']
     # dataset_re = tf.data.Dataset.sample_from_datasets(datasets_by_label, seed=18)
 
     # 更新重采样后训练集大小
-    train_size_re = np.array([label.numpy() for _, label in dataset_re]).shape[0]
+    train_size_re = (dataset_re.map(lambda _, label: label, num_parallel_calls=tf.data.AUTOTUNE)
+                     .reduce(0, lambda count, _: count + 1).numpy())
     ds_info.update({
         'train_size': train_size_re,
     })
-    logging.info("train_size updated.")
+    logging.info("ds_train resampled and train_size updated.")
 
     return dataset_re, ds_info
 
@@ -80,7 +80,6 @@ def resample(dataset, ds_info):
 @gin.configurable
 def preprocess(image, label, img_height, img_width):
     """Dataset preprocessing: Normalizing and resizing"""
-
     # Normalize image: `uint8` -> `float32`.
     image = tf.cast(image, tf.float32) / 255.
 
@@ -91,12 +90,16 @@ def preprocess(image, label, img_height, img_width):
 
 
 def augment(image, label):
-    operations = ['Rotation90', 'Rotation180', 'Rotation270', 'Flippinglr', 'Flippingud', 'Cropping','Shearing']
+    """Data augmentation"""
+    operations = [
+        'None', 'Rotation90', 'Rotation180', 'Rotation270', 'Flippinglr', 'Flippingud', 'Cropping', 'Shearing']
     # Randomly choose one or more operations
     chosen_operations = random.sample(operations, k=random.randint(1, len(operations)))
 
     for operation in chosen_operations:
-        if operation == 'Rotation90':
+        if operation == 'None':
+            image = image
+        elif operation == 'Rotation90':
             image = tf.image.rot90(image)
         elif operation == 'Rotation180':
             image = tf.image.rot90(image, 2)
@@ -117,31 +120,5 @@ def augment(image, label):
             shear_y = random.uniform(-0.3, 0.3)  # Shear magnitude along y-axis
             image = tfa.image.transform(image, [1.0, shear_x, 0.0, shear_y, 1.0, 0.0, 0.0, 0.0],
                                         interpolation='NEAREST')
-    return image, label
-
-
-@gin.configurable()
-def augment(image, label, operation, central_frac):
-    """Data augmentation"""
-    if 'Rotation90' in operation:  # rotate 90 degree
-        image = tf.image.rot90(image)
-
-    elif 'Rotation180' in operation:  # rotate 180 degree
-        image = tf.image.rot90(image, 2)
-
-    elif 'Rotation270' in operation:  # rotate 270 degree
-        image = tf.image.rot90(image, 3)
-
-    elif 'Flippinglr' in operation:  # flip left and right
-        image = tf.image.flip_left_right(image)
-
-    elif 'Flippingud' in operation:  # flip up and down
-        image = tf.image.flip_up_down(image)
-
-    # elif 'Cropping' in operation:  # crop the central region of the image
-    #     image = tf.image.central_crop(image, central_frac)
-
-    # elif 'Shearing' in operation:  # shear the image
-    #     image = tf.image.shear(image)  # no such method in tf.image
 
     return image, label

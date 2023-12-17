@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 
+
 class ConfusionMatrix(tf.keras.metrics.Metric):
     def __init__(self, num_classes, name='confusion_matrix', **kwargs):
         super(ConfusionMatrix, self).__init__(name=name, **kwargs)
@@ -23,6 +24,5 @@ class ConfusionMatrix(tf.keras.metrics.Metric):
         return tf.identity(self.confusion_matrix)
 
     def reset_states(self):
-        tf.keras.backend.set_value(self.confusion_matrix, np.zeros((self.num_classes, self.num_classes), dtype=np.int32))
-
-
+        tf.keras.backend.set_value(self.confusion_matrix, np.zeros((self.num_classes, self.num_classes),
+                                                                   dtype=np.int32))
