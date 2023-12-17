@@ -32,13 +32,11 @@ def train_func():
         ds_train, ds_val, ds_test, ds_info = load()
 
         # model
-        model = vgg_like(input_shape=ds_info.features["image"].shape, n_classes=ds_info.features["label"].num_classes)
-
+        model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
 
         trainer = Trainer(model, ds_train, ds_val, ds_info, run_paths)
         for _ in trainer.train():
             continue
-
 
 
 sweep_config = {
@@ -86,4 +84,3 @@ wandb.login(key="f27c584f9e444901abf85615134f27d2da6e411d")
 sweep_id = wandb.sweep(sweep_config)
 train_func()
 wandb.agent(sweep_id, function=train_func, count=20)
-

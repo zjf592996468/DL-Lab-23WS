@@ -21,14 +21,15 @@ def train_func(config):
     utils_misc.set_loggers(run_paths['path_logs_train'], logging.INFO)
 
     # gin-config
-    gin.parse_config_files_and_bindings(['/mnt/home/repos/dl-lab-skeleton/diabetic_retinopathy/configs/config.gin'], bindings)
+    gin.parse_config_files_and_bindings(
+        ['/mnt/home/repos/dl-lab-skeleton/diabetic_retinopathy/configs/config.gin'], bindings)
     utils_params.save_config(run_paths['path_gin'], gin.config_str())
 
     # setup pipeline
     ds_train, ds_val, ds_test, ds_info = load(group=True)
 
     # model
-    model = vgg_like(input_shape=ds_info.features["image"].shape, n_classes=ds_info.features["label"].num_classes)
+    model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
 
     trainer = Trainer(model, ds_train, ds_val, ds_info, run_paths)
     for val_accuracy in trainer.train():

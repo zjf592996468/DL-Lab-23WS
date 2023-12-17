@@ -3,6 +3,7 @@ import tensorflow as tf
 import logging
 import wandb
 
+
 @gin.configurable
 class Trainer(object):
     def __init__(self, model, ds_train, ds_val, ds_info, run_paths, total_steps, log_interval, ckpt_interval):
@@ -20,7 +21,6 @@ class Trainer(object):
         self.train_loss = tf.keras.metrics.Mean(name='train_loss')
         self.train_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='train_accuracy')
 
-
         self.val_loss = tf.keras.metrics.Mean(name='test_loss')
         self.val_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='test_accuracy')
 
@@ -37,8 +37,6 @@ class Trainer(object):
         self.ckpt = tf.train.Checkpoint(model=model, optimizer=self.optimizer)
         self.manager = tf.train.CheckpointManager(self.ckpt, self.run_paths['path_ckpts_train'], max_to_keep=3)
 
-
-
     @tf.function
     def train_step(self, images, labels):
         with tf.GradientTape() as tape:
@@ -52,6 +50,7 @@ class Trainer(object):
         self.train_loss(loss)
         self.train_accuracy(labels, predictions)
         print(loss)
+
     @tf.function
     def test_step(self, images, labels):
         # training=False is only needed if there are layers with different
@@ -61,7 +60,6 @@ class Trainer(object):
 
         self.test_loss(t_loss)
         self.test_accuracy(labels, predictions)
-
 
     def train(self):
         wandb.init(project='idrid-cnn', name=self.run_paths['model_id'])
@@ -79,7 +77,6 @@ class Trainer(object):
                 for test_images, test_labels in self.ds_val:
 
                     self.val_step(test_images, test_labels)
-
 
                 template = 'Step {}, Loss: {}, Accuracy: {}, Test Loss: {}, Test Accuracy: {}'
                 logging.info(template.format(step,
@@ -102,9 +99,8 @@ class Trainer(object):
                 self.train_loss.reset_states()
                 self.train_accuracy.reset_states()
 
-
-
                 yield self.val_accuracy.result().numpy()
+
             if step % self.ckpt_interval == 0:
                 save_path = self.manager.save()
                 logging.info(f'Saving checkpoint to {self.run_paths["path_ckpts_train"]}.')
@@ -119,4 +115,3 @@ class Trainer(object):
                 save_path = self.manager.save()
                 print("Saved checkpoint for step {}: {}".format(int(step), save_path))
                 return self.val_accuracy.result().numpy()
-

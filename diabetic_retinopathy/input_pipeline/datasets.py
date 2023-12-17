@@ -88,7 +88,7 @@ def load(name, data_dir, split_frac, group):
         train_size = int(split_frac * train_labels.shape[0])
         train_dataset = train_labels[:train_size]
         val_dataset = train_labels[train_size:]
-        logging.info("Dataset is divided into train and validation.")
+        logging.info(f"Dataset is divided into train and validation with rate = {split_frac}.")
 
         # create TFRecord files for origin train and test
         create_tfrecord(train_tfrd_path, train_img_dir, train_dataset, group)
@@ -112,7 +112,6 @@ def load(name, data_dir, split_frac, group):
             'test_size': test_labels.shape[0],
             'num_classes': num_classes,
         }
-        logging.info("ds_info recorded.")
 
         return prepare(ds_train, ds_val, ds_test, ds_info)
 
@@ -171,15 +170,12 @@ def prepare(ds_train, ds_val, ds_test, ds_info, batch_size, caching):
         'img_width': img_width,
         'img_channels': img_channels,
     })
-    logging.info("ds_info updated.")
 
     # resample ds_train
     ds_train, ds_info = resample(ds_train, ds_info)
-    logging.info("ds_train resampled.")
 
     if caching:
         ds_train = ds_train.cache()
-    ds_train = resample(ds_train)
     ds_train = ds_train.map(
         augment, num_parallel_calls=tf.data.experimental.AUTOTUNE)
     ds_train = ds_train.shuffle(ds_info['train_size'] // 10)  # todo: Q: will here with smaller num better?
