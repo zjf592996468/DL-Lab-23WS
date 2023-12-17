@@ -11,13 +11,13 @@ import matplotlib.pyplot as plt
 # generate folder structures
 run_paths = utils_params.gen_run_folder()
 
-
 # load dataset
 ds_train, ds_val, ds_test, ds_info = datasets.load(group=True)
 # model vgg
 # model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
 # model cnn
-model = create_cnn_nets(input_shape=(256,256,3), num_blocks=3, filters=8, kernel_size=(3,3), dense_units=128, dropout_rate=0.4)
+model = create_cnn_nets(input_shape=(256, 256, 3), num_blocks=3, filters=8, kernel_size=(3, 3), dense_units=128,
+                        dropout_rate=0.4)
 # load the model
 ckpt = tf.train.Checkpoint(model=model, optimizer=tf.keras.optimizers.Adam())
 manager = tf.train.CheckpointManager(ckpt, run_paths['path_ckpts_train'], max_to_keep=5)

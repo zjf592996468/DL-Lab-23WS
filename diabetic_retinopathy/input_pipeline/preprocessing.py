@@ -47,27 +47,32 @@ def check_imb(dataset):
     return label_class.shape[0], counts
 
 
-def resample(dataset, ds_info):
+@gin.configurable()
+def resample(dataset, ds_info, method):
     """resample the dataset to equal distribution and return it"""
-    # method: rejection resample
-    dataset_re = dataset.rejection_resample(
-        class_func=lambda image, label: label,
-        target_dist=[1.0 / ds_info['num_classes']] * ds_info['num_classes'],
-        seed=18)
-    # 使用 map 删除多余的标签副本
-    dataset_re = dataset_re.map(lambda extra_label, image_and_label: image_and_label)
-
-    # # method: sample from datasets
-    # # 根据标签拆分数据集
-    # datasets_by_label = []
-    # for label in range(ds_info['num_classes']):
-    #     filtered_dataset = dataset.filter(lambda image, lbl: tf.equal(lbl, label))
-    #     datasets_by_label.append(filtered_dataset)
-    # # 使用 sample_from_datasets 进行重采样
-    # dataset_re = tf.data.Dataset.sample_from_datasets(datasets_by_label, seed=18)
+    if method == 'rejection':
+        # method: rejection resample
+        dataset_re = dataset.rejection_resample(
+            class_func=lambda image, lbl: lbl,
+            target_dist=[1.0 / ds_info['num_classes']] * ds_info['num_classes'],
+            seed=18)
+        # 使用 map 删除多余的标签副本
+        dataset_re = dataset_re.map(lambda extra_label, image_and_label: image_and_label)
+    elif method == 'sfd':
+        # method: sample from datasets
+        # 根据标签拆分数据集
+        datasets_by_label = []
+        for label in range(ds_info['num_classes']):
+            filtered_dataset = dataset.filter(lambda image, lbl: tf.equal(lbl, label))
+            datasets_by_label.append(filtered_dataset)
+        # 使用 sample_from_datasets 进行重采样
+        dataset_re = tf.data.Dataset.sample_from_datasets(datasets_by_label, seed=18)
+    else:
+        logging.info('Ues ds_train without resample')
+        return dataset, ds_info
 
     # 更新重采样后训练集大小
-    train_size_re = (dataset_re.map(lambda _, label: label, num_parallel_calls=tf.data.AUTOTUNE)
+    train_size_re = (dataset_re.map(lambda _, lbl: lbl, num_parallel_calls=tf.data.AUTOTUNE)
                      .reduce(0, lambda count, _: count + 1).numpy())
     ds_info.update({
         'train_size': train_size_re,
@@ -76,12 +81,7 @@ def resample(dataset, ds_info):
 
     return dataset_re, ds_info
 
-def resample1(datasets):
-    class_0_ds = datasets.filter(lambda image, label: label == 0)
-    class_1_ds = datasets.filter(lambda image, label: label == 1)
-    weights = [0.5, 0.5]  # 重采样权重
-    resampled_ds = tf.data.experimental.sample_from_datasets([class_0_ds, class_1_ds], weights)
-    return resampled_ds
+
 @gin.configurable
 def preprocess(image, label, img_height, img_width):
     """Dataset preprocessing: Normalizing and resizing"""
