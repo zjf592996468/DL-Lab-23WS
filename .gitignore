@@ -8,6 +8,8 @@ __pycache__/
 
 # Custom
 experiments/
+wandb/
+/wandb
 
 # C extensions
 *.so
@@ -142,6 +144,3 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
-
-wandb/
-/wandb

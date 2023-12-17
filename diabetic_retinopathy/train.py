@@ -3,6 +3,7 @@ import tensorflow as tf
 import logging
 import wandb
 
+
 @gin.configurable
 class Trainer(object):
     def __init__(self, model, ds_train, ds_val, ds_info, run_paths, total_steps, log_interval, ckpt_interval):
@@ -36,8 +37,6 @@ class Trainer(object):
         self.ckpt = tf.train.Checkpoint(model=model, optimizer=self.optimizer)
         self.manager = tf.train.CheckpointManager(self.ckpt, self.run_paths['path_ckpts_train'], max_to_keep=3)
 
-
-
     @tf.function
     def train_step(self, images, labels):
         with tf.GradientTape() as tape:
@@ -51,6 +50,7 @@ class Trainer(object):
         self.train_loss(loss)
         self.train_accuracy(labels, predictions)
         print(loss)
+
     @tf.function
     def val_step(self, images, labels):
         # training=False is only needed if there are layers with different
@@ -61,7 +61,6 @@ class Trainer(object):
         self.val_loss(t_loss)
         self.val_accuracy(labels, predictions)
 
-
     def train(self):
         wandb.init(project='idrid-cnn', name=self.run_paths['model_id'])
         for idx, (images, labels) in enumerate(self.ds_train):
@@ -71,23 +70,26 @@ class Trainer(object):
 
             if step % self.log_interval == 0:
 
-                # Reset test metrics
+                # Reset val metrics
                 self.val_loss.reset_states()
                 self.val_accuracy.reset_states()
 
-                for test_images, test_labels in self.ds_val:
-                    self.val_step(test_images, test_labels)
+                for val_images, val_labels in self.ds_val:
 
-                template = 'Step {}, Loss: {}, Accuracy: {}, Test Loss: {}, Test Accuracy: {}'
+                    self.val_step(val_images, val_labels)
+
+                template = 'Step {}, Loss: {}, Accuracy: {}, Val Loss: {}, Val Accuracy: {}'
                 logging.info(template.format(step,
                                              self.train_loss.result(),
                                              self.train_accuracy.result() * 100,
+
                                              self.val_loss.result(),
                                              self.val_accuracy.result() * 100))
 
                 # wandb logging
                 wandb.log({'train_acc': self.train_accuracy.result() * 100, 'train_loss': self.train_loss.result(),
                            'val_acc': self.val_accuracy.result() * 100, 'val_loss': self.val_loss.result(),
+
                            'step': step})
 
                 # Write summary to tensorboard
@@ -97,8 +99,8 @@ class Trainer(object):
                 self.train_loss.reset_states()
                 self.train_accuracy.reset_states()
 
-
                 yield self.val_accuracy.result().numpy()
+
             if step % self.ckpt_interval == 0:
                 save_path = self.manager.save()
                 logging.info(f'Saving checkpoint to {self.run_paths["path_ckpts_train"]}.')
@@ -109,6 +111,7 @@ class Trainer(object):
             if step % self.total_steps == 0:
                 logging.info(f'Finished training after {step} steps.')
                 # Save final checkpoint
+
                 save_path = self.manager.save()
                 print("Saved checkpoint for step {}: {}".format(int(step), save_path))
                 return self.val_accuracy.result().numpy()

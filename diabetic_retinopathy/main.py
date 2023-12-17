@@ -1,5 +1,6 @@
 import gin
 import logging
+import wandb
 from absl import app, flags
 from train import Trainer
 from evaluation.eval import evaluate
@@ -9,14 +10,13 @@ from utils import utils_params, utils_misc
 from models.architectures import vgg_like
 from models.cnnmodel import create_cnn_nets
 import tensorflow as tf
-import wandb
 import matplotlib.pyplot as plt
 
 FLAGS = flags.FLAGS
 flags.DEFINE_boolean('train', True, 'Specify whether to train or evaluate a model.')
 
-def main(argv):
 
+def main(argv):
     # generate folder structures
     run_paths = utils_params.gen_run_folder()
 
@@ -26,17 +26,25 @@ def main(argv):
     # gin-config
     gin.parse_config_files_and_bindings(['configs/config.gin'], [])
     utils_params.save_config(run_paths['path_gin'], gin.config_str())
-    # setup pipeline
-    ds_train, ds_val, ds_test, ds_info = datasets.load(group=True)
+
     # setup wandb
     wandb.login(key="f27c584f9e444901abf85615134f27d2da6e411d")
     wandb.init(project='idrid-cnn', name=run_paths['model_id'],
                config=utils_params.gin_config_to_readable_dictionary(gin.config._CONFIG))
+    logging.info("Wandb logged in")
+
+    # setup pipeline
+    ds_train, ds_val, ds_test, ds_info = datasets.load(group=True)
+    logging.info("Dataset IDRID is successfully loaded")
+
     # model vgg
-    #model = vgg_like(input_shape=[256,256,3], n_classes=2)
+    logging.info("start model initialization")
+    # model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
+    # logging.info("model-vgg_like initialized")
+
     # model cnn
     model = create_cnn_nets()
-    logging.info("model initialization finished")
+    logging.info("model-cnn initialized")
     logging.info(model.summary())
 
     # checkpoints
@@ -56,7 +64,6 @@ def main(argv):
         for _ in trainer.train():
             continue
         evaluate1(model, ds_test, run_paths)
-
     else:
         evaluate(model,
                  ckpt_restore_path,
@@ -64,6 +71,7 @@ def main(argv):
                  run_paths
                  )
     wandb.finish()
+
 
 if __name__ == "__main__":
     app.run(main)

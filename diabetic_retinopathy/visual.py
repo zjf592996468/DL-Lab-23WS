@@ -15,7 +15,7 @@ run_paths = utils_params.gen_run_folder()
 # load dataset
 ds_train, ds_val, ds_test, ds_info = datasets.load(group=True)
 # model vgg
-#model = vgg_like(input_shape=[256,256,3], n_classes=2)
+# model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
 # model cnn
 model = create_cnn_nets(input_shape=(256,256,3), num_blocks=3, filters=8, kernel_size=(3,3), dense_units=128, dropout_rate=0.4)
 # load the model
@@ -39,5 +39,5 @@ for images, _ in ds_train.take(1):
 category_index = 0  # 这里以类别索引 0 为例
 layer_name = 'conv2d_2'  # 替换为你选择的卷积层名称
 
-heatmap = grad_cam(model, image, category_index, layer_name)
+heatmap = grad_cam(model, image, category_index, layer_name)  # todo: Name 'image' can be undefined
 plt.imshow(heatmap)

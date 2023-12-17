@@ -6,7 +6,8 @@ import logging
 import wandb
 from sklearn.metrics import confusion_matrix, accuracy_score, roc_auc_score, recall_score
 
-def evaluate(model: tf.keras.Model, checkpoint:object, ds_test: tf.data.Dataset, run_paths: dict) -> np.ndarray:
+
+def evaluate(model: tf.keras.Model, checkpoint: object, ds_test: tf.data.Dataset, run_paths: dict) -> np.ndarray:
     ckpt = tf.train.Checkpoint(model=model, optimizer=tf.keras.optimizers.Adam())
     ckpt.restore(checkpoint).expect_partial()
     wandb.init(project='idrid', name=run_paths['model_id'])

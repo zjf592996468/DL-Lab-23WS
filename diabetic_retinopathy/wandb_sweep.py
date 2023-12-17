@@ -9,7 +9,6 @@ from train import Trainer
 from utils import utils_params, utils_misc
 
 
-
 def train_func():
     with wandb.init() as run:
         gin.clear_config()
@@ -29,19 +28,20 @@ def train_func():
         utils_params.save_config(run_paths['path_gin'], gin.config_str())
 
         # setup pipeline
-        ds_train, ds_val, ds_test, ds_info = load(group=True)
+
+        ds_train, ds_val, ds_test, ds_info = load()
 
         # model
-        model = vgg_like(input_shape=[256,256,3], n_classes=2)
+        model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
 
         trainer = Trainer(model, ds_train, ds_val, ds_info, run_paths)
         for _ in trainer.train():
             continue
-        original_val_acc, original_test_acc = trainer.evaluate(ds_val, ds_test)
-        wandb.log({"original_val_acc": original_val_acc, "original_test_acc": original_test_acc})
+
 
 sweep_config = {
-    'name': 'idrid-sweep',
+    'name': 'mnist-example-sweep',
+
     'method': 'random',
     'metric': {
         'name': 'val_acc',
@@ -49,7 +49,9 @@ sweep_config = {
     },
     'parameters': {
         'Trainer.total_steps': {
-            'values': [1000]
+
+            'values': [5e4]
+
         },
         'vgg_like.base_filters': {
             'distribution': 'q_log_uniform',
@@ -76,6 +78,7 @@ sweep_config = {
         }
     }
 }
+
 
 wandb.login(key="f27c584f9e444901abf85615134f27d2da6e411d")
 sweep_id = wandb.sweep(sweep_config)

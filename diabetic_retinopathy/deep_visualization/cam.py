@@ -1,6 +1,7 @@
 import numpy as np
 import tensorflow as tf
 
+
 def grad_cam(model, image, category_index, layer_name):
     grad_model = tf.keras.models.Model([model.inputs], [model.get_layer(layer_name).output, model.output])
 
