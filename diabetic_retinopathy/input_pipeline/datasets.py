@@ -103,7 +103,7 @@ def load(name, data_dir, split_frac, group):
         logging.info("Train, val and test datasets are created from tfrecord.")
 
         # check and plot ds_train imbalance situation, get num of classes and num of samples in each class
-        num_classes, counts = check_imb(ds_train)
+        num_classes, counts = check_imb(ds_train, method=False)
 
         # 构建数据集信息
         ds_info = {
@@ -172,7 +172,8 @@ def prepare(ds_train, ds_val, ds_test, ds_info, batch_size, caching):
     })
 
     # resample ds_train
-    ds_train, ds_info = resample(ds_train, ds_info)
+    ds_train, ds_info, re_method = resample(ds_train, ds_info)
+    check_imb(ds_train, re_method)
 
     if caching:
         ds_train = ds_train.cache()
