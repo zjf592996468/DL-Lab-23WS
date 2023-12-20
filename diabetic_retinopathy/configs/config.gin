@@ -17,14 +17,14 @@ create_cnn_nets.dense_units = 49
 create_cnn_nets.dropout_rate=0.5378443402110621
 
 # Training
-Trainer.total_steps = 5e4
+Trainer.total_steps = 1e5
 Trainer.log_interval = 1e4
 Trainer.ckpt_interval = 1e4
 
 # Input pipeline
 # Dataset
 load.name = 'idrid'
-load.split_frac = 0.9
+load.split_frac = 0.8
 load.data_dir = r'/home/data/IDRID_dataset'
 # load.data_dir = r'C:\DL-lab\IDRID_dataset'
 # load.data_dir = r'D:\idrid\IDRID_dataset'
@@ -36,4 +36,3 @@ preprocess.img_height = 256
 preprocess.img_width = 256
 augment.img_height = 256
 augment.img_width = 256
-resample.method = 'rejection'

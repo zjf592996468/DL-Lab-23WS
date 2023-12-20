@@ -28,7 +28,7 @@ def train_func():
         utils_params.save_config(run_paths['path_gin'], gin.config_str())
 
         # setup pipeline
-        ds_train, ds_val, ds_test, ds_info = load(group=True)
+        ds_train, ds_val, ds_test, ds_info = load()
 
         # model
         model = create_cnn_nets()

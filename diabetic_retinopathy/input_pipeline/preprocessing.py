@@ -1,95 +1,38 @@
 import gin
 import tensorflow as tf
 import random
-from pathlib import Path
-import numpy as np
 import matplotlib.pyplot as plt
-import logging
 
 
-def check_imb(dataset, method):
+def check_imb(labels):
     """check and plot imbalance situation, return num of classes and num of samples in each class"""
-    # 获取原始数据，转换为 NumPy 数组
-    lb = np.array([label.numpy() for _, label in dataset])
+    # Calculate the num of each class
+    label_counts = labels["Retinopathy grade"].value_counts().sort_index()
 
-    # 获取原始数据的类别分布
-    label_class, counts = np.unique(lb, return_counts=True)
+    # Set different color for each class
+    # colors = plt.cm.viridis(np.linspace(0, 1, label_counts.index.shape[0]))
+    colors = plt.cm.tab10(range(label_counts.index.shape[0]))  # Options: Accent, tab10, Paired
 
-    # 为每个类别设置不同的颜色
-    colors = plt.cm.get_cmap('tab10')(np.arange(label_class.shape[0]))
-
-    # 绘制柱状图
-    bars = plt.bar(label_class, counts, color=colors, label='Class percentages')  # color='skyblue'
+    # Plot the figure
+    plt.figure(figsize=(8, 6))
+    bars = plt.bar(label_counts.index, label_counts.values, color=colors, label='Class percentages')
     plt.xlabel('Class')
     plt.ylabel('Number of Samples')
-    plt.title('Class Distribution Before Resampling')
+    plt.title('Class Distribution')
+    plt.xticks(label_counts.index)
 
-    # 设置 x 轴的标签为类别标签
-    plt.xticks(label_class)
+    # Show num on the bar
+    for i, count in enumerate(label_counts.values):
+        plt.text(label_counts.index[i], count, str(count), ha='center', va='bottom')
 
-    # 在柱状图上显示数据标签
-    for i, count in enumerate(counts):
-        plt.text(label_class[i], count, str(count), ha='center', va='bottom')
+    # Show the legend with percent info
+    total_samples = sum(label_counts.values)
+    percents = [count / total_samples * 100 for count in label_counts.values]
+    legend_labels = [f'Class {label_counts.index[i]}: {percents[i]:.2f}%' for i in range(label_counts.index.shape[0])]
+    plt.legend(bars, legend_labels, bbox_to_anchor=(1, 1))
+    plt.tight_layout()
 
-    # 显示图例在左上角，并且里面包含每个类别的占比信息
-    total_samples = lb.shape[0]
-    percents = [count / total_samples * 100 for count in counts]
-    legend_labels = [f'Class {label_class[i]}: {percents[i]:.2f}%' for i in range(label_class.shape[0])]
-    plt.legend(bars, legend_labels)
-
-    # 保存图表到文件
-    plot_path = Path.cwd().parent.parent
-    if method:
-        plt.title(f'Class Distribution After Resampling with {method}')
-        plt.savefig(plot_path / f'Class distribution after resampling with {method}.png')
-        logging.info(f"Class distribution plot after resampling is created in {plot_path.resolve()}.")
-    else:
-        plt.savefig(plot_path / 'Class distribution before resampling.png')
-        logging.info(f"Class distribution plot before resampling is created in {plot_path.resolve()}.")
-    plt.close()  # 关闭图表，释放资源
-
-    return label_class.shape[0], counts
-
-
-@gin.configurable()
-def resample(dataset, ds_info, method):
-    """resample the dataset to equal distribution and return it"""
-    if method == 'rejection':
-        # method: rejection resample
-        dataset_re = dataset.rejection_resample(
-            class_func=lambda image, lbl: lbl,
-            target_dist=[1.0 / ds_info['num_classes']] * ds_info['num_classes'],
-            seed=18)
-        # 使用 map 删除多余的标签副本
-        dataset_re = dataset_re.map(lambda extra_label, image_and_label: image_and_label,
-                                    num_parallel_calls=tf.data.AUTOTUNE)
-    elif method == 'sfd':
-        # method: sample from datasets
-        # 根据标签拆分数据集
-        datasets_by_label = []
-        for label in range(ds_info['num_classes']):
-            filtered_dataset = dataset.filter(lambda image, lbl: tf.equal(lbl, label))
-            datasets_by_label.append(filtered_dataset)
-        # 使用 sample_from_datasets 进行重采样
-        dataset_re = tf.data.Dataset.sample_from_datasets(datasets_by_label, seed=18)
-    elif method == 'cy':
-        class_0_ds = dataset.filter(lambda image, lbl: lbl == 0)
-        class_1_ds = dataset.filter(lambda image, lbl: lbl == 1)
-        weights = [0.5, 0.5]  # 重采样权重
-        dataset_re = tf.data.Dataset.sample_from_datasets([class_0_ds, class_1_ds], weights, seed=18)
-    else:
-        logging.info('Ues ds_train without resample')
-        return dataset, ds_info, False
-
-    # 更新重采样后训练集大小
-    train_size_re = (dataset_re.map(lambda _, lbl: lbl, num_parallel_calls=tf.data.AUTOTUNE)
-                     .reduce(0, lambda count, _: count + 1).numpy())
-    ds_info.update({
-        'train_size': train_size_re,
-    })
-    logging.info(f"ds_train resampled with '{method}' and train_size updated.")
-
-    return dataset_re, ds_info, method
+    return plt
 
 
 @gin.configurable
@@ -110,10 +53,10 @@ def augment(image, label, img_height, img_width):
     operations = [
         'Rotation90', 'Rotation180', 'Rotation270', 'Flippinglr', 'Flippingud', 'Cropping', 'Shearing',
         'AdjustContrast', 'AdjustBrightness']
-    # 确保每次最多选择两种操作
-    chosen_operations = random.sample(operations, k=min(3, len(operations)))
+    # Randomly use operations and at least use half of them
+    chosen_op = random.sample(operations, random.randint(round(0.5 * len(operations)), len(operations)))
 
-    for operation in chosen_operations:
+    for operation in chosen_op:
         if operation == 'Rotation90':
             image = tf.image.rot90(image)
         elif operation == 'Rotation180':

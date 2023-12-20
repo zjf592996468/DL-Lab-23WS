@@ -13,6 +13,7 @@ import tensorflow as tf
 
 FLAGS = flags.FLAGS
 flags.DEFINE_boolean('train', True, 'Specify whether to train or evaluate a model.')
+flags.DEFINE_boolean('multi_class', False, 'Specify whether to take multi_classification')
 
 
 def main(argv):
@@ -33,7 +34,7 @@ def main(argv):
     logging.info("Wandb logged in")
 
     # setup pipeline
-    ds_train, ds_val, ds_test, ds_info = datasets.load(group=True)
+    ds_train, ds_val, ds_test, ds_info = datasets.load()
     logging.info("Dataset IDRID is successfully loaded")
 
     # # 下面的代码仅用于debug时查看ds中的数据是否正常

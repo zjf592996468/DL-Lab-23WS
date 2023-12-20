@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 run_paths = utils_params.gen_run_folder()
 
 # load dataset
-ds_train, ds_val, ds_test, ds_info = datasets.load(group=True)
+ds_train, ds_val, ds_test, ds_info = datasets.load()
 # model vgg
 # model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
 # model cnn
