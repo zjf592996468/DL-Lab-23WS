@@ -55,7 +55,7 @@ def augment(image, label, img_height, img_width):
     # , 'Shearing','AdjustContrast', 'AdjustBrightness'
     # Randomly use operations
     # chosen_op = random.sample(operations, random.randint(round(0.5 * len(operations)), len(operations)))  # over half
-    chosen_op = random.sample(operations, round(0.5 * len(operations)))  # use half
+    chosen_op = random.sample(operations, 1)  # use one
 
     for operation in chosen_op:
         if operation == 'Rotation90':
