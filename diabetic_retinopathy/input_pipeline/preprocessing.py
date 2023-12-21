@@ -51,11 +51,11 @@ def preprocess(image, label, img_height, img_width):
 def augment(image, label, img_height, img_width):
     """Data augmentation"""
     operations = [
-        'Rotation90', 'Rotation180', 'Rotation270', 'Flippinglr', 'Flippingud', 'Cropping', 'Shearing',
-        'AdjustContrast', 'AdjustBrightness']
-    # Randomly use operations and at least use half of them
-    # chosen_op = random.sample(operations, random.randint(round(2 / 3 * len(operations)), len(operations)))
-    chosen_op = random.sample(operations, len(operations))
+        'Rotation90', 'Rotation180', 'Rotation270', 'Flippinglr', 'Flippingud', 'Cropping']
+    # , 'Shearing','AdjustContrast', 'AdjustBrightness'
+    # Randomly use operations
+    # chosen_op = random.sample(operations, random.randint(round(0.5 * len(operations)), len(operations)))  # over half
+    chosen_op = random.sample(operations, round(0.5 * len(operations)))  # use half
 
     for operation in chosen_op:
         if operation == 'Rotation90':
