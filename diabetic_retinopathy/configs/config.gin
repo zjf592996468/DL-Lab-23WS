@@ -14,12 +14,12 @@ create_cnn_nets.num_blocks = 3
 create_cnn_nets.filters = 38
 create_cnn_nets.kernel_size = (3, 3)
 create_cnn_nets.dense_units = 49
-create_cnn_nets.dropout_rate=0.5378443402110621
+create_cnn_nets.dropout_rate = 0.5
 
 # Training
 Trainer.total_steps = 1e5
-Trainer.log_interval = 1e4
-Trainer.ckpt_interval = 1e4
+Trainer.log_interval = 2e3
+Trainer.ckpt_interval = 2e3
 
 # Input pipeline
 # Dataset
