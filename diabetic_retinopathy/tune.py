@@ -26,7 +26,7 @@ def train_func(config):
     utils_params.save_config(run_paths['path_gin'], gin.config_str())
 
     # setup pipeline
-    ds_train, ds_val, ds_test, ds_info = load(group=True)
+    ds_train, ds_val, ds_test, ds_info = load()
 
     # model
     model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
