@@ -44,12 +44,15 @@ class Trainer(object):
             # behavior during training versus inference (e.g. Dropout).
             predictions = self.model(images, training=True)
             loss = self.loss_object(labels, predictions)
-        gradients = tape.gradient(loss, self.model.trainable_variables)
+            # Add regularisation losses from the model
+            regularization_loss = tf.math.add_n(self.model.losses)
+            total_loss = loss + regularization_loss
+        gradients = tape.gradient(total_loss, self.model.trainable_variables)
         self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
 
-        self.train_loss(loss)
+        self.train_loss(total_loss)
         self.train_accuracy(labels, predictions)
-        print(loss)
+
 
     @tf.function
     def val_step(self, images, labels):

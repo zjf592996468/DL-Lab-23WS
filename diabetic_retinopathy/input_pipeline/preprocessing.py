@@ -1,8 +1,8 @@
 import gin
 import tensorflow as tf
-import random
+import tensorflow_addons as tfa
+import numpy as np
 import matplotlib.pyplot as plt
-
 
 def check_imb(labels):
     """check and plot imbalance situation, return num of classes and num of samples in each class"""
@@ -48,44 +48,46 @@ def preprocess(image, label, img_height, img_width):
 
 
 @gin.configurable()
-def augment(image, label, img_height, img_width):
-    """Data augmentation"""
-    operations = [
-        'Rotation90', 'Rotation180', 'Rotation270', 'Flippinglr', 'Flippingud', 'Cropping']
-    # , 'Shearing','AdjustContrast', 'AdjustBrightness'
-    # Randomly use operations
-    # chosen_op = random.sample(operations, random.randint(round(0.5 * len(operations)), len(operations)))  # over half
-    chosen_op = random.sample(operations, 1)  # use one
+def augment(image, label, seed=2023):
+    """Data augmentation with a fixed seed for reproducibility"""
 
-    for operation in chosen_op:
-        if operation == 'Rotation90':
-            image = tf.image.rot90(image)
-        elif operation == 'Rotation180':
-            image = tf.image.rot90(image, 2)
-        elif operation == 'Rotation270':
-            image = tf.image.rot90(image, 3)
-        elif operation == 'Flippinglr':
-            image = tf.image.flip_left_right(image)
-        elif operation == 'Flippingud':
-            image = tf.image.flip_up_down(image)
-        elif operation == 'Cropping':
-            # 随机裁剪并调整大小至256x256
-            cropped_size = [tf.random.uniform([], minval=180, maxval=256, dtype=tf.int32) for _ in range(2)]
-            image = tf.image.random_crop(image, size=[cropped_size[0], cropped_size[1], 3])
-            image = tf.image.resize_with_pad(image, img_height, img_width)
-        # elif operation == 'Shearing':
-        #     # 利用仿射变换进行剪切，保持图像大小不变
-        #     shear_x = random.uniform(-0.3, 0.3)  # x轴剪切幅度
-        #     shear_y = random.uniform(-0.3, 0.3)  # y轴剪切幅度
-        #     image = tfa.image.transform(image, [1.0, shear_x, 0.0, shear_y, 1.0, 0.0, 0.0, 0.0],
-        #                                 interpolation='NEAREST')
-        # elif operation == 'AdjustContrast':
-        #     # 随机调整对比度
-        #     contrast_factor = random.uniform(0.5, 1.5)  # 可根据需要调整这个范围
-        #     image = tf.image.adjust_contrast(image, contrast_factor)
-        # elif operation == 'AdjustBrightness':
-        #     # 随机调整亮度
-        #     brightness_delta = random.uniform(-0.3, 0.3)  # 可根据需要调整这个范围
-        #     image = tf.image.adjust_brightness(image, brightness_delta)
+    # Randomly rotate the image by +- 0.125pi
+    num_rotations = tf.random.uniform(shape=(), minval=0, maxval=4, dtype=tf.int32, seed=seed)
+    image = tf.image.rot90(image, k=num_rotations)
+
+    # 50% possibility up to down flipping
+    image = tf.image.random_flip_up_down(image, seed=seed)
+
+    # 50% possibility left to right flipping
+    image = tf.image.random_flip_left_right(image, seed=seed)
+
+    # Randomly crop the image from left and right sides and scale it to the original size
+    image = tf.image.convert_image_dtype(image, dtype=tf.float32)
+    in_h = image.shape[0]
+    in_w = image.shape[1]
+    scaling = tf.random.uniform([2], 0.8, 1)
+    x_scaling = scaling[0]
+    y_scaling = scaling[1]
+    out_h = tf.cast(in_h * y_scaling, dtype=tf.int32)
+    out_w = tf.cast(in_w * x_scaling, dtype=tf.int32)
+    seed = np.random.randint(2020)
+    image = tf.image.random_crop(image, size=[out_h, out_w, 3], seed=seed)
+    image = tf.image.resize(image, size=(in_h, in_w))
+
+    # Random shearing
+    x_shear = tf.random.uniform([1], minval=-0.1, maxval=0.1, dtype=tf.float32)[0]
+    y_shear = tf.random.uniform([1], minval=-0.1, maxval=0.1, dtype=tf.float32)[0]
+    image = tfa.image.transform(image, [1.0, x_shear, 0, y_shear, 1.0, 0.0, 0.0, 0.0])
+    # Random brightness
+    image = tf.image.random_brightness(image, max_delta=0.1, seed=seed)
+
+    # Random saturation
+    image = tf.image.random_saturation(image, lower=0.75, upper=1.25, seed=seed)
+
+    # Random hue
+    image = tf.image.random_hue(image, max_delta=0.01, seed=seed)
+
+    # Random contrast
+    image = tf.image.random_contrast(image, lower=0.75, upper=1.25, seed=seed)
 
     return image, label
