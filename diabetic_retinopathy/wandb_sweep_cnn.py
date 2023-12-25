@@ -28,7 +28,7 @@ def train_func():
         utils_params.save_config(run_paths['path_gin'], gin.config_str())
 
         # setup pipeline
-        ds_train, ds_val, ds_test, ds_info = load(group=True)
+        ds_train, ds_val, ds_test, ds_info = load()
 
         # model
         model = create_cnn_nets()
@@ -49,7 +49,7 @@ sweep_config = {
     },
     'parameters': {
         'Trainer.total_steps': {
-            'values': [1e5]
+            'values': [5e4]
         },
         'create_cnn_nets.filters': {
             'distribution': 'q_log_uniform',
@@ -61,7 +61,7 @@ sweep_config = {
             'distribution': 'q_uniform',
             'q': 1,
             'min': 2,
-            'max': 4
+            'max': 5
         },
         'create_cnn_nets.dense_units': {
             'distribution': 'q_log_uniform',
@@ -72,7 +72,7 @@ sweep_config = {
         'create_cnn_nets.dropout_rate': {
             'distribution': 'uniform',
             'min': 0.2,
-            'max': 0.5
+            'max': 0.8
         }
     }
 }
