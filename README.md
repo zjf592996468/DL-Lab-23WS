@@ -3,6 +3,19 @@
 - Yang Cao (st186635)
 
 
+# How to run the code
+## P1: Diabetic Retinopathy Detection
+- Train and evaluate model with IDRID dataset on **binary classification**
+
+  Type `python3 main.py --train=True --multi_class=False` in batch file.
+- 5-class classification
+
+  Type `python3 main.py --train=True --multi_class=True` in batch file.
+
+# Results
+to do
+
+
 # Datasets
 ### IDRID Dataset
 The IDRID dataset is located at _/home/data/idrid_dataset_ on the GPU-Server.
@@ -84,10 +97,3 @@ and potentially detect failure modes.
 ## T8: [Optional] Ensemble learning
 
 ## T9: [Optional] Multi-class classification
-
-
-# How to run the code
-to do
-
-# Results
-to do
