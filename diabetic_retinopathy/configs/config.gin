@@ -24,6 +24,7 @@ cnn_block.l2_lambda=%l2_lambda
 cnn_block.seed= %GLOBAL_SEED
 create_cnn_nets.seed= %GLOBAL_SEED
 
+
 # Training
 Trainer.total_steps = 1e5
 Trainer.log_interval = 5e3

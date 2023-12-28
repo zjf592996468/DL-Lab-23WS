@@ -82,5 +82,4 @@ sweep_config = {
 
 wandb.login(key="f27c584f9e444901abf85615134f27d2da6e411d")
 sweep_id = wandb.sweep(sweep_config)
-train_func()
 wandb.agent(sweep_id, function=train_func, count=20)

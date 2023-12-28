@@ -97,14 +97,29 @@ def load(name, data_dir, tfrd_dir):
         ds_test = tf.data.TFRecordDataset(test_tfrd_path).map(_parse_tfrd_function)
         ds_val=tf.data.TFRecordDataset(val_tfrd_path).map(_parse_tfrd_function)
 
+        label0_count = 0
+        label1_count = 0
+
+        for _, labels in ds_train:
+            # 遍历批处理中的每个标签
+            for label in labels.numpy():
+                if label == 0:
+                    label0_count += 1
+                elif label == 1:
+                    label1_count += 1
+
+        print(f"Label 0 count: {label0_count}")
+        print(f"Label 1 count: {label1_count}")
         ds_info = {
-            'train_size': 400,
+            'train_size': label0_count+label1_count,
             'val_size': 40,
             'test_size': 103,
+            'label0_count':label0_count,
+            'label1_count': label1_count
             # 其他信息
         }
 
-        return prepare(ds_train, ds_val, ds_test, ds_info, seed=2023,batch_size=32, caching=True)
+        return prepare(ds_train, ds_val, ds_test, ds_info, seed=2023, batch_size=32, caching=True)
 
     elif name == "eyepacs":
         logging.info(f"Preparing dataset {name}...")

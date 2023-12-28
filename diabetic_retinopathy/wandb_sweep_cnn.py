@@ -37,9 +37,6 @@ def train_func():
         for _ in trainer.train():
             continue
 
-
-train_func()
-
 sweep_config = {
     'name': 'idrid-sweep',
     'method': 'random',
@@ -73,11 +70,15 @@ sweep_config = {
             'distribution': 'uniform',
             'min': 0.2,
             'max': 0.8
+        },
+        'l2_lambda':{
+            'distribution': 'uniform',
+            'min': 0.001,
+            'max': 0.01
         }
     }
 }
 wandb.login(key="f27c584f9e444901abf85615134f27d2da6e411d")
 sweep_id = wandb.sweep(sweep_config)
-
 wandb.agent(sweep_id, function=train_func, count=20)
 wandb.finish()
