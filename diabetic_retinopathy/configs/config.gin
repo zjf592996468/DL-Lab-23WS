@@ -32,13 +32,11 @@ Trainer.ckpt_interval = 1e4
 
 # Input pipeline
 load.name = 'idrid'
-load.data_dir = r'/home/data/IDRID_dataset'
+#load.data_dir = r'/home/data/IDRID_dataset'
 #load.data_dir = r'C:\DL-lab\IDRID_dataset'
-#load.data_dir = r'D:\idrid\IDRID_dataset'
+load.data_dir = r'D:\idrid\IDRID_dataset'
+load.split_frac=0.2
 
-#load.tfrd_dir = r'D:\idrid\IDRID_dataset'
-#load.tfrd_dir = r'/home/RUS_CIP/st181366'
-load.tfrd_dir = r'/home/RUS_CIP/st186635'
 preprocess.img_height = 256
 preprocess.img_width = 256
 augment.seed=%GLOBAL_SEED

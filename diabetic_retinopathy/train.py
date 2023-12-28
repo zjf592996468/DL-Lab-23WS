@@ -33,7 +33,6 @@ class Trainer(object):
         self.log_interval = log_interval
         self.ckpt_interval = ckpt_interval
         # Checkpoint Manager
-        # self.iterator = iter(self.ds_train)
         self.ckpt = tf.train.Checkpoint(model=model, optimizer=self.optimizer)
         self.manager = tf.train.CheckpointManager(self.ckpt, self.run_paths['path_ckpts_train'], max_to_keep=3)
 
@@ -45,12 +44,14 @@ class Trainer(object):
             predictions = self.model(images, training=True)
             loss = self.loss_object(labels, predictions)
             # Add regularisation losses from the model
-            regularization_loss = tf.math.add_n(self.model.losses)
-            total_loss = loss + regularization_loss
-        gradients = tape.gradient(total_loss, self.model.trainable_variables)
+        #     regularization_loss = tf.math.add_n(self.model.losses)
+        #     total_loss = loss + regularization_loss
+        # gradients = tape.gradient(total_loss, self.model.trainable_variables)
+        gradients = tape.gradient(loss, self.model.trainable_variables)
         self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
 
-        self.train_loss(total_loss)
+        self.train_loss(loss)
+        # self.train_loss(total_loss)
         self.train_accuracy(labels, predictions)
 
 

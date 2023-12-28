@@ -5,7 +5,7 @@ import tensorflow_datasets as tfds
 import os
 import pandas as pd
 
-from input_pipeline.preprocessing import preprocess, augment,resample
+from input_pipeline.preprocessing import preprocess, augment, resample
 
 
 # create tfrecord and load datasets
@@ -64,7 +64,7 @@ def _parse_tfrd_function(example_proto):
 
 
 @gin.configurable
-def load(name, data_dir, tfrd_dir):
+def load(name, data_dir, split_frac):
     if name == "idrid":
         logging.info(f"Preparing dataset {name}...")
 
@@ -78,44 +78,49 @@ def load(name, data_dir, tfrd_dir):
         test_labels = pd.read_csv(os.path.join(labels_dir, "test.csv"), usecols=["Image name", "Retinopathy grade"])
 
         # 分割训练集和验证集
-        val_size = int(len(train_labels) * 0.2)
+        val_size = int(len(train_labels) * split_frac)
         val_labels = train_labels[:val_size]
         train_labels = train_labels[val_size:]
 
+        # 获取当前工作目录
+        current_dir = os.getcwd()
+
         # 设置TFRecord文件的路径
-        val_tfrd_path = os.path.join(tfrd_dir, "val.tfrecord")
-        train_tfrd_path = os.path.join(tfrd_dir, "train.tfrecord")
-        test_tfrd_path = os.path.join(tfrd_dir, "test.tfrecord")
+        val_tfrd_path = os.path.join(current_dir, "val.tfrecord")
+        train_tfrd_path = os.path.join(current_dir, "train.tfrecord")
+        test_tfrd_path = os.path.join(current_dir, "test.tfrecord")
 
         # 创建TFRecord文件
         create_tfrecord(train_tfrd_path, train_img_dir, train_labels)
-        create_tfrecord(val_tfrd_path, train_img_dir, val_labels )
+        create_tfrecord(val_tfrd_path, train_img_dir, val_labels)
         create_tfrecord(test_tfrd_path, test_img_dir, test_labels)
 
-        # read TFRecord files and create origin dataset
+        # 读取TFRecord文件并创建原始数据集
         ds_train = tf.data.TFRecordDataset(train_tfrd_path).map(_parse_tfrd_function)
         ds_test = tf.data.TFRecordDataset(test_tfrd_path).map(_parse_tfrd_function)
-        ds_val=tf.data.TFRecordDataset(val_tfrd_path).map(_parse_tfrd_function)
+        ds_val = tf.data.TFRecordDataset(val_tfrd_path).map(_parse_tfrd_function)
 
         label0_count = 0
         label1_count = 0
 
-        for _, labels in ds_train:
-            # 遍历批处理中的每个标签
-            for label in labels.numpy():
-                if label == 0:
-                    label0_count += 1
-                elif label == 1:
-                    label1_count += 1
+        for _, label in ds_train:
+            label = label.numpy()
+            if label == 0:
+                label0_count += 1
+            elif label == 1:
+                label1_count += 1
 
         print(f"Label 0 count: {label0_count}")
         print(f"Label 1 count: {label1_count}")
+
         ds_info = {
             'train_size': label0_count+label1_count,
             'val_size': 40,
             'test_size': 103,
-            'label0_count':label0_count,
-            'label1_count': label1_count
+            'label0_count': label0_count,
+            'label1_count': label1_count,
+            'shape': (256, 256, 3),
+            'num_classes': 2
             # 其他信息
         }
 
