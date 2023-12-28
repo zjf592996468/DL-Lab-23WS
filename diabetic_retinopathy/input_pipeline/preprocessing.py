@@ -2,7 +2,7 @@ import gin
 import tensorflow as tf
 import tensorflow_addons as tfa
 import numpy as np
-import matplotlib.pyplot as plt
+
 
 def resample(datasets):
     class_0_ds = datasets.filter(lambda image, label: label == 0)
@@ -24,7 +24,7 @@ def preprocess(image, label, img_height, img_width):
 
 
 @gin.configurable()
-def augment(image, label, seed=2023):
+def augment(image, label, seed):
     """Data augmentation with a fixed seed for reproducibility"""
 
     # Randomly rotate the image by +- 0.125pi

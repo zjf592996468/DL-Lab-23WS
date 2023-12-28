@@ -23,7 +23,7 @@ def _int64_feature(value):
 
 
 # define func to create tfrecorder files
-def create_tfrecord(tfrd_path, img_dir, labels, group):
+def create_tfrecord(tfrd_path, img_dir, labels):
     with tf.io.TFRecordWriter(tfrd_path) as writer:
         # according to labels to read files
         for index, row in labels.iterrows():
@@ -32,8 +32,7 @@ def create_tfrecord(tfrd_path, img_dir, labels, group):
                 img = open(img_path, 'rb').read()
                 label = row['Retinopathy grade']
                 # according to task to group labels into 2 groups
-                if group:
-                    label = 0 if label in [0, 1] else 1
+                label = 0 if label in [0, 1] else 1
 
                 feature = {
                     'image': _bytes_feature(img),
@@ -65,7 +64,7 @@ def _parse_tfrd_function(example_proto):
 
 
 @gin.configurable
-def load(name, data_dir, tfrd_dir, group):
+def load(name, data_dir, tfrd_dir):
     if name == "idrid":
         logging.info(f"Preparing dataset {name}...")
 
@@ -79,7 +78,7 @@ def load(name, data_dir, tfrd_dir, group):
         test_labels = pd.read_csv(os.path.join(labels_dir, "test.csv"), usecols=["Image name", "Retinopathy grade"])
 
         # 分割训练集和验证集
-        val_size = int(len(train_labels) * 0.1)
+        val_size = int(len(train_labels) * 0.2)
         val_labels = train_labels[:val_size]
         train_labels = train_labels[val_size:]
 
@@ -89,9 +88,9 @@ def load(name, data_dir, tfrd_dir, group):
         test_tfrd_path = os.path.join(tfrd_dir, "test.tfrecord")
 
         # 创建TFRecord文件
-        create_tfrecord(train_tfrd_path, train_img_dir, train_labels, group)
-        create_tfrecord(val_tfrd_path, train_img_dir, val_labels, group)
-        create_tfrecord(test_tfrd_path, test_img_dir, test_labels, group)
+        create_tfrecord(train_tfrd_path, train_img_dir, train_labels)
+        create_tfrecord(val_tfrd_path, train_img_dir, val_labels )
+        create_tfrecord(test_tfrd_path, test_img_dir, test_labels)
 
         # read TFRecord files and create origin dataset
         ds_train = tf.data.TFRecordDataset(train_tfrd_path).map(_parse_tfrd_function)
@@ -105,7 +104,7 @@ def load(name, data_dir, tfrd_dir, group):
             # 其他信息
         }
 
-        return prepare(ds_train, ds_val, ds_test, ds_info, batch_size=32, caching=True)
+        return prepare(ds_train, ds_val, ds_test, ds_info, seed=2023,batch_size=32, caching=True)
 
     elif name == "eyepacs":
         logging.info(f"Preparing dataset {name}...")
@@ -144,7 +143,7 @@ def load(name, data_dir, tfrd_dir, group):
 
 
 @gin.configurable
-def prepare(ds_train, ds_val, ds_test, ds_info, batch_size, caching):
+def prepare(ds_train, ds_val, ds_test, ds_info, seed, batch_size, caching):
     # Prepare training dataset
     ds_train = ds_train.map(
         preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
@@ -156,7 +155,7 @@ def prepare(ds_train, ds_val, ds_test, ds_info, batch_size, caching):
 
     ds_train = ds_train.map(
         augment, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-    ds_train = ds_train.shuffle(40)
+    ds_train = ds_train.shuffle(buffer_size=400, seed=seed)
     ds_train = ds_train.batch(batch_size)
     ds_train = ds_train.repeat(-1)
     ds_train = ds_train.prefetch(tf.data.experimental.AUTOTUNE)

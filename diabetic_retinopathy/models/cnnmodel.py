@@ -3,12 +3,13 @@ import tensorflow as tf
 import gin
 
 @gin.configurable
-def create_cnn_nets(input_shape, num_blocks, filters, kernel_size, dense_units, dropout_rate, l2_lambda):
+def create_cnn_nets(input_shape, num_blocks,num_classes,filters, kernel_size, dense_units, dropout_rate,seed, l2_lambda):
     """
     Builds an advanced CNN model for binary classification with multiple CNN blocks and L2 regularization.
     Parameters:
         input_shape (tuple): Shape of the input images.
         num_blocks (int): Number of CNN blocks to be used.
+        num_classes: output
         filters (int): Number of filters for the first CNN block.
         kernel_size (tuple): Size of the kernel for the CNN blocks.
         dense_units (int): Number of units in the dense layer.
@@ -29,9 +30,9 @@ def create_cnn_nets(input_shape, num_blocks, filters, kernel_size, dense_units, 
     out = tf.keras.layers.GlobalAveragePooling2D()(x)
     out = tf.keras.layers.Dense(dense_units, activation=tf.nn.relu,
                                 kernel_regularizer=tf.keras.regularizers.l2(l2_lambda),
-                                kernel_initializer='glorot_uniform')(out)
+                                kernel_initializer=tf.keras.initializers.glorot_uniform(seed))(out)
     out = tf.keras.layers.Dropout(dropout_rate)(out)
-    outputs = tf.keras.layers.Dense(2, kernel_regularizer=tf.keras.regularizers.l2(l2_lambda),
-                                    kernel_initializer='glorot_uniform')(out)
+    outputs = tf.keras.layers.Dense(units=num_classes, kernel_regularizer=tf.keras.regularizers.l2(l2_lambda),
+                                    kernel_initializer=tf.keras.initializers.glorot_uniform(seed))(out)
 
     return tf.keras.Model(inputs=inputs, outputs=outputs, name='cnn_like')

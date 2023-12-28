@@ -1,3 +1,7 @@
+# Global Seed
+GLOBAL_SEED = 2023
+l2_lambda=0.005
+
 # Architectures
 vgg_like.base_filters = 8
 vgg_like.n_blocks = 3
@@ -9,14 +13,16 @@ vgg_block.kernel_size = (3, 3)
 
 # cnn Models
 create_cnn_nets.input_shape = (256, 256, 3)
-#create_cnn_nets.num_classes = 2
+create_cnn_nets.num_classes = 2
 create_cnn_nets.num_blocks = 3
 create_cnn_nets.filters = 8
 create_cnn_nets.kernel_size = (3, 3)
 create_cnn_nets.dense_units = 128
 create_cnn_nets.dropout_rate= 0.5
-create_cnn_nets.l2_lambda=0.005
-cnn_block.l2_lambda=0.005
+create_cnn_nets.l2_lambda=%l2_lambda
+cnn_block.l2_lambda=%l2_lambda
+cnn_block.seed= %GLOBAL_SEED
+create_cnn_nets.seed= %GLOBAL_SEED
 
 # Training
 Trainer.total_steps = 1e5
@@ -34,3 +40,4 @@ load.data_dir = r'/home/data/IDRID_dataset'
 load.tfrd_dir = r'/home/RUS_CIP/st186635'
 preprocess.img_height = 256
 preprocess.img_width = 256
+augment.seed=%GLOBAL_SEED

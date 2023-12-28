@@ -2,7 +2,7 @@ import tensorflow as tf
 import gin
 
 @gin.configurable
-def cnn_block(inputs, filters, kernel_size,l2_lambda, pool_size=(2, 2)):
+def cnn_block(inputs, filters, kernel_size,l2_lambda,seed, pool_size=(2, 2)):
     """
     Creates a CNN block with convolution, activation, batch normalization, max pooling, and L2 regularization.
     Parameters:
@@ -15,7 +15,8 @@ def cnn_block(inputs, filters, kernel_size,l2_lambda, pool_size=(2, 2)):
         Tensor: Output tensor of the CNN block.
     """
     x = tf.keras.layers.Conv2D(filters, kernel_size, padding='same', activation='relu',
-                               kernel_regularizer=tf.keras.regularizers.l2(l2_lambda),kernel_initializer='glorot_uniform')(inputs)
+                               kernel_regularizer=tf.keras.regularizers.l2(l2_lambda),
+                               kernel_initializer=tf.keras.initializers.glorot_uniform(seed))(inputs)
     x = tf.keras.layers.BatchNormalization()(x)
     x = tf.keras.layers.MaxPooling2D(pool_size)(x)
     return x
