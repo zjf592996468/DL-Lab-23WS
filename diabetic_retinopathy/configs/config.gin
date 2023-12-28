@@ -15,8 +15,8 @@ create_cnn_nets.filters = 8
 create_cnn_nets.kernel_size = (3, 3)
 create_cnn_nets.dense_units = 128
 create_cnn_nets.dropout_rate= 0.5
-create_cnn_nets.l2_lambda=0.001
-cnn_block.l2_lambda=0.001
+create_cnn_nets.l2_lambda=0.005
+cnn_block.l2_lambda=0.005
 
 # Training
 Trainer.total_steps = 1e5

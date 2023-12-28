@@ -29,7 +29,7 @@ def main(argv):
 
     # setup wandb
     wandb.login(key="f27c584f9e444901abf85615134f27d2da6e411d")
-    wandb.init(project='idrid-cnn', name=run_paths['model_id'],
+    wandb.init(project='idrid-cnn-cy', name=run_paths['model_id'],
                config=utils_params.gin_config_to_readable_dictionary(gin.config._CONFIG))
     logging.info("Wandb logged in")
 

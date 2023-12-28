@@ -65,7 +65,7 @@ class Trainer(object):
         self.val_accuracy(labels, predictions)
 
     def train(self):
-        wandb.init(project='idrid-cnn', name=self.run_paths['model_id'])
+        wandb.init(project='idrid-cnn-cy', name=self.run_paths['model_id'])
         for idx, (images, labels) in enumerate(self.ds_train):
 
             step = idx + 1
