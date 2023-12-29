@@ -65,6 +65,9 @@ def main(argv):
     #             ax.axis('off')  # 隐藏多余的子图
     #     plt.show()
 
+
+
+
     # model vgg
     logging.info("start model initialization")
     # model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
