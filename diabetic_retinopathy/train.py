@@ -50,6 +50,7 @@ class Trainer(object):
         self.train_accuracy(labels, predictions)
 
     # this is train step with l2
+    @tf.function
     def train_step_l2(self, images, labels):
         with tf.GradientTape() as tape:
             # training=True is only needed if there are layers with different
@@ -83,7 +84,7 @@ class Trainer(object):
         for idx, (images, labels) in enumerate(self.ds_train):
 
             step = idx + 1
-            self.train_step_l2(images, labels)
+            self.train_step(images, labels)
 
             if step % self.log_interval == 0:
 

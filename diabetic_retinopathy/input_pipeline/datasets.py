@@ -110,16 +110,22 @@ def load(name, data_dir, split_frac):
             elif label == 1:
                 label1_count += 1
 
-        print(f"Label 0 count: {label0_count}")
-        print(f"Label 1 count: {label1_count}")
+        # this is for test ob train datasets is correct
+        # print(f"Label 0 count: {label0_count}")
+        # print(f"Label 1 count: {label1_count}")
 
+        for image, label in ds_train.take(1):
+            # get image shape
+            shape = image.numpy().shape
+
+        # 更新 ds_info 字典
         ds_info = {
-            'train_size': label0_count+label1_count,
-            'val_size': 40,
+            'train_size': label0_count + label1_count,  # 假设这些变量已经定义
+            'val_size': 413-(label0_count + label1_count),
             'test_size': 103,
             'label0_count': label0_count,
             'label1_count': label1_count,
-            'shape': (256, 256, 3),
+            'shape': shape,  # 更新形状
             'num_classes': 2
             # 其他信息
         }
