@@ -7,13 +7,13 @@ from evaluation.eval import evaluate
 from evaluation.eval import evaluate1
 from input_pipeline import datasets
 from utils import utils_params, utils_misc
-from transfer_learning.model import transfermodel
+from transfer_learning.vgg16 import transfermodel
 from models.architectures import vgg_like
 from models.cnnmodel import create_cnn_nets
 import tensorflow as tf
 
 FLAGS = flags.FLAGS
-flags.DEFINE_boolean('train', True, 'Specify whether to train or evaluate a model.')
+flags.DEFINE_boolean('train', False, 'Specify whether to train or evaluate a model.')
 
 def main(argv):
     # generate folder structures

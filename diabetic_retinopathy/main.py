@@ -37,44 +37,13 @@ def main(argv):
     ds_train, ds_val, ds_test, ds_info = datasets.load()
     logging.info("Dataset IDRID is successfully loaded")
 
-    # # 下面的代码仅用于debug时查看ds中的数据是否正常
-    # import matplotlib.pyplot as plt
-    # import numpy as np
-    # # 创建一个迭代器
-    # iterator = iter(ds_train)
-    # # 设置子图的行和列数
-    # rows, cols = 4, 8
-    # # 显示所有批次的图像
-    # for sample_batch in iterator:
-    #     # 提取图像和标签
-    #     sample_images = sample_batch[0]
-    #     sample_labels = sample_batch[1]
-    #     # 获取当前批次的图像数量和批次大小
-    #     batch_size = len(sample_images)
-    #     # 计算调整后的行和列数
-    #     adjusted_rows = int(np.ceil(batch_size / cols))
-    #     adjusted_cols = min(batch_size, cols)
-    #     # 显示这个批次的图像
-    #     fig, axes = plt.subplots(adjusted_rows, adjusted_cols, figsize=(16, 8))
-    #     for i, ax in enumerate(axes.flat):
-    #         if i < batch_size:
-    #             ax.imshow(sample_images[i].numpy())  # 假设图像是彩色的
-    #             ax.set_title(f"Label: {sample_labels[i].numpy()}")
-    #             ax.axis('off')
-    #         else:
-    #             ax.axis('off')  # 隐藏多余的子图
-    #     plt.show()
-
-
-
-
     # model vgg
     logging.info("start model initialization")
-    # model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
+    model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
     # logging.info("model-vgg_like initialized")
 
     # model cnn
-    model = create_cnn_nets(ds_info)
+    # model = create_cnn_nets(ds_info)
     logging.info("model-cnn initialized")
     logging.info(model.summary())
 

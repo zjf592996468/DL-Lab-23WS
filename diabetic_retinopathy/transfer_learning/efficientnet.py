@@ -1,4 +1,3 @@
-import gin
 import tensorflow as tf
 import tensorflow_hub as hub
 from tensorflow.python.keras.layers import Dense, Dropout,GlobalAveragePooling2D
@@ -10,7 +9,7 @@ def transfermodel(input_shape, n_classes, dropout_rate=0.5, dense_units=1024):
 
     model = Sequential([
         hub.KerasLayer(efficientnet_url, input_shape=input_shape, trainable=False),
-        # 如果预训练模型输出二维张量，则不需要 GlobalAveragePooling2D
+
         Dense(dense_units, activation='relu'),
         Dropout(dropout_rate),
         Dense(n_classes)

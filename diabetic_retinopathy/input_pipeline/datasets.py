@@ -120,12 +120,12 @@ def load(name, data_dir, split_frac):
 
         # 更新 ds_info 字典
         ds_info = {
-            'train_size': label0_count + label1_count,  # 假设这些变量已经定义
+            'train_size': label0_count + label1_count,
             'val_size': 413-(label0_count + label1_count),
             'test_size': 103,
             'label0_count': label0_count,
             'label1_count': label1_count,
-            'shape': shape,  # 更新形状
+            'shape': shape,
             'num_classes': 2
             # 其他信息
         }
@@ -176,12 +176,20 @@ def prepare(ds_train, ds_val, ds_test, ds_info, seed, batch_size, caching):
 
     ds_train = resample(ds_train)
 
+    for image, label in ds_train.take(1):
+        # get image shape
+        shape = image.numpy().shape
+    ds_info.update({
+
+        'shape': shape,
+    })
+
     if caching:
         ds_train = ds_train.cache()
 
     ds_train = ds_train.map(
         augment, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-    ds_train = ds_train.shuffle(buffer_size=400, seed=seed)
+    ds_train = ds_train.shuffle(buffer_size=40, seed=seed)
     ds_train = ds_train.batch(batch_size)
     ds_train = ds_train.repeat(-1)
     ds_train = ds_train.prefetch(tf.data.experimental.AUTOTUNE)
