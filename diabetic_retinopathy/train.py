@@ -43,15 +43,28 @@ class Trainer(object):
             # behavior during training versus inference (e.g. Dropout).
             predictions = self.model(images, training=True)
             loss = self.loss_object(labels, predictions)
-            # Add regularisation losses from the model
-        #     regularization_loss = tf.math.add_n(self.model.losses)
-        #     total_loss = loss + regularization_loss
-        # gradients = tape.gradient(total_loss, self.model.trainable_variables)
+
         gradients = tape.gradient(loss, self.model.trainable_variables)
         self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
-
         self.train_loss(loss)
-        # self.train_loss(total_loss)
+        self.train_accuracy(labels, predictions)
+
+    # this is train step with l2
+    def train_step_l2(self, images, labels):
+        with tf.GradientTape() as tape:
+            # training=True is only needed if there are layers with different
+            # behavior during training versus inference (e.g. Dropout).
+            predictions = self.model(images, training=True)
+            loss = self.loss_object(labels, predictions)
+            # Add regularisation losses from the model
+            regularization_loss = tf.math.add_n(self.model.losses)
+            total_loss = loss + regularization_loss
+        gradients = tape.gradient(total_loss, self.model.trainable_variables)
+
+        self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
+
+
+        self.train_loss(total_loss)
         self.train_accuracy(labels, predictions)
 
 
@@ -70,7 +83,7 @@ class Trainer(object):
         for idx, (images, labels) in enumerate(self.ds_train):
 
             step = idx + 1
-            self.train_step(images, labels)
+            self.train_step_l2(images, labels)
 
             if step % self.log_interval == 0:
 
