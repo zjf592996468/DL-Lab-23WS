@@ -16,9 +16,9 @@ def evaluate(model: tf.keras.Model, checkpoint: object, ds_test: tf.data.Dataset
     pred_probs = []
 
     for x, y in ds_test:
-        y_pred = model.predict(x)
+        y_pred = model(x, training=False)  # 直接在模型上调用 x
         true_labels.extend(y.numpy())
-        pred_probs.extend(y_pred)
+        pred_probs.extend(y_pred.numpy())  # 使用 numpy() 转换
 
     true_labels = np.array(true_labels)
     pred_labels = np.argmax(pred_probs, axis=1)
@@ -66,9 +66,9 @@ def evaluate1(model: tf.keras.Model, ds_test: tf.data.Dataset, run_paths) -> np.
     pred_probs = []
 
     for x, y in ds_test:
-        y_pred = model.predict(x)
+        y_pred = model(x, training=False)  # 直接在模型上调用 x
         true_labels.extend(y.numpy())
-        pred_probs.extend(y_pred)
+        pred_probs.extend(y_pred.numpy())  # 使用 numpy() 转换
 
     true_labels = np.array(true_labels)
     pred_labels = np.argmax(pred_probs, axis=1)

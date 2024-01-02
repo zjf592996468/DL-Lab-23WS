@@ -4,7 +4,7 @@ import tensorflow as tf
 import tensorflow_datasets as tfds
 import os
 import pandas as pd
-
+from sklearn.model_selection import train_test_split
 from input_pipeline.preprocessing import preprocess, augment, resample
 
 
@@ -74,7 +74,12 @@ def load(name, data_dir, split_frac):
         labels_dir = os.path.join(data_dir, "labels")
 
         # 读取标签文件
+
         train_labels = pd.read_csv(os.path.join(labels_dir, "train.csv"), usecols=["Image name", "Retinopathy grade"])
+        # 进行分层抽样
+        train_labels, val_labels = train_test_split(train_labels, test_size=split_frac,
+                                                    stratify=train_labels['Retinopathy grade'])
+
         test_labels = pd.read_csv(os.path.join(labels_dir, "test.csv"), usecols=["Image name", "Retinopathy grade"])
 
         # 分割训练集和验证集
