@@ -12,7 +12,7 @@ from models.cnnmodel import create_cnn_nets
 import tensorflow as tf
 
 FLAGS = flags.FLAGS
-flags.DEFINE_boolean('train', True, 'Specify whether to train or evaluate a model.')
+flags.DEFINE_boolean('train', False, 'Specify whether to train or evaluate a model.')
 
 
 
@@ -39,11 +39,11 @@ def main(argv):
 
     # model vgg
     logging.info("start model initialization")
-    model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
+    #model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
     # logging.info("model-vgg_like initialized")
 
     # model cnn
-    # model = create_cnn_nets(ds_info)
+    model = create_cnn_nets(ds_info)
     logging.info("model-cnn initialized")
     logging.info(model.summary())
 

@@ -1,6 +1,6 @@
 # Global Seed
 GLOBAL_SEED = 2023
-l2_lambda= 0.005
+l2_lambda= 0.0069876317967560424
 
 # Architectures
 vgg_like.base_filters = 8
@@ -15,10 +15,10 @@ vgg_block.kernel_size = (3, 3)
 create_cnn_nets.input_shape = (256, 256, 3)
 create_cnn_nets.num_classes = 2
 create_cnn_nets.num_blocks = 3
-create_cnn_nets.filters = 32
+create_cnn_nets.filters = 20
 create_cnn_nets.kernel_size = (3, 3)
-create_cnn_nets.dense_units = 128
-create_cnn_nets.dropout_rate=0.4
+create_cnn_nets.dense_units = 107
+create_cnn_nets.dropout_rate=0.501690801037651
 create_cnn_nets.l2_lambda=%l2_lambda
 cnn_block.l2_lambda=%l2_lambda
 cnn_block.seed= %GLOBAL_SEED
@@ -40,6 +40,6 @@ load.data_dir = r'D:\idrid\IDRID_dataset'
 load.split_frac=0.2
 
 # if use cnn 256*256*3, if use transfer learning 224*224*3
-preprocess.img_height = 224
-preprocess.img_width = 224
+preprocess.img_height = 256
+preprocess.img_width = 256
 augment.seed=%GLOBAL_SEED

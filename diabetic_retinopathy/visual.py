@@ -1,5 +1,5 @@
 import gin
-from deep_visualization.cam import grad_cam
+from deep_visualization.cam import grad_cam,overlay_heatmap
 from deep_visualization.guidcam import guided_grad_cam
 from input_pipeline.datasets import load
 from utils import utils_params, utils_misc
@@ -8,6 +8,8 @@ from models.cnnmodel import create_cnn_nets
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from absl import app
+from train import Trainer
+import matplotlib
 
 def main(argv):
     # generate folder structures
@@ -44,35 +46,40 @@ def main(argv):
     heatmap_cam = grad_cam(model, image, category_index, layer_name)
     heatmap_guid = guided_grad_cam(model, image, category_index, layer_name)
     original_image = image[0].numpy()
+    overlayed_image=overlay_heatmap(orig_image=original_image,heatmap=heatmap_cam)
+    overlayed_image1=overlay_heatmap(orig_image=original_image,heatmap=heatmap_guid)
+    # 创建一个 2x3 的子图
+    fig, axs = plt.subplots(2, 3, figsize=(15, 10))
 
-
-    # 创建一个2行2列的子图结构
-    fig, axs = plt.subplots(2, 2, figsize=(10, 10))
-
-    # 子图1：原图
+    # 在第一行显示原始图像和叠加的热力图
     axs[0, 0].imshow(original_image)
-    axs[0, 0].set_title("Original Image")
-    axs[0, 0].axis('off')  # 关闭坐标轴
+    axs[0, 0].set_title('Original Image')
+    axs[0, 0].axis('off')
 
-    # 子图2：Grad-CAM 热力图
-    axs[0, 1].imshow(original_image, alpha=0.75)  # 首先显示原图
-    axs[0, 1].imshow(heatmap_cam, cmap='jet', alpha=0.5)  # 叠加显示热力图，半透明
-    axs[0, 1].set_title("Grad-CAM")
-    axs[0, 1].axis('off')  # 关闭坐标轴
+    axs[0, 1].imshow(heatmap_cam)
+    axs[0, 1].set_title('Grad-CAM')
+    axs[0, 1].axis('off')
 
-    # 子图3：Guided Grad-CAM 热力图
-    axs[1, 0].imshow(original_image, alpha=0.75)  # 首先显示原图
-    axs[1, 0].imshow(heatmap_guid, cmap='jet', alpha=0.5)  # 叠加显示热力图，半透明
-    axs[1, 0].set_title("Guided Grad-CAM")
-    axs[1, 0].axis('off')  # 关闭坐标轴
+    axs[0, 2].imshow(overlayed_image)
+    axs[0, 2].set_title('Overlayed Grad-CAM')
+    axs[0, 2].axis('off')
 
-    # 第四个子图我们不使用，可以隐藏它
+    # 在第二行显示原始图像、Guided Grad-CAM 和叠加的 Guided Grad-CAM
+    axs[1, 0].imshow(original_image)
+    axs[1, 0].set_title('Original Image')
+    axs[1, 0].axis('off')
+
+    axs[1, 1].imshow(heatmap_guid)
+    axs[1, 1].set_title('Guided Grad-CAM')
     axs[1, 1].axis('off')
 
-    # 调整子图间的空间
+    axs[1, 2].imshow(overlayed_image1)
+    axs[1, 2].set_title('Overlayed Guided Grad-CAM')
+    axs[1, 2].axis('off')
+
     plt.tight_layout()
-    # 显示图形
     plt.show()
+    matplotlib.use('Agg')
 
 if __name__ == "__main__":
     app.run(main)

@@ -3,19 +3,22 @@ import numpy as np
 
 
 # 修改 ReLU 行为
+# Define the guided ReLU activation function
 @tf.custom_gradient
 def guided_relu(x):
     def grad(dy):
         return tf.cast(dy > 0, "float32") * tf.cast(x > 0, "float32") * dy
-
     return tf.nn.relu(x), grad
 
-
-# 应用 Guided ReLU
+# Function to recursively replace ReLU activations
 def replace_relu_with_guided_relu(model):
     for layer in model.layers:
-        if isinstance(layer, tf.keras.layers.ReLU):
+        if hasattr(layer, 'activation') and layer.activation == tf.keras.activations.relu:
             layer.activation = guided_relu
+        # If the layer is a model itself, recursively replace its ReLU
+        if hasattr(layer, 'layers'):
+            replace_relu_with_guided_relu(layer)
+    # After modifying the model, return it
     return model
 
 
@@ -23,6 +26,7 @@ def guided_grad_cam(model, image, category_index, layer_name):
 
     # 创建新的模型，以获取卷积层输出和最终预测
     grad_model = tf.keras.models.Model([model.inputs], [model.get_layer(layer_name).output, model.output])
+
     # 用 Guided ReLU 替换标准的 ReLU
     model = replace_relu_with_guided_relu(grad_model)
 

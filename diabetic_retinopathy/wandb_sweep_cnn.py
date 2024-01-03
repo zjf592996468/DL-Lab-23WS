@@ -7,7 +7,7 @@ from input_pipeline.datasets import load
 from train import Trainer
 from utils import utils_params, utils_misc
 from models.cnnmodel import create_cnn_nets
-
+from models.architectures import vgg_like
 
 def train_func():
     with wandb.init() as run:
@@ -31,7 +31,7 @@ def train_func():
         ds_train, ds_val, ds_test, ds_info = load()
 
         # model
-        model = create_cnn_nets()
+        model = create_cnn_nets(ds_info)
 
         trainer = Trainer(model, ds_train, ds_val, ds_info, run_paths)
         for _ in trainer.train():
@@ -80,5 +80,5 @@ sweep_config = {
 }
 wandb.login(key="f27c584f9e444901abf85615134f27d2da6e411d")
 sweep_id = wandb.sweep(sweep_config)
-wandb.agent(sweep_id, function=train_func, count=20)
+wandb.agent(sweep_id, function=train_func, count=25)
 wandb.finish()

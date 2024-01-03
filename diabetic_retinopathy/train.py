@@ -84,7 +84,7 @@ class Trainer(object):
         for idx, (images, labels) in enumerate(self.ds_train):
 
             step = idx + 1
-            self.train_step(images, labels)
+            self.train_step_l2(images, labels)
 
             if step % self.log_interval == 0:
 
