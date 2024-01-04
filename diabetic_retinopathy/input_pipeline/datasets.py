@@ -32,7 +32,7 @@ def create_tfrecord(tfrd_path, img_dir, labels):
                 img = open(img_path, 'rb').read()
                 label = row['Retinopathy grade']
                 # according to task to group labels into 2 groups
-                label = 0 if label in [0, 1] else 1
+                # label = 0 if label in [0, 1] else 1
 
                 feature = {
                     'image': _bytes_feature(img),
