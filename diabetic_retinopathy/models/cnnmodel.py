@@ -2,14 +2,16 @@ from models.cnnblocks import cnn_block
 import tensorflow as tf
 import gin
 import numpy as np
+
+
 @gin.configurable
-def create_cnn_nets(ds_info, input_shape, num_blocks, num_classes,filters, kernel_size, dense_units, dropout_rate, seed, l2_lambda):
+def create_cnn_nets(input_shape, num_blocks, n_classes, filters, kernel_size, dense_units, dropout_rate, seed, l2_lambda):
     """
     Builds an advanced CNN model for binary classification with multiple CNN blocks and L2 regularization.
     Parameters:
         input_shape (tuple): Shape of the input images.
         num_blocks (int): Number of CNN blocks to be used.
-        num_classes: output
+        n_classes (int): output
         filters (int): Number of filters for the first CNN block.
         kernel_size (tuple): Size of the kernel for the CNN blocks.
         dense_units (int): Number of units in the dense layer.
@@ -28,8 +30,8 @@ def create_cnn_nets(ds_info, input_shape, num_blocks, num_classes,filters, kerne
     inputs = tf.keras.Input(shape=input_shape)
     x = inputs
 
-    label0_count = ds_info['label0_count']
-    label1_count = ds_info['label1_count']
+    label0_count = 1
+    label1_count = 1
 
     # 计算初始偏差
     initial_bias_value = np.log([label0_count / label1_count])
@@ -43,7 +45,7 @@ def create_cnn_nets(ds_info, input_shape, num_blocks, num_classes,filters, kerne
                                 kernel_regularizer=tf.keras.regularizers.l2(l2_lambda),
                                 kernel_initializer=tf.keras.initializers.glorot_uniform(seed))(out)
     out = tf.keras.layers.Dropout(dropout_rate)(out)
-    outputs = tf.keras.layers.Dense(units=num_classes, kernel_regularizer=tf.keras.regularizers.l2(l2_lambda),
+    outputs = tf.keras.layers.Dense(units=n_classes, kernel_regularizer=tf.keras.regularizers.l2(l2_lambda),
                                     kernel_initializer=tf.keras.initializers.glorot_uniform(seed),
                                     bias_initializer=tf.keras.initializers.Constant(initial_bias_value))(out)
 

@@ -1,15 +1,39 @@
 import gin
 import tensorflow as tf
+import matplotlib.pyplot as plt
 import tensorflow_addons as tfa
 import numpy as np
 
 
-def resample(datasets):
-    class_0_ds = datasets.filter(lambda image, label: label == 0)
-    class_1_ds = datasets.filter(lambda image, label: label == 1)
-    weights = [0.5, 0.5]  # 重采样权重
-    resampled_ds = tf.data.experimental.sample_from_datasets([class_0_ds, class_1_ds], weights)
-    return resampled_ds
+def check_imb(labels):
+    """check and plot imbalance situation, return num of classes and num of samples in each class"""
+    # Calculate the num of each class
+    label_counts = labels["Retinopathy grade"].value_counts().sort_index()
+
+    # Set different color for each class
+    colors = plt.cm.tab10(range(label_counts.index.shape[0]))  # Options: Accent, tab10, Paired
+
+    # Plot the figure
+    plt.figure(figsize=(8, 6))
+    bars = plt.bar(label_counts.index, label_counts.values, color=colors, label='Class percentages')
+    plt.xlabel('Class')
+    plt.ylabel('Number of Samples')
+    plt.title('Class Distribution')
+    plt.xticks(label_counts.index)
+
+    # Show num on the bar
+    for i, count in enumerate(label_counts.values):
+        plt.text(label_counts.index[i], count, str(count), ha='center', va='bottom')
+
+    # Show the legend with percent info
+    total_samples = sum(label_counts.values)
+    percents = [count / total_samples * 100 for count in label_counts.values]
+    legend_labels = [f'Class {label_counts.index[i]}: {percents[i]:.2f}%' for i in range(label_counts.index.shape[0])]
+    plt.legend(bars, legend_labels, bbox_to_anchor=(1, 1))
+    plt.tight_layout()
+
+    return plt
+
 
 @gin.configurable
 def preprocess(image, label, img_height, img_width):

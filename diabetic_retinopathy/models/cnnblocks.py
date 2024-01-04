@@ -1,6 +1,8 @@
 import tensorflow as tf
 import gin
 import numpy as np
+
+
 @gin.configurable
 def cnn_block(inputs, filters, kernel_size, l2_lambda, seed, pool_size=(2, 2)):
     """

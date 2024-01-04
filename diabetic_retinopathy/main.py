@@ -12,8 +12,10 @@ from models.cnnmodel import create_cnn_nets
 import tensorflow as tf
 
 FLAGS = flags.FLAGS
-flags.DEFINE_boolean('train', False, 'Specify whether to train or evaluate a model.')
-
+flags.DEFINE_boolean('train', True, 'Specify whether to train or evaluate a model.')
+flags.DEFINE_boolean('multi_class', False, 'Specify whether to take multi_classification')
+flags.DEFINE_string('model_name', 'cnn', 'The name of the model')
+flags.DEFINE_string('wandb', 'idrid-cnn-cy', 'The name of the wandb project')
 
 
 def main(argv):
@@ -29,7 +31,7 @@ def main(argv):
 
     # setup wandb
     wandb.login(key="f27c584f9e444901abf85615134f27d2da6e411d")
-    wandb.init(project='idrid-cnn-cy', name=run_paths['model_id'],
+    wandb.init(project=FLAGS.wandb, name=run_paths['model_id'],
                config=utils_params.gin_config_to_readable_dictionary(gin.config._CONFIG))
     logging.info("Wandb logged in")
 
@@ -37,14 +39,16 @@ def main(argv):
     ds_train, ds_val, ds_test, ds_info = datasets.load()
     logging.info("Dataset IDRID is successfully loaded")
 
-    # model vgg
+    # use chosen model
     logging.info("start model initialization")
-    #model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
-    # logging.info("model-vgg_like initialized")
-
+    # model vgg
+    if FLAGS.model_name == 'vgg':
+        model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
+        logging.info("model-vgg_like initialized")
     # model cnn
-    model = create_cnn_nets(ds_info)
-    logging.info("model-cnn initialized")
+    elif FLAGS.model_name == 'cnn':
+        model = create_cnn_nets(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
+        logging.info("model-cnn initialized")
     logging.info(model.summary())
 
     # checkpoints
