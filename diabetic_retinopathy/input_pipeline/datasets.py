@@ -92,8 +92,8 @@ def load(name, data_dir, split_frac, seed):
         # Binarise the dataset when not doing multi classification
         if not FLAGS.multi_class:
             # Group all data into 2 groups, with 0 represents NRDR, 1 represents RDR
-            train_labels['Retinopathy grade'] = (train_labels['Retinopathy grade'] >= 1).astype(int)
-            test_labels['Retinopathy grade'] = (test_labels['Retinopathy grade'] >= 1).astype(int)
+            train_labels['Retinopathy grade'] = (train_labels['Retinopathy grade'] > 1).astype(int)
+            test_labels['Retinopathy grade'] = (test_labels['Retinopathy grade'] > 1).astype(int)
 
             # Check and plot the distribution of binarised dataset
             fig = check_imb(train_labels)
@@ -114,30 +114,41 @@ def load(name, data_dir, split_frac, seed):
         logging.info(f"Num of val samples is: {val_size}")
         logging.info(f"Num of test samples is: {test_labels.shape[0]}")
 
-        # Resample the train dataset with oversampling
-        class_counts = train_dataset['Retinopathy grade'].value_counts()
-        targ_size = class_counts.max()
-        train_dataset = train_dataset.groupby('Retinopathy grade').apply(
-            lambda x: x.sample(targ_size, replace=True, random_state=seed))
-        train_dataset = train_dataset.sample(frac=1, random_state=seed).reset_index(drop=True)
-        logging.info(f"Train dataset is resampled.")
-        train_size = train_dataset.shape[0]
-        logging.info(f"Num of train samples after resampling is: {train_size}")
-
-        # Check and plot the distribution of resampled dataset
-        fig = check_imb(train_dataset)
-        fig.title('Class Distribution After Resampling')
-        fig.savefig(store_dir / 'Class distribution after resampling.png')
-        logging.info(f"Class distribution after resampling is saved to {store_dir.resolve()}")
-        fig.close()
+        # # Resample the train dataset with oversampling
+        # class_counts = train_dataset['Retinopathy grade'].value_counts().sort_index()
+        # targ_size = class_counts.max()
+        # train_dataset = train_dataset.groupby('Retinopathy grade').apply(
+        #     lambda x: x.sample(targ_size, replace=True, random_state=seed))
+        # train_dataset = train_dataset.sample(frac=1, random_state=seed).reset_index(drop=True)
+        # logging.info(f"Train dataset is resampled.")
+        # train_size = train_dataset.shape[0]
+        # logging.info(f"Num of train samples after resampling is: {train_size}")
+        #
+        # # Check and plot the distribution of resampled dataset
+        # fig = check_imb(train_dataset)
+        # fig.title('Class Distribution After Resampling')
+        # fig.savefig(store_dir / 'Class distribution after resampling.png')
+        # logging.info(f"Class distribution after resampling is saved to {store_dir.resolve()}")
+        # fig.close()
 
         # Build dataset info
+        class_counts = train_dataset['Retinopathy grade'].value_counts().sort_index()
         ds_info = {
             'train_size': train_size,
             'val_size': val_size,
             'test_size': test_labels.shape[0],
             'num_classes': class_counts.shape[0],
+            'class0_counts': class_counts.values[0],
+            'class1_counts': class_counts.values[1],
         }
+
+        # Update ds_info when doing multi classification
+        if FLAGS.multi_class:
+            ds_info.update({
+                'class2_counts': class_counts.values[2],
+                'class3_counts': class_counts.values[3],
+                'class4_counts': class_counts.values[4],
+            })
 
         # Create TFRecord files for train, val and test
         create_tfrecord(train_tfrd_path, train_img_dir, train_dataset)

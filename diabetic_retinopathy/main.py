@@ -47,9 +47,9 @@ def main(argv):
         logging.info("model-vgg_like initialized")
     # model cnn
     elif FLAGS.model_name == 'cnn':
-        model = create_cnn_nets(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
+        model = create_cnn_nets(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'], ds_info=ds_info)
         logging.info("model-cnn initialized")
-    logging.info(model.summary())
+    logging.info(f"{model.summary()}")
 
     # checkpoints
     ckpt = tf.train.Checkpoint(model=model, optimizer=tf.keras.optimizers.Adam())

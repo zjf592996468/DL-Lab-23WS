@@ -5,10 +5,12 @@ import numpy as np
 
 
 @gin.configurable
-def create_cnn_nets(input_shape, num_blocks, n_classes, filters, kernel_size, dense_units, dropout_rate, seed, l2_lambda):
+def create_cnn_nets(ds_info, input_shape, num_blocks, n_classes, filters, kernel_size, dense_units, dropout_rate,
+                    seed, l2_lambda):
     """
     Builds an advanced CNN model for binary classification with multiple CNN blocks and L2 regularization.
     Parameters:
+        ds_info: Dataset info dictionary
         input_shape (tuple): Shape of the input images.
         num_blocks (int): Number of CNN blocks to be used.
         n_classes (int): output
@@ -22,6 +24,7 @@ def create_cnn_nets(input_shape, num_blocks, n_classes, filters, kernel_size, de
         #initializer = @tf.keras.initializers.glorot_uniform(seed=2023)
         #initializer = @tf.keras.initializers.RandomNormal(mean=0.0, stddev=0.05, seed=2023)
         #initializer = @tf.keras.initializers.RandomUniform(minval=-0.05, maxval=0.05, seed=2023)
+        seed(int): Random seed to get reproducible results
         l2_lambda (float): Lambda value for L2 regularization.
     Returns:
         keras.Model: Constructed Keras model for binary classification.
@@ -29,9 +32,9 @@ def create_cnn_nets(input_shape, num_blocks, n_classes, filters, kernel_size, de
 
     inputs = tf.keras.Input(shape=input_shape)
     x = inputs
-
-    label0_count = 1
-    label1_count = 1
+    # 这个方案在5分类的时候是否还有用？
+    label0_count = ds_info['class0_counts']
+    label1_count = ds_info['class1_counts']
 
     # 计算初始偏差
     initial_bias_value = np.log([label0_count / label1_count])
