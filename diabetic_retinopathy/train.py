@@ -2,7 +2,6 @@ import gin
 import tensorflow as tf
 import logging
 import wandb
-from sklearn.model_selection import KFold
 
 
 @gin.configurable
@@ -37,6 +36,7 @@ class Trainer(object):
         self.ckpt = tf.train.Checkpoint(model=model, optimizer=self.optimizer)
         self.manager = tf.train.CheckpointManager(self.ckpt, self.run_paths['path_ckpts_train'],
                                                   max_to_keep=round(total_steps/ckpt_interval))
+
 
     @tf.function
     def train_step(self, images, labels):
@@ -125,6 +125,7 @@ class Trainer(object):
                 save_path = self.manager.save()
                 logging.info(f'Saving checkpoint to {self.run_paths["path_ckpts_train"]}.')
                 print("Saved checkpoint for step {}: {}".format(int(step), save_path))
+
                 # Save checkpoint
                 # ...
 
