@@ -222,7 +222,7 @@ def prepare(ds_train, ds_val, ds_test, ds_info, seed, batch_size, caching):
         ds_train = ds_train.cache()
     ds_train = ds_train.map(
         augment, num_parallel_calls=tf.data.AUTOTUNE)
-    ds_train = ds_train.shuffle(buffer_size=40, seed=seed)  # use train_size better
+    ds_train = ds_train.shuffle(ds_info['train_size'], seed=seed)  # use train_size better
     ds_train = ds_train.batch(batch_size)
     ds_train = ds_train.repeat(-1)
     ds_train = ds_train.prefetch(tf.data.AUTOTUNE)

@@ -23,7 +23,7 @@ cnn_block.seed = %GLOBAL_SEED
 create_cnn_nets.seed = %GLOBAL_SEED
 
 # Training
-Trainer.total_steps = 5.5e4
+Trainer.total_steps = 6e4
 Trainer.log_interval = 5e3
 Trainer.ckpt_interval = 5e3
 
