@@ -103,8 +103,9 @@ def load(name, data_dir, split_frac, seed):
             fig.close()
 
         # Split train and val dataset with split_frac
-        # First random shuffle the train dataset
-        train_labels = train_labels.sample(frac=1, random_state=seed).reset_index(drop=True)
+        # # First random shuffle the train dataset
+        # train_labels = train_labels.sample(frac=1, random_state=seed).reset_index(drop=True)
+        # Without shuffle
         val_size = int(split_frac * train_labels.shape[0])
         train_size = train_labels.shape[0] - val_size
         train_dataset = train_labels[:train_size]
@@ -114,22 +115,22 @@ def load(name, data_dir, split_frac, seed):
         logging.info(f"Num of val samples is: {val_size}")
         logging.info(f"Num of test samples is: {test_labels.shape[0]}")
 
-        # # Resample the train dataset with oversampling
-        # class_counts = train_dataset['Retinopathy grade'].value_counts().sort_index()
-        # targ_size = class_counts.max()
-        # train_dataset = train_dataset.groupby('Retinopathy grade').apply(
-        #     lambda x: x.sample(targ_size, replace=True, random_state=seed))
-        # train_dataset = train_dataset.sample(frac=1, random_state=seed).reset_index(drop=True)
-        # logging.info(f"Train dataset is resampled.")
-        # train_size = train_dataset.shape[0]
-        # logging.info(f"Num of train samples after resampling is: {train_size}")
-        #
-        # # Check and plot the distribution of resampled dataset
-        # fig = check_imb(train_dataset)
-        # fig.title('Class Distribution After Resampling')
-        # fig.savefig(store_dir / 'Class distribution after resampling.png')
-        # logging.info(f"Class distribution after resampling is saved to {store_dir.resolve()}")
-        # fig.close()
+        # Resample the train dataset with oversampling
+        class_counts = train_dataset['Retinopathy grade'].value_counts().sort_index()
+        targ_size = class_counts.max()
+        train_dataset = train_dataset.groupby('Retinopathy grade').apply(
+            lambda x: x.sample(targ_size, replace=True, random_state=seed))
+        train_dataset = train_dataset.sample(frac=1, random_state=seed).reset_index(drop=True)
+        logging.info(f"Train dataset is resampled.")
+        train_size = train_dataset.shape[0]
+        logging.info(f"Num of train samples after resampling is: {train_size}")
+
+        # Check and plot the distribution of resampled dataset
+        fig = check_imb(train_dataset)
+        fig.title('Class Distribution After Resampling')
+        fig.savefig(store_dir / 'Class distribution after resampling.png')
+        logging.info(f"Class distribution after resampling is saved to {store_dir.resolve()}")
+        fig.close()
 
         # Build dataset info
         class_counts = train_dataset['Retinopathy grade'].value_counts().sort_index()
@@ -162,7 +163,7 @@ def load(name, data_dir, split_frac, seed):
         ds_test = tf.data.TFRecordDataset(test_tfrd_path).map(_parse_tfrd_function)
         logging.info("Train, val and test datasets are created from tfrecord.")
 
-        return prepare(ds_train, ds_val, ds_test, ds_info, seed=2023, batch_size=32, caching=True)
+        return prepare(ds_train, ds_val, ds_test, ds_info)
 
     elif name == "eyepacs":
         logging.info(f"Preparing dataset {name}...")
@@ -177,9 +178,9 @@ def load(name, data_dir, split_frac, seed):
         def _preprocess(img_label_dict):
             return img_label_dict['image'], img_label_dict['label']
 
-        ds_train = ds_train.map(_preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-        ds_val = ds_val.map(_preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-        ds_test = ds_test.map(_preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        ds_train = ds_train.map(_preprocess, num_parallel_calls=tf.data.AUTOTUNE)
+        ds_val = ds_val.map(_preprocess, num_parallel_calls=tf.data.AUTOTUNE)
+        ds_test = ds_test.map(_preprocess, num_parallel_calls=tf.data.AUTOTUNE)
 
         return prepare(ds_train, ds_val, ds_test, ds_info)
 
@@ -204,7 +205,7 @@ def load(name, data_dir, split_frac, seed):
 def prepare(ds_train, ds_val, ds_test, ds_info, seed, batch_size, caching):
     # Prepare training dataset
     ds_train = ds_train.map(
-        preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        preprocess, num_parallel_calls=tf.data.AUTOTUNE)
 
     for image, label in ds_train.take(1):
         # get image shape
@@ -220,26 +221,26 @@ def prepare(ds_train, ds_val, ds_test, ds_info, seed, batch_size, caching):
     if caching:
         ds_train = ds_train.cache()
     ds_train = ds_train.map(
-        augment, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        augment, num_parallel_calls=tf.data.AUTOTUNE)
     ds_train = ds_train.shuffle(buffer_size=40, seed=seed)  # use train_size better
     ds_train = ds_train.batch(batch_size)
     ds_train = ds_train.repeat(-1)
-    ds_train = ds_train.prefetch(tf.data.experimental.AUTOTUNE)
+    ds_train = ds_train.prefetch(tf.data.AUTOTUNE)
 
     # Prepare validation dataset
     ds_val = ds_val.map(
-        preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        preprocess, num_parallel_calls=tf.data.AUTOTUNE)
     ds_val = ds_val.batch(batch_size)
     if caching:
         ds_val = ds_val.cache()
-    ds_val = ds_val.prefetch(tf.data.experimental.AUTOTUNE)
+    ds_val = ds_val.prefetch(tf.data.AUTOTUNE)
 
     # Prepare test dataset
     ds_test = ds_test.map(
-        preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        preprocess, num_parallel_calls=tf.data.AUTOTUNE)
     ds_test = ds_test.batch(batch_size)
     if caching:
         ds_test = ds_test.cache()
-    ds_test = ds_test.prefetch(tf.data.experimental.AUTOTUNE)
+    ds_test = ds_test.prefetch(tf.data.AUTOTUNE)
 
     return ds_train, ds_val, ds_test, ds_info

@@ -23,7 +23,7 @@ cnn_block.seed = %GLOBAL_SEED
 create_cnn_nets.seed = %GLOBAL_SEED
 
 # Training
-Trainer.total_steps = 4e4
+Trainer.total_steps = 5.5e4
 Trainer.log_interval = 5e3
 Trainer.ckpt_interval = 5e3
 
@@ -34,6 +34,9 @@ load.data_dir = r'/home/data/IDRID_dataset'
 #load.data_dir = r'D:\idrid\IDRID_dataset'
 load.split_frac = 0.2
 load.seed = %GLOBAL_SEED
+prepare.seed = %GLOBAL_SEED
+prepare.batch_size = 32
+prepare.caching = True
 
 # if use cnn 256*256*3, if use transfer learning 224*224*3
 preprocess.img_height = 256
