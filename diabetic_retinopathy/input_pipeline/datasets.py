@@ -119,14 +119,14 @@ def load(name, data_dir, split_frac, seed):
         logging.info(f"Num of test samples is: {test_labels.shape[0]}")
 
         # Resample the train dataset with oversampling
-        class_counts = train_dataset['Retinopathy grade'].value_counts().sort_index()
-        targ_size = class_counts.max()
-        train_dataset = train_dataset.groupby('Retinopathy grade').apply(
-            lambda x: x.sample(targ_size, replace=True, random_state=seed))
-        train_dataset = train_dataset.sample(frac=1, random_state=seed).reset_index(drop=True)
-        logging.info(f"Train dataset is resampled.")
-        train_size = train_dataset.shape[0]
-        logging.info(f"Num of train samples after resampling is: {train_size}")
+        # class_counts = train_dataset['Retinopathy grade'].value_counts().sort_index()
+        # targ_size = class_counts.max()
+        # train_dataset = train_dataset.groupby('Retinopathy grade').apply(
+        #     lambda x: x.sample(targ_size, replace=True, random_state=seed))
+        # train_dataset = train_dataset.sample(frac=1, random_state=seed).reset_index(drop=True)
+        # logging.info(f"Train dataset is resampled.")
+        # train_size = train_dataset.shape[0]
+        # logging.info(f"Num of train samples after resampling is: {train_size}")
 
         # Check and plot the distribution of resampled dataset
         fig = check_imb(train_dataset)

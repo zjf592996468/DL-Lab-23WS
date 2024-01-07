@@ -61,7 +61,7 @@ def evaluate(model: tf.keras.Model, checkpoint: object,ds_test: tf.data.Dataset,
     return conf_matrix
 
 
-def evaluate1(model: tf.keras.Model,ds_info ,ds_test: tf.data.Dataset, run_paths) -> np.ndarray:
+def evaluate1(model: tf.keras.Model,ds_test: tf.data.Dataset, run_paths) -> np.ndarray:
     # Initialize Weights & Biases
     wandb.init(project='idrid', name=run_paths['model_id'])
 
