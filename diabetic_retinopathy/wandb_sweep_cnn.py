@@ -46,7 +46,7 @@ sweep_config = {
     },
     'parameters': {
         'Trainer.total_steps': {
-            'values': [5e4]
+            'values': [65000, 50000, 60000, 70000, 55000,40000]
         },
         'create_cnn_nets.filters': {
             'distribution': 'q_log_uniform',
@@ -80,5 +80,5 @@ sweep_config = {
 }
 wandb.login(key="f27c584f9e444901abf85615134f27d2da6e411d")
 sweep_id = wandb.sweep(sweep_config)
-wandb.agent(sweep_id, function=train_func, count=25)
+wandb.agent(sweep_id, function=train_func, count=30)
 wandb.finish()
