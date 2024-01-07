@@ -11,6 +11,8 @@
 - 5-class classification
 
   Type `python3 main.py --train=True --multi_class=True` in batch file.
+  
+  if run transfer.py remenber shift the train step
 
 # Results
 to do
