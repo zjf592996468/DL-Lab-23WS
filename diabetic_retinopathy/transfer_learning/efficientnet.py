@@ -19,4 +19,3 @@ def transfermodel(input_shape, n_classes, dropout_rate=0.5, dense_units=1024):  
                   loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
                   metrics=['accuracy'])
     return model
-

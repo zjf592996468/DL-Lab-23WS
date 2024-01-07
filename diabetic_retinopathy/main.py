@@ -3,9 +3,8 @@ import logging
 import wandb
 from absl import app, flags
 from train import Trainer
-from evaluation.eval import evaluate
-from evaluation.eval import evaluate1
-from input_pipeline import datasets
+from evaluation.eval import evaluate, evaluate1
+from input_pipeline.datasets import load
 from utils import utils_params, utils_misc
 from models.architectures import vgg_like
 from models.cnnmodel import create_cnn_nets
@@ -36,7 +35,7 @@ def main(argv):
     logging.info("Wandb logged in")
 
     # setup pipeline
-    ds_train, ds_val, ds_test, ds_info = datasets.load()
+    ds_train, ds_val, ds_test, ds_info = load()
     logging.info("Dataset IDRID is successfully loaded")
 
     # use chosen model

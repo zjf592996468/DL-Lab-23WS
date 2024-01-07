@@ -3,6 +3,7 @@ import tensorflow as tf
 from PIL import Image
 import cv2
 
+
 def grad_cam(model, image, category_index, layer_name):
     # load the model
     grad_model = tf.keras.models.Model([model.inputs], [model.get_layer(layer_name).output, model.output])
@@ -35,7 +36,7 @@ def overlay_heatmap(orig_image, heatmap, threshold=0.2):
     orig_array = np.array(orig_image)
 
     # Resize heatmap to match original image size
-    heatmap_resized = cv2.resize(heatmap, (256,256))
+    heatmap_resized = cv2.resize(heatmap, (256, 256))
 
     # Convert heatmap to color using a colormap
     heatmap_color = cv2.applyColorMap(np.uint8(255 * heatmap_resized), cv2.COLORMAP_JET)

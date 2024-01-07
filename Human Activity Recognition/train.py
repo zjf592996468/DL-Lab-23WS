@@ -4,6 +4,7 @@ import logging
 import wandb
 from sklearn.model_selection import KFold
 
+
 @gin.configurable
 class Trainer(object):
     def __init__(self, model, ds_train, ds_val, ds_info, run_paths, total_steps, log_interval, ckpt_interval):
@@ -64,10 +65,8 @@ class Trainer(object):
 
         self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
 
-
         self.train_loss(total_loss)
         self.train_accuracy(labels, predictions)
-
 
     @tf.function
     def val_step(self, images, labels):
@@ -93,7 +92,6 @@ class Trainer(object):
                 self.val_accuracy.reset_states()
 
                 for val_images, val_labels in self.ds_val:
-
                     self.val_step(val_images, val_labels)
 
                 template = 'Step {}, Loss: {}, Accuracy: {}, Val Loss: {}, Val Accuracy: {}'

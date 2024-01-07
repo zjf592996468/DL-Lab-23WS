@@ -8,7 +8,9 @@ import numpy as np
 def guided_relu(x):
     def grad(dy):
         return tf.cast(dy > 0, "float32") * tf.cast(x > 0, "float32") * dy
+
     return tf.nn.relu(x), grad
+
 
 # Function to recursively replace ReLU activations
 def replace_relu_with_guided_relu(model):
@@ -23,7 +25,6 @@ def replace_relu_with_guided_relu(model):
 
 
 def guided_grad_cam(model, image, category_index, layer_name):
-
     # 创建新的模型，以获取卷积层输出和最终预测
     grad_model = tf.keras.models.Model([model.inputs], [model.get_layer(layer_name).output, model.output])
 

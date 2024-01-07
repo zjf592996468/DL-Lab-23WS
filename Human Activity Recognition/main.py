@@ -15,7 +15,6 @@ FLAGS = flags.FLAGS
 flags.DEFINE_boolean('train', False, 'Specify whether to train or evaluate a model.')
 
 
-
 def main(argv):
     # generate folder structures
     run_paths = utils_params.gen_run_folder()
@@ -39,7 +38,7 @@ def main(argv):
 
     # model vgg
     logging.info("start model initialization")
-    #model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
+    # model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
     # logging.info("model-vgg_like initialized")
 
     # model cnn

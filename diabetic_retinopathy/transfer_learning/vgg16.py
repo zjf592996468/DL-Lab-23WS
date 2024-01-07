@@ -3,6 +3,7 @@ from tensorflow.python.keras.layers import Dense, Dropout, GlobalAveragePooling2
 from tensorflow.python.keras.models import Sequential
 from keras.applications import VGG16
 
+
 def transfermodel(input_shape, n_classes, dropout_rate=0.5, dense_units=1024):
     # 加载预训练的 VGG16 模型，不包括顶层
     base_model = VGG16(weights='imagenet', include_top=False, input_shape=input_shape)
