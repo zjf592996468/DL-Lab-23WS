@@ -1,7 +1,7 @@
 import gin
 import logging
 import wandb
-from absl import app,flags
+from absl import app, flags
 from train import Trainer
 from evaluation.eval import evaluate
 from evaluation.eval import evaluate1
@@ -14,6 +14,7 @@ import tensorflow as tf
 
 FLAGS = flags.FLAGS
 flags.DEFINE_boolean('train', False, 'Specify whether to train or evaluate a model.')
+
 
 def main(argv):
     # generate folder structures
@@ -36,7 +37,7 @@ def main(argv):
     ds_train, ds_val, ds_test, ds_info = datasets.load()
     logging.info("Dataset IDRID is successfully loaded")
 
-    transfer_model = transfermodel(input_shape=ds_info['shape'],n_classes=ds_info['num_classes'])
+    transfer_model = transfermodel(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
     transfer_model.build((None, 224, 224, 3))
     transfer_model.summary()
 
@@ -64,6 +65,7 @@ def main(argv):
                  run_paths
                  )
     wandb.finish()
+
 
 if __name__ == "__main__":
     app.run(main)

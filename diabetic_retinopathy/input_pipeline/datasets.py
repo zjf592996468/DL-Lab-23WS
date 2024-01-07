@@ -89,50 +89,48 @@ def load(name, data_dir, split_frac, seed):
         logging.info(f"Class distribution of IDRID dataset is saved to {store_dir.resolve()}")
         fig.close()
 
-        # Binarise the dataset when not doing multi classification
-        if not FLAGS.multi_class:
-            # Group all data into 2 groups, with 0 represents NRDR, 1 represents RDR
-            train_labels['Retinopathy grade'] = (train_labels['Retinopathy grade'] > 1).astype(int)
-            test_labels['Retinopathy grade'] = (test_labels['Retinopathy grade'] > 1).astype(int)
-
-            # Check and plot the distribution of binarised dataset
-            fig = check_imb(train_labels)
-            fig.title('Class Distribution After Binarisation')
-            fig.savefig(store_dir / 'Class distribution after binarisation.png')
-            logging.info(f"Class distribution after binarisation is saved to {store_dir.resolve()}")
-            fig.close()
-
         # Split train and val dataset with split_frac
         # # First random shuffle the train dataset
         # train_labels = train_labels.sample(frac=1, random_state=seed).reset_index(drop=True)
         # Without shuffle
         val_size = int(split_frac * train_labels.shape[0])
         train_size = train_labels.shape[0] - val_size
-
-        # 分割训练集和验证集
-        val_size = int(len(train_labels) * split_frac)
-        val_dataset = train_labels[:val_size]
-        train_dataset = train_labels[val_size:]
+        val_dataset = train_labels[train_size:]
+        train_dataset = train_labels[:train_size]
         logging.info(f"Dataset is divided into train and validation with rate = {split_frac}.")
         logging.info(f"Num of train samples before resampling is: {train_size}")
         logging.info(f"Num of val samples is: {val_size}")
         logging.info(f"Num of test samples is: {test_labels.shape[0]}")
 
+        # Binarise the dataset when not doing multi classification
+        if not FLAGS.multi_class:
+            # Group all data into 2 groups, with 0 represents NRDR, 1 represents RDR
+            train_dataset['Retinopathy grade'] = (train_dataset['Retinopathy grade'] > 1).astype(int)
+            val_dataset['Retinopathy grade'] = (val_dataset['Retinopathy grade'] > 1).astype(int)
+            test_labels['Retinopathy grade'] = (test_labels['Retinopathy grade'] > 1).astype(int)
+
+            # Check and plot the distribution of binarised dataset
+            fig = check_imb(train_dataset)
+            fig.title('Class Distribution Of Train Set After Binarisation')
+            fig.savefig(store_dir / 'Class distribution of train set after binarisation.png')
+            logging.info(f"Class distribution of train set after binarisation is saved to {store_dir.resolve()}")
+            fig.close()
+
         # Resample the train dataset with oversampling
-        # class_counts = train_dataset['Retinopathy grade'].value_counts().sort_index()
-        # targ_size = class_counts.max()
-        # train_dataset = train_dataset.groupby('Retinopathy grade').apply(
-        #     lambda x: x.sample(targ_size, replace=True, random_state=seed))
-        # train_dataset = train_dataset.sample(frac=1, random_state=seed).reset_index(drop=True)
-        # logging.info(f"Train dataset is resampled.")
-        # train_size = train_dataset.shape[0]
-        # logging.info(f"Num of train samples after resampling is: {train_size}")
+        class_counts = train_dataset['Retinopathy grade'].value_counts().sort_index()
+        targ_size = class_counts.max()
+        train_dataset = train_dataset.groupby('Retinopathy grade').apply(
+            lambda x: x.sample(targ_size, replace=True, random_state=seed))
+        train_dataset = train_dataset.sample(frac=1, random_state=seed).reset_index(drop=True)
+        logging.info(f"Train dataset is resampled.")
+        train_size = train_dataset.shape[0]
+        logging.info(f"Num of train samples after resampling is: {train_size}")
 
         # Check and plot the distribution of resampled dataset
         fig = check_imb(train_dataset)
-        fig.title('Class Distribution After Resampling')
-        fig.savefig(store_dir / 'Class distribution after resampling.png')
-        logging.info(f"Class distribution after resampling is saved to {store_dir.resolve()}")
+        fig.title('Class Distribution Of Train Set After Resampling')
+        fig.savefig(store_dir / 'Class distribution of train set after resampling.png')
+        logging.info(f"Class distribution of train set after resampling is saved to {store_dir.resolve()}")
         fig.close()
 
         # Build dataset info
@@ -160,7 +158,7 @@ def load(name, data_dir, split_frac, seed):
         create_tfrecord(test_tfrd_path, test_img_dir, test_labels)
         logging.info(f"TFRecord files are created in {store_dir.resolve()}.")
 
-        # Read TFRecord files and create resampled dataset
+        # Read TFRecord files and create dataset
         ds_train = tf.data.TFRecordDataset(train_tfrd_path).map(_parse_tfrd_function)
         ds_val = tf.data.TFRecordDataset(val_tfrd_path).map(_parse_tfrd_function)
         ds_test = tf.data.TFRecordDataset(test_tfrd_path).map(_parse_tfrd_function)
@@ -206,12 +204,13 @@ def load(name, data_dir, split_frac, seed):
 
 @gin.configurable
 def prepare(ds_train, ds_val, ds_test, ds_info, seed, batch_size, caching):
+    """Prepare the dataset for training, validation and test"""
     # Prepare training dataset
     ds_train = ds_train.map(
         preprocess, num_parallel_calls=tf.data.AUTOTUNE)
 
+    # get image shape and update ds_info
     for image, label in ds_train.take(1):
-        # get image shape
         shape = image.numpy().shape
     ds_info.update({
         'shape': shape,
@@ -225,7 +224,7 @@ def prepare(ds_train, ds_val, ds_test, ds_info, seed, batch_size, caching):
         ds_train = ds_train.cache()
     ds_train = ds_train.map(
         augment, num_parallel_calls=tf.data.AUTOTUNE)
-    ds_train = ds_train.shuffle(buffer_size=40, seed=seed)  # use train_size better
+    ds_train = ds_train.shuffle(ds_info['train_size'], seed=seed)  # shuffle whole dataset
     ds_train = ds_train.batch(batch_size)
     ds_train = ds_train.repeat(-1)
     ds_train = ds_train.prefetch(tf.data.AUTOTUNE)

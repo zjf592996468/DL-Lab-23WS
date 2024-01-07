@@ -5,18 +5,39 @@
 
 # How to run the code
 ## P1: Diabetic Retinopathy Detection
-Run main, chosse cnn model, flag chosse True, path chosse passed path.
+* Train default **cnn** model with IDRID dataset for **binary classification**
 
-Run sweep,use wandb to look for suitable hyperparameter.
+    Type `python3 main.py --train=True --multi_class=False` in batch file.
 
-Run visual, you can get Grad-CAM and Guided-Grad-CAM to help uns to learn the model.
+* Train for 5-class classification
 
-Run transfer, you can use the efficientnet to transfer learn.
+    Type `python3 main.py --train=True --multi_class=True` in batch file.
+
+* Train other models
+  * vgg
+  
+    Add `--model='vgg'` in batch file.
+
+* Tune hyperparameters
+
+    Run `sweep.sh`, use wandb to look for suitable hyperparameter.
+
+* Deep visualization
+
+    Run `visual.sh`, you can get Grad-CAM and Guided-Grad-CAM
+to help us to learn the model.
+
+* Transfer learning
+
+    Run `transfer.sh`, you can use the efficientnet to transfer learn.
 
 # Results
-We found that there is a quarter checkpoint around step 2w, and its test accuracy can reach 90%, but we cannot find it accurately every time, so we chose step 4w to stabilize it at 86%.
+We found that there is a quarter checkpoint around step 2w,
+and its test accuracy can reach 90%, but we cannot find it accurately every time,
+so we chose step 4w to stabilize it at 86%.
 
-By using transfer learning, you can easily achieve an accuracy of about 86%, in about 10,000 steps, which saves a lot of computing power.
+By using **transfer learning**, you can easily achieve an accuracy of about 86%,
+in about 10,000 steps, which saves a lot of computing power.
 
 
 # Datasets

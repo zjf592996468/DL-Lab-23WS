@@ -50,7 +50,7 @@ def preprocess(image, label, img_height, img_width):
 @gin.configurable()
 def augment(image, label, seed):
     """Data augmentation with a fixed seed for reproducibility"""
-    # Randomly rotate the image by +- 0.125pi
+    # Randomly rotate the image by +- 0.5pi
     num_rotations = tf.random.uniform(shape=(), minval=0, maxval=4, dtype=tf.int32, seed=seed)
     image = tf.image.rot90(image, k=num_rotations)
 

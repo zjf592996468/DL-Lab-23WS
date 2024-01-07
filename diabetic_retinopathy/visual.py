@@ -1,5 +1,5 @@
 import gin
-from deep_visualization.cam import grad_cam,overlay_heatmap
+from deep_visualization.cam import grad_cam, overlay_heatmap
 from deep_visualization.guidcam import guided_grad_cam
 from input_pipeline.datasets import load
 from utils import utils_params, utils_misc
@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from absl import app
 from train import Trainer
 import matplotlib
+
 
 def main(argv):
     # generate folder structures
@@ -46,8 +47,8 @@ def main(argv):
     heatmap_cam = grad_cam(model, image, category_index, layer_name)
     heatmap_guid = guided_grad_cam(model, image, category_index, layer_name)
     original_image = image[0].numpy()
-    overlayed_image=overlay_heatmap(orig_image=original_image,heatmap=heatmap_cam)
-    overlayed_image1=overlay_heatmap(orig_image=original_image,heatmap=heatmap_guid)
+    overlayed_image = overlay_heatmap(orig_image=original_image, heatmap=heatmap_cam)
+    overlayed_image1 = overlay_heatmap(orig_image=original_image, heatmap=heatmap_guid)
     # 创建一个 2x3 的子图
     fig, axs = plt.subplots(2, 3, figsize=(15, 10))
 
@@ -80,6 +81,7 @@ def main(argv):
     plt.tight_layout()
     plt.show()
     matplotlib.use('Agg')
+
 
 if __name__ == "__main__":
     app.run(main)

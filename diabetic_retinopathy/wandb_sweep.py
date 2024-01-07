@@ -28,7 +28,6 @@ def train_func():
         utils_params.save_config(run_paths['path_gin'], gin.config_str())
 
         # setup pipeline
-
         ds_train, ds_val, ds_test, ds_info = load()
 
         # model
@@ -41,7 +40,6 @@ def train_func():
 
 sweep_config = {
     'name': 'mnist-example-sweep',
-
     'method': 'random',
     'metric': {
         'name': 'val_acc',
@@ -49,9 +47,7 @@ sweep_config = {
     },
     'parameters': {
         'Trainer.total_steps': {
-
             'values': [5e4]
-
         },
         'vgg_like.base_filters': {
             'distribution': 'q_log_uniform',
@@ -78,7 +74,6 @@ sweep_config = {
         }
     }
 }
-
 
 wandb.login(key="f27c584f9e444901abf85615134f27d2da6e411d")
 sweep_id = wandb.sweep(sweep_config)
