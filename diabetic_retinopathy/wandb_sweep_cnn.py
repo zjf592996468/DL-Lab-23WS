@@ -7,6 +7,7 @@ from input_pipeline.datasets import load
 from train import Trainer
 from utils import utils_params, utils_misc
 from models.cnnmodel import create_cnn_nets
+from models.architectures import vgg_like
 
 
 def train_func():
