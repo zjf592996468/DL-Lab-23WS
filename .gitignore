@@ -10,6 +10,9 @@ __pycache__/
 experiments/
 wandb/
 /wandb
+.tfrecord/
+/tfrecord
+*.tfrecord
 
 # C extensions
 *.so

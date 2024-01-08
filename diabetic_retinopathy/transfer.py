@@ -3,18 +3,17 @@ import logging
 import wandb
 from absl import app, flags
 from train import Trainer
-from evaluation.eval import evaluate, evaluate1
-from input_pipeline.datasets import load
+from evaluation.eval import evaluate
+from evaluation.eval import evaluate1
+from input_pipeline import datasets
 from utils import utils_params, utils_misc
+from transfer_learning.efficientnet import transfermodel
 from models.architectures import vgg_like
 from models.cnnmodel import create_cnn_nets
 import tensorflow as tf
 
 FLAGS = flags.FLAGS
-flags.DEFINE_boolean('train', True, 'Specify whether to train or evaluate a model.')
-flags.DEFINE_boolean('multi_class', False, 'Specify whether to take multi_classification')
-flags.DEFINE_string('model', 'cnn', 'The name of the model')
-flags.DEFINE_string('wandb', 'idrid-cnn-cy', 'The name of the wandb project')
+flags.DEFINE_boolean('train', False, 'Specify whether to train or evaluate a model.')
 
 
 def main(argv):
@@ -30,30 +29,22 @@ def main(argv):
 
     # setup wandb
     wandb.login(key="f27c584f9e444901abf85615134f27d2da6e411d")
-    wandb.init(project=FLAGS.wandb, name=run_paths['model_id'],
+    wandb.init(project='idrid-transfer', name=run_paths['model_id'],
                config=utils_params.gin_config_to_readable_dictionary(gin.config._CONFIG))
     logging.info("Wandb logged in")
 
     # setup pipeline
-    ds_train, ds_val, ds_test, ds_info = load()
+    ds_train, ds_val, ds_test, ds_info = datasets.load()
     logging.info("Dataset IDRID is successfully loaded")
 
-    # use chosen model
-    logging.info("start model initialization")
-    # model vgg
-    if FLAGS.model == 'vgg':
-        model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
-        logging.info("model-vgg_like initialized")
-    # model cnn
-    elif FLAGS.model == 'cnn':
-        model = create_cnn_nets(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'], ds_info=ds_info)
-        logging.info("model-cnn initialized")
-    logging.info(f"{model.summary()}")
+    transfer_model = transfermodel(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
+    transfer_model.build((None, 224, 224, 3))
+    transfer_model.summary()
 
     # checkpoints
-    ckpt = tf.train.Checkpoint(model=model, optimizer=tf.keras.optimizers.Adam())
-    manager = tf.train.CheckpointManager(ckpt, run_paths['path_ckpts_train'], max_to_keep=5)
-    # load latest checkpoint
+    ckpt = tf.train.Checkpoint(model=transfer_model, optimizer=tf.keras.optimizers.Adam())
+    manager = tf.train.CheckpointManager(ckpt, run_paths['path_ckpts_train'], max_to_keep=3)
+    # 加载最新的检查点
     ckpt_restore_path = manager.latest_checkpoint
     print(ckpt_restore_path)
 
@@ -63,12 +54,12 @@ def main(argv):
             print("Checkpoint restored from:", ckpt_restore_path)
         else:
             print("No checkpoint found at:", run_paths['path_ckpts_train'])
-        trainer = Trainer(model, ds_train, ds_val, ds_info, run_paths)
+        trainer = Trainer(transfer_model, ds_train, ds_val, ds_info, run_paths)
         for _ in trainer.train():
             continue
-        evaluate1(model, ds_test, run_paths)
+        evaluate1(transfer_model, ds_test, run_paths)
     else:
-        evaluate(model,
+        evaluate(transfer_model,
                  ckpt_restore_path,
                  ds_test,
                  run_paths

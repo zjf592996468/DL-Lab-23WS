@@ -2,6 +2,7 @@ import gin
 import tensorflow as tf
 import logging
 import wandb
+from sklearn.model_selection import KFold
 
 
 @gin.configurable
@@ -34,8 +35,7 @@ class Trainer(object):
         self.ckpt_interval = ckpt_interval
         # Checkpoint Manager
         self.ckpt = tf.train.Checkpoint(model=model, optimizer=self.optimizer)
-        self.manager = tf.train.CheckpointManager(self.ckpt, self.run_paths['path_ckpts_train'],
-                                                  max_to_keep=round(total_steps/ckpt_interval))
+        self.manager = tf.train.CheckpointManager(self.ckpt, self.run_paths['path_ckpts_train'], max_to_keep=3)
 
     @tf.function
     def train_step(self, images, labels):
@@ -58,13 +58,13 @@ class Trainer(object):
             # behavior during training versus inference (e.g. Dropout).
             predictions = self.model(images, training=True)
             loss = self.loss_object(labels, predictions)
-
             # Add regularisation losses from the model
             regularization_loss = tf.math.add_n(self.model.losses)
             total_loss = loss + regularization_loss
-
         gradients = tape.gradient(total_loss, self.model.trainable_variables)
+
         self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
+
         self.train_loss(total_loss)
         self.train_accuracy(labels, predictions)
 
@@ -74,16 +74,19 @@ class Trainer(object):
         # behavior during training versus inference (e.g. Dropout).
         predictions = self.model(images, training=False)
         t_loss = self.loss_object(labels, predictions)
+
         self.val_loss(t_loss)
         self.val_accuracy(labels, predictions)
 
     def train(self):
         wandb.init(project='idrid-cnn-cy', name=self.run_paths['model_id'])
         for idx, (images, labels) in enumerate(self.ds_train):
+
             step = idx + 1
             self.train_step_l2(images, labels)
 
             if step % self.log_interval == 0:
+
                 # Reset val metrics
                 self.val_loss.reset_states()
                 self.val_accuracy.reset_states()
@@ -102,6 +105,7 @@ class Trainer(object):
                 # wandb logging
                 wandb.log({'train_acc': self.train_accuracy.result() * 100, 'train_loss': self.train_loss.result(),
                            'val_acc': self.val_accuracy.result() * 100, 'val_loss': self.val_loss.result(),
+
                            'step': step})
 
                 # Write summary to tensorboard
@@ -117,7 +121,6 @@ class Trainer(object):
                 save_path = self.manager.save()
                 logging.info(f'Saving checkpoint to {self.run_paths["path_ckpts_train"]}.')
                 print("Saved checkpoint for step {}: {}".format(int(step), save_path))
-
                 # Save checkpoint
                 # ...
 
