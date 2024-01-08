@@ -2,7 +2,7 @@ import os
 import datetime
 
 
-def gen_run_folder(path_model_id='ckpt'):
+def gen_run_folder(path_model_id='har-ckpt'):
     run_paths = dict()
 
     if not os.path.isdir(path_model_id):
@@ -11,7 +11,7 @@ def gen_run_folder(path_model_id='ckpt'):
         # run_id = 'run_' + date_creation
         # if path_model_id:
         #     run_id += '_' + path_model_id
-        run_paths['path_model_id'] = os.path.join(path_model_root, 'ckpt')
+        run_paths['path_model_id'] = os.path.join(path_model_root, 'har-ckpt')
     else:
         run_paths['path_model_id'] = path_model_id
     run_paths['model_id'] = run_paths['path_model_id'].split(os.sep)[-1]
@@ -19,8 +19,8 @@ def gen_run_folder(path_model_id='ckpt'):
     run_paths['model_id'] = run_paths['path_model_id'].split(os.sep)[-1]
     run_paths['path_logs_train'] = os.path.join(run_paths['path_model_id'], 'logs', 'run.log')
     run_paths['path_logs_eval'] = os.path.join(run_paths['path_model_id'], 'logs', 'eval', 'run.log')
-    run_paths['path_ckpts_train'] = os.path.join(run_paths['path_model_id'], 'ckpts')
-    run_paths['path_ckpts_eval'] = os.path.join(run_paths['path_model_id'], 'ckpts', 'eval')
+    run_paths['path_ckpts_train'] = os.path.join(run_paths['path_model_id'], 'har-ckpts')
+    run_paths['path_ckpts_eval'] = os.path.join(run_paths['path_model_id'], 'har-ckpts', 'eval')
     run_paths['path_gin'] = os.path.join(run_paths['path_model_id'], 'config_operative.gin')
 
     # Create folders

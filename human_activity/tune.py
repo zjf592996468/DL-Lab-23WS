@@ -3,7 +3,6 @@ import gin
 from ray import tune
 
 from input_pipeline.datasets import load
-from models.architectures import vgg_like
 from train import Trainer
 from utils import utils_params, utils_misc
 
@@ -29,6 +28,7 @@ def train_func(config):
     ds_train, ds_val, ds_test, ds_info = load()
 
     # model
+    # todo: use rnn model
     model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
 
     trainer = Trainer(model, ds_train, ds_val, ds_info, run_paths)

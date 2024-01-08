@@ -34,6 +34,12 @@ If run transfer.py remember **shift the train step**.
 `python3 transfer.py`
 You can use the efficientnet to transfer learn.
 
+## P2: Human Activity Recognition
+Train with HAPT dataset:
+
+`python3 main.py --train=True wandb='hapt'`
+
+
 # Results
 We found that there is a quarter checkpoint around step 2w,
 and its test accuracy can reach 90%, but we cannot find it accurately every time,
@@ -54,6 +60,13 @@ The tensorflow_datasets folder is located at _/home/data/tensorflow_datasets_.
 
 ### HAPT dataset
 The HAPT dataset is located at _/home/data/HAPT_dataset_ on the GPU-Server.
+
+'RawData/labels.txt': include all the activity labels available for the dataset (1 per row). 
+* Column 1: experiment number ID, 
+* Column 2: user number ID, 
+* Column 3: activity number ID 
+* Column 4: Label start point (in number of signal log samples (recorded at 50Hz))
+* Column 5: Label end point (in number of signal log samples)
 
 ### Real World (HAR) dataset
 The Real World (HAR) dataset is located at _/home/data/realworld2016_dataset_

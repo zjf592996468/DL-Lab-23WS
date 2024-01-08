@@ -1,0 +1,14 @@
+# Global Seed
+GLOBAL_SEED = 2024
+
+# Training
+Trainer.total_steps = 5e4
+Trainer.log_interval = 5e3
+Trainer.ckpt_interval = 5e3
+
+# Input pipeline
+load.name = 'idrid'
+#load.data_dir = r'/home/data/HAPT_dataset'
+load.data_dir = r'C:\DL-lab\HAPT Data Set'
+#load.data_dir = r''
+load.seed = %GLOBAL_SEED

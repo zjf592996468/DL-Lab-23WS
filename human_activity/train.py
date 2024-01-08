@@ -2,7 +2,6 @@ import gin
 import tensorflow as tf
 import logging
 import wandb
-from sklearn.model_selection import KFold
 
 
 @gin.configurable
