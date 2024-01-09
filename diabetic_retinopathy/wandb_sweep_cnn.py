@@ -7,6 +7,7 @@ from input_pipeline.datasets import load
 from train import Trainer
 from utils import utils_params, utils_misc
 from models.cnnmodel import create_cnn_nets
+from models.architectures import vgg_like
 
 
 def train_func():
@@ -31,14 +32,12 @@ def train_func():
         ds_train, ds_val, ds_test, ds_info = load()
 
         # model
-        model = create_cnn_nets()
+        model = create_cnn_nets(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'], ds_info=ds_info)
 
         trainer = Trainer(model, ds_train, ds_val, ds_info, run_paths)
         for _ in trainer.train():
             continue
 
-
-train_func()
 
 sweep_config = {
     'name': 'idrid-sweep',
@@ -49,7 +48,7 @@ sweep_config = {
     },
     'parameters': {
         'Trainer.total_steps': {
-            'values': [5e4]
+            'values': [65000, 50000, 60000, 70000, 55000, 40000]
         },
         'create_cnn_nets.filters': {
             'distribution': 'q_log_uniform',
@@ -73,11 +72,16 @@ sweep_config = {
             'distribution': 'uniform',
             'min': 0.2,
             'max': 0.8
+        },
+        'l2_lambda': {
+            'distribution': 'uniform',
+            'min': 0.001,
+            'max': 0.01
         }
     }
 }
+
 wandb.login(key="f27c584f9e444901abf85615134f27d2da6e411d")
 sweep_id = wandb.sweep(sweep_config)
-
-wandb.agent(sweep_id, function=train_func, count=20)
+wandb.agent(sweep_id, function=train_func, count=30)
 wandb.finish()

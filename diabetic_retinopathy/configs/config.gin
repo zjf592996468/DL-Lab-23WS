@@ -1,3 +1,7 @@
+# Global Seed
+GLOBAL_SEED = 2023
+l2_lambda = 0.0069876317967560424
+
 # Architectures
 vgg_like.base_filters = 8
 vgg_like.n_blocks = 3
@@ -8,29 +12,33 @@ vgg_like.dropout_rate = 0.4
 vgg_block.kernel_size = (3, 3)
 
 # cnn Models
-create_cnn_nets.input_shape = (256, 256, 3)
-#create_cnn_nets.num_classes = 2
 create_cnn_nets.num_blocks = 3
-create_cnn_nets.filters = 8
+create_cnn_nets.filters = 20
 create_cnn_nets.kernel_size = (3, 3)
-create_cnn_nets.dense_units = 128
-create_cnn_nets.dropout_rate=0.4
+create_cnn_nets.dense_units = 107
+create_cnn_nets.dropout_rate = 0.501690801037651
+create_cnn_nets.l2_lambda = %l2_lambda
+cnn_block.l2_lambda = %l2_lambda
+cnn_block.seed = %GLOBAL_SEED
+create_cnn_nets.seed = %GLOBAL_SEED
 
 # Training
-Trainer.total_steps = 1e5
-Trainer.log_interval = 1e4
-Trainer.ckpt_interval = 1e4
+Trainer.total_steps = 6e4
+Trainer.log_interval = 5e3
+Trainer.ckpt_interval = 5e3
 
 # Input pipeline
-# Dataset
 load.name = 'idrid'
-load.split_frac = 0.9
 load.data_dir = r'/home/data/IDRID_dataset'
-# load.data_dir = r'C:\DL-lab\IDRID_dataset'
-# load.data_dir = r'D:\idrid\IDRID_dataset'
-
-# Preprocessing
-preprocess.img_height = 256
-preprocess.img_width = 256
+#load.data_dir = r'C:\DL-lab\IDRID_dataset'
+#load.data_dir = r'D:\idrid\IDRID_dataset'
+load.split_frac = 0.2
+load.seed = %GLOBAL_SEED
+prepare.seed = %GLOBAL_SEED
 prepare.batch_size = 32
 prepare.caching = True
+
+# if use cnn 256*256*3, if use transfer learning 224*224*3
+preprocess.img_height = 256
+preprocess.img_width = 256
+augment.seed = %GLOBAL_SEED

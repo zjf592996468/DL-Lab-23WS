@@ -1,9 +1,12 @@
 import numpy as np
 import tensorflow as tf
+from PIL import Image
+import cv2
 
 
 
 def grad_cam(model, image, category_index, layer_name):
+    # load the model
     grad_model = tf.keras.models.Model([model.inputs], [model.get_layer(layer_name).output, model.output])
 
     with tf.GradientTape() as tape:
@@ -25,8 +28,35 @@ def grad_cam(model, image, category_index, layer_name):
 
     cam = np.maximum(cam, 0)
     heatmap = (cam - cam.min()) / (cam.max() - cam.min())
-    
+
     return heatmap
+
+
+def overlay_heatmap(orig_image, heatmap, threshold=0.2):
+    # Assuming orig_image is a PIL Image
+    orig_array = np.array(orig_image)
+
+    # Resize heatmap to match original image size
+    heatmap_resized = cv2.resize(heatmap, (256, 256))
+
+    # Convert heatmap to color using a colormap
+    heatmap_color = cv2.applyColorMap(np.uint8(255 * heatmap_resized), cv2.COLORMAP_JET)
+
+    # Create a mask where the heatmap is above the threshold
+    mask = heatmap_resized > threshold
+
+    # Create an overlay image, ensuring the data type is uint8
+    overlayed_image = np.zeros_like(orig_array, dtype=np.uint8)
+
+    # Apply the mask to combine the original image and the heatmap
+    overlayed_image[~mask] = orig_array[~mask]
+    overlayed_image[mask] = heatmap_color[mask]
+
+    # Convert the overlayed image to uint8 type if not already
+    overlayed_image = np.clip(overlayed_image, 0, 255).astype(np.uint8)
+
+    # Return a PIL Image
+    return Image.fromarray(overlayed_image)
 
 
 '''Model: "vgg_like"
