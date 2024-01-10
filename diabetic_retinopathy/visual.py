@@ -4,14 +4,17 @@ from deep_visualization.guidcam import guided_grad_cam
 from input_pipeline.datasets import load
 from utils import utils_params, utils_misc
 from models.architectures import vgg_like
+import train
 from models.cnnmodel import create_cnn_nets
 import tensorflow as tf
 import matplotlib.pyplot as plt
-from absl import app
+from absl import flags,app
 from train import Trainer
 import matplotlib
 
 
+FLAGS = flags.FLAGS
+flags.DEFINE_boolean('multi_class', False, 'Specify whether to take multi_classification')
 def main(argv):
     # generate folder structures
     run_paths = utils_params.gen_run_folder()
@@ -36,13 +39,20 @@ def main(argv):
     else:
         print("No checkpoint found at:", run_paths['path_ckpts_train'])
 
-    for images, _ in ds_test.take(1):
-        image = images[0]
-        image = tf.expand_dims(image, axis=0)  # 扩展维度以符合模型输入
-        break
+    category_index = 0  # 指定的类别索引
+    layer_name = 'max_pooling2d_2'  # 替换为你选择的卷积层名称
 
-    category_index = 0  # 这里以类别索引 0 为例
-    layer_name = 'conv2d_2'  # 替换为你选择的卷积层名称
+    # 从测试数据集中寻找匹配指定类别索引的图像
+    for images, labels in ds_test:
+        for i, label in enumerate(labels):
+            if label.numpy() == category_index:
+                image = images[i]
+                image = tf.expand_dims(image, axis=0)  # 扩展维度以符合模型输入
+                found = True
+                break
+        if found:
+            break
+
 
     heatmap_cam = grad_cam(model, image, category_index, layer_name)
     heatmap_guid = guided_grad_cam(model, image, category_index, layer_name)

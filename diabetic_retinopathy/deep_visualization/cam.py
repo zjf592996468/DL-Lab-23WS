@@ -32,12 +32,13 @@ def grad_cam(model, image, category_index, layer_name):
     return heatmap
 
 
-def overlay_heatmap(orig_image, heatmap, threshold=0.2):
-    # Assuming orig_image is a PIL Image
-    orig_array = np.array(orig_image)
+def overlay_heatmap(orig_image, heatmap, threshold=0.1):
+    # Assuming orig_image is a PIL Image and has been normalized (0-1 range)
+    orig_array = np.array(orig_image) * 255
+    orig_array = orig_array.astype(np.uint8)
 
     # Resize heatmap to match original image size
-    heatmap_resized = cv2.resize(heatmap, (256, 256))
+    heatmap_resized = cv2.resize(heatmap, (orig_array.shape[1], orig_array.shape[0]))
 
     # Convert heatmap to color using a colormap
     heatmap_color = cv2.applyColorMap(np.uint8(255 * heatmap_resized), cv2.COLORMAP_JET)
@@ -55,7 +56,7 @@ def overlay_heatmap(orig_image, heatmap, threshold=0.2):
     # Convert the overlayed image to uint8 type if not already
     overlayed_image = np.clip(overlayed_image, 0, 255).astype(np.uint8)
 
-    # Return a PIL Image
+    # Return a PIL Image of the overlayed image
     return Image.fromarray(overlayed_image)
 
 

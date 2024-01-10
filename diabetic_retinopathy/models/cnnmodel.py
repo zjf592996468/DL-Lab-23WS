@@ -5,8 +5,7 @@ import numpy as np
 
 
 @gin.configurable
-def create_cnn_nets(ds_info, input_shape, num_blocks, n_classes, filters, kernel_size, dense_units, dropout_rate,
-                    seed, l2_lambda):
+def create_cnn_nets(ds_info, num_blocks, filters, kernel_size, dense_units, dropout_rate,seed, l2_lambda):
     """
     Builds an advanced CNN model for binary classification with multiple CNN blocks and L2 regularization.
     Parameters:
@@ -30,7 +29,7 @@ def create_cnn_nets(ds_info, input_shape, num_blocks, n_classes, filters, kernel
         keras.Model: Constructed Keras model for binary classification.
     """
 
-    inputs = tf.keras.Input(shape=input_shape)
+    inputs = tf.keras.Input(shape=ds_info['shape'])
     x = inputs
     # 这个方案在5分类的时候是否还有用？
     label0_count = ds_info['class0_counts']
@@ -48,7 +47,7 @@ def create_cnn_nets(ds_info, input_shape, num_blocks, n_classes, filters, kernel
                                 kernel_regularizer=tf.keras.regularizers.l2(l2_lambda),
                                 kernel_initializer=tf.keras.initializers.glorot_uniform(seed))(out)
     out = tf.keras.layers.Dropout(dropout_rate)(out)
-    outputs = tf.keras.layers.Dense(units=n_classes, kernel_regularizer=tf.keras.regularizers.l2(l2_lambda),
+    outputs = tf.keras.layers.Dense(units=ds_info['num_classes'], kernel_regularizer=tf.keras.regularizers.l2(l2_lambda),
                                     kernel_initializer=tf.keras.initializers.glorot_uniform(seed),
                                     bias_initializer=tf.keras.initializers.Constant(initial_bias_value))(out)
 
