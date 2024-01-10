@@ -90,8 +90,8 @@ def load(name, data_dir, split_frac, seed):
         fig.close()
 
         # Split train and val dataset with split_frac
-        # First random shuffle the train dataset
-        train_labels = train_labels.sample(frac=1, random_state=seed).reset_index(drop=True)
+        # # First random shuffle the train dataset
+        # train_labels = train_labels.sample(frac=1, random_state=seed).reset_index(drop=True)
         val_size = int(split_frac * train_labels.shape[0])
         train_size = train_labels.shape[0] - val_size
         val_dataset = train_labels[train_size:]
