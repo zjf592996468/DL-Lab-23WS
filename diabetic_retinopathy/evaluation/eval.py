@@ -4,9 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import logging
 import wandb
-from evaluation.metrics import custom_recall_score, custom_auc_score, custom_f1_score, custom_accuracy_score, \
-    custom_confusion_matrix
-from sklearn.metrics import roc_auc_score
+from evaluation.metrics import (recall_score, auc_score, f1score, accuracy_score,confusion_matrix)
 
 
 def evaluate(model: tf.keras.Model, checkpoint: object, ds_test: tf.data.Dataset, run_paths: dict) -> np.ndarray:
@@ -26,12 +24,12 @@ def evaluate(model: tf.keras.Model, checkpoint: object, ds_test: tf.data.Dataset
     pred_labels = np.argmax(pred_probs, axis=1)
 
     # 使用自定义函数计算指标
-    conf_matrix = custom_confusion_matrix(true_labels, pred_labels)
-    accuracy = custom_accuracy_score(true_labels, pred_labels)
-    sensitivity = custom_recall_score(true_labels, pred_labels, 1)
-    specificity = custom_recall_score(true_labels, pred_labels, 0)
-    auc = roc_auc_score(true_labels, [pred[1] for pred in pred_probs])
-    f1_score = custom_f1_score(true_labels, pred_labels, 1)
+    conf_matrix = confusion_matrix(true_labels, pred_labels)
+    accuracy = accuracy_score(true_labels, pred_labels)
+    sensitivity = recall_score(true_labels, pred_labels, 1)
+    specificity = recall_score(true_labels, pred_labels, 0)
+    auc = auc_score(true_labels, [pred[1] for pred in pred_probs])
+    f1_score = f1score(true_labels, pred_labels, 1)
 
     # Log metrics
     logging.info("Confusion Matrix:\n%s", conf_matrix)
@@ -78,12 +76,12 @@ def evaluate1(model: tf.keras.Model, ds_test: tf.data.Dataset, run_paths) -> np.
     pred_labels = np.argmax(pred_probs, axis=1)
 
     # 使用自定义函数计算指标
-    conf_matrix = custom_confusion_matrix(true_labels, pred_labels)
-    accuracy = custom_accuracy_score(true_labels, pred_labels)
-    sensitivity = custom_recall_score(true_labels, pred_labels, 1)
-    specificity = custom_recall_score(true_labels, pred_labels, 0)
-    auc = roc_auc_score(true_labels, [pred[1] for pred in pred_probs])
-    f1_score = custom_f1_score(true_labels, pred_labels, 1)
+    conf_matrix = confusion_matrix(true_labels, pred_labels)
+    accuracy = accuracy_score(true_labels, pred_labels)
+    sensitivity = recall_score(true_labels, pred_labels, 1)
+    specificity = recall_score(true_labels, pred_labels, 0)
+    auc = auc_score(true_labels, [pred[1] for pred in pred_probs])
+    f1_score = (f1score(true_labels, pred_labels, 1))
 
     # Log metrics
     logging.info("Confusion Matrix:\n%s", conf_matrix)

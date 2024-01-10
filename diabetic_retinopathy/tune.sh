@@ -10,4 +10,4 @@
 module load cuda/11.8
 
 # Run your python code
-python3 wandb_sweep_cnn.py --train=True --multi_class=False --model='cnn' --wandb='idrid-cnn-cy'
+python3 wandb_sweep_cnn.py  --multi_class=False  --wandb='idrid-cnn-cy'

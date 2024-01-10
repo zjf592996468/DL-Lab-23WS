@@ -11,7 +11,7 @@ from models.cnnmodel import create_cnn_nets
 import tensorflow as tf
 
 FLAGS = flags.FLAGS
-flags.DEFINE_boolean('train', True, 'Specify whether to train or evaluate a model.')
+flags.DEFINE_boolean('train', False, 'Specify whether to train or evaluate a model.')
 flags.DEFINE_boolean('multi_class', False, 'Specify whether to take multi_classification')
 flags.DEFINE_string('model', 'cnn', 'The name of the model')
 flags.DEFINE_string('wandb', 'idrid-cnn', 'The name of the wandb project')
@@ -46,7 +46,7 @@ def main(argv):
         logging.info("model-vgg_like initialized")
     # model cnn
     elif FLAGS.model == 'cnn':
-        model = create_cnn_nets(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'], ds_info=ds_info)
+        model = create_cnn_nets(ds_info=ds_info)
         logging.info("model-cnn initialized")
     logging.info(f"{model.summary()}")
 
