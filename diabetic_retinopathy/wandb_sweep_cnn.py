@@ -36,7 +36,7 @@ def train_func():
         ds_train, ds_val, ds_test, ds_info = load()
 
         # model
-        model = create_cnn_nets(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'], ds_info=ds_info)
+        model = create_cnn_nets(ds_info=ds_info)
 
         trainer = Trainer(model, ds_train, ds_val, ds_info, run_paths)
         for _ in trainer.train():
