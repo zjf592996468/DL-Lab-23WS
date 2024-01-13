@@ -1,6 +1,6 @@
 # Global Seed
 GLOBAL_SEED = 2023
-l2_lambda = 0.0069876317967560424
+l2_lambda = 0.008123966331126475
 
 # Architectures
 vgg_like.base_filters = 8
@@ -13,17 +13,17 @@ vgg_block.kernel_size = (3, 3)
 
 # cnn Models
 create_cnn_nets.num_blocks = 3
-create_cnn_nets.filters = 20
+create_cnn_nets.filters = 8
 create_cnn_nets.kernel_size = (3, 3)
-create_cnn_nets.dense_units = 107
-create_cnn_nets.dropout_rate = 0.501690801037651
+create_cnn_nets.dense_units = 73
+create_cnn_nets.dropout_rate = 0.31924071507679663
 create_cnn_nets.l2_lambda = %l2_lambda
 cnn_block.l2_lambda = %l2_lambda
 cnn_block.seed = %GLOBAL_SEED
 create_cnn_nets.seed = %GLOBAL_SEED
 
 # Training
-Trainer.total_steps = 6e4
+Trainer.total_steps = 5.5e4
 Trainer.log_interval = 5e3
 Trainer.ckpt_interval = 5e3
 

@@ -10,10 +10,10 @@ from utils import utils_params, utils_misc
 from models.cnnmodel import create_cnn_nets
 from models.architectures import vgg_like
 
-
-
 FLAGS = flags.FLAGS
 flags.DEFINE_boolean('multi_class', False, 'Specify whether to take multi_classification')
+
+
 def train_func():
     with wandb.init() as run:
         gin.clear_config()
@@ -52,7 +52,7 @@ sweep_config = {
     },
     'parameters': {
         'Trainer.total_steps': {
-            'values': [65000, 50000, 60000, 70000, 55000, 40000]
+            'values': [50000, 55000, 40000, 45000]
         },
         'create_cnn_nets.filters': {
             'distribution': 'q_log_uniform',
@@ -90,5 +90,5 @@ if __name__ == '__main__':
     FLAGS(sys.argv)
     wandb.login(key="f27c584f9e444901abf85615134f27d2da6e411d")
     sweep_id = wandb.sweep(sweep_config)
-    wandb.agent(sweep_id, function=train_func, count=30)
+    wandb.agent(sweep_id, function=train_func, count=40)
     wandb.finish()
