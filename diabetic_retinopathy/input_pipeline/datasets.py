@@ -90,13 +90,11 @@ def load(name, data_dir, split_frac, seed):
         fig.close()
 
         # Split train and val dataset with split_frac
-        # # First random shuffle the train dataset
-        # train_labels = train_labels.sample(frac=1, random_state=seed).reset_index(drop=True)
         val_size = int(split_frac * train_labels.shape[0])
         train_size = train_labels.shape[0] - val_size
         val_dataset = train_labels[train_size:]
         train_dataset = train_labels[:train_size]
-        logging.info(f"Dataset is divided into train and validation with rate = {split_frac}.")
+        logging.info(f"Dataset is divided into train and validation with rate: {split_frac}")
         logging.info(f"Num of train samples before resampling is: {train_size}")
         logging.info(f"Num of val samples is: {val_size}")
         logging.info(f"Num of test samples is: {test_labels.shape[0]}")
@@ -115,24 +113,7 @@ def load(name, data_dir, split_frac, seed):
             logging.info(f"Class distribution of train set after binarisation is saved to {store_dir.resolve()}")
             fig.close()
 
-        # Resample the train dataset with oversampling
-        class_counts = train_dataset['Retinopathy grade'].value_counts().sort_index()
-        targ_size = class_counts.max()
-        train_dataset = train_dataset.groupby('Retinopathy grade').apply(
-            lambda x: x.sample(targ_size, replace=True, random_state=seed))
-        train_dataset = train_dataset.sample(frac=1, random_state=seed).reset_index(drop=True)
-        logging.info(f"Train dataset is resampled.")
-        train_size = train_dataset.shape[0]
-        logging.info(f"Num of train samples after resampling is: {train_size}")
-
-        # Check and plot the distribution of resampled dataset
-        fig = check_imb(train_dataset)
-        fig.title('Class Distribution Of Train Set After Resampling')
-        fig.savefig(store_dir / 'Class distribution of train set after resampling.png')
-        logging.info(f"Class distribution of train set after resampling is saved to {store_dir.resolve()}")
-        fig.close()
-
-        # Build dataset info
+        # Build origin dataset info
         class_counts = train_dataset['Retinopathy grade'].value_counts().sort_index()
         ds_info = {
             'train_size': train_size,
@@ -149,6 +130,36 @@ def load(name, data_dir, split_frac, seed):
                 'class2_counts': class_counts.values[2],
                 'class3_counts': class_counts.values[3],
                 'class4_counts': class_counts.values[4],
+            })
+
+        # Resample the train dataset with oversampling
+        targ_size = class_counts.max()
+        train_dataset_re = train_dataset.groupby('Retinopathy grade').apply(
+            lambda x: x.sample(targ_size, replace=True, random_state=seed))
+        train_dataset_re = train_dataset_re.sample(frac=1, random_state=seed).reset_index(drop=True)
+        logging.info(f"Train dataset is resampled.")
+        train_size_re = train_dataset_re.shape[0]
+        logging.info(f"Num of train samples after resampling is: {train_size_re}")
+
+        # Check and plot the distribution of resampled dataset
+        fig = check_imb(train_dataset_re)
+        fig.title('Class Distribution Of Train Set After Resampling')
+        fig.savefig(store_dir / 'Class distribution of train set after resampling.png')
+        logging.info(f"Class distribution of train set after resampling is saved to {store_dir.resolve()}")
+        fig.close()
+
+        # Update ds_info with resampled dataset
+        class_counts_re = train_dataset_re['Retinopathy grade'].value_counts().sort_index()
+        ds_info.update({
+            'train_size_re': train_size_re,
+            'class0_counts_re': class_counts_re.values[0],
+            'class1_counts_re': class_counts_re.values[1],
+        })
+        if FLAGS.multi_class:
+            ds_info.update({
+                'class2_counts_re': class_counts_re.values[2],
+                'class3_counts_re': class_counts_re.values[3],
+                'class4_counts_re': class_counts_re.values[4],
             })
 
         # Create TFRecord files for train, val and test
@@ -223,7 +234,7 @@ def prepare(ds_train, ds_val, ds_test, ds_info, seed, batch_size, caching):
         ds_train = ds_train.cache()
     ds_train = ds_train.map(
         augment, num_parallel_calls=tf.data.AUTOTUNE)
-    ds_train = ds_train.shuffle(ds_info['train_size'], seed=seed)  # shuffle whole dataset
+    ds_train = ds_train.shuffle(ds_info['train_size_re'], seed=seed)  # shuffle whole dataset
     ds_train = ds_train.batch(batch_size)
     ds_train = ds_train.repeat(-1)
     ds_train = ds_train.prefetch(tf.data.AUTOTUNE)
