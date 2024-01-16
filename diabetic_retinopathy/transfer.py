@@ -1,7 +1,7 @@
 import gin
 import logging
 import wandb
-from absl import app, flags
+from absl import app,flags
 from train import Trainer
 from evaluation.eval import evaluate
 from evaluation.eval import evaluate1
@@ -12,8 +12,12 @@ from models.architectures import vgg_like
 from models.cnnmodel import create_cnn_nets
 import tensorflow as tf
 
+
 FLAGS = flags.FLAGS
 flags.DEFINE_boolean('train', True, 'Specify whether to train or evaluate a model.')
+flags.DEFINE_boolean('multi_class', True, 'Specify whether to take multi_classification')
+flags.DEFINE_string('model', 'cnn', 'The name of the model')
+flags.DEFINE_string('wandb', 'idrid-cnn', 'The name of the wandb project')
 
 
 def main(argv):
@@ -37,7 +41,7 @@ def main(argv):
     ds_train, ds_val, ds_test, ds_info = datasets.load()
     logging.info("Dataset IDRID is successfully loaded")
 
-    transfer_model = transfermodel(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
+    transfer_model = transfermodel(input_shape=ds_info['shape'],n_classes=ds_info['num_classes'])
     transfer_model.build((None, 224, 224, 3))
     transfer_model.summary()
 
@@ -57,15 +61,15 @@ def main(argv):
         trainer = Trainer(transfer_model, ds_train, ds_val, ds_info, run_paths)
         for _ in trainer.train():
             continue
-        evaluate1(transfer_model, ds_test, run_paths)
+        evaluate1(transfer_model, ds_test,ds_info, run_paths)
     else:
         evaluate(transfer_model,
                  ckpt_restore_path,
                  ds_test,
+                 ds_info,
                  run_paths
                  )
     wandb.finish()
-
 
 if __name__ == "__main__":
     app.run(main)

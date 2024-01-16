@@ -39,6 +39,6 @@ prepare.batch_size = 32
 prepare.caching = True
 
 # if use cnn 256*256*3, if use transfer learning 224*224*3
-preprocess.img_height = 256
-preprocess.img_width = 256
+preprocess.img_height = 224
+preprocess.img_width = 224
 augment.seed = %GLOBAL_SEED

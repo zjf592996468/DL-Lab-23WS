@@ -32,7 +32,6 @@ def guided_grad_cam(model, image, category_index, layer_name):
     model = replace_relu_with_guided_relu(grad_model)
 
 
-
     with tf.GradientTape() as tape:
         # 正向传播
         conv_outputs, predictions = model(image)

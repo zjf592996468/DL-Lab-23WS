@@ -81,7 +81,7 @@ class Trainer(object):
         wandb.init(project='idrid-cnn-cy', name=self.run_paths['model_id'])
         for idx, (images, labels) in enumerate(self.ds_train):
             step = idx + 1
-            self.train_step_l2(images, labels)
+            self.train_step(images, labels)
 
             if step % self.log_interval == 0:
                 # Reset val metrics
