@@ -5,18 +5,18 @@ from keras.applications import VGG16
 
 
 def transfermodel(input_shape, n_classes, dropout_rate=0.5, dense_units=1024):
-    # 加载预训练的 VGG16 模型，不包括顶层
+    # Load the pre-trained VGG16 model, excluding the top layer
     base_model = VGG16(weights='imagenet', include_top=False, input_shape=input_shape)
 
-    # 冻结 VGG16 模型的参数
+    # Freezing the parameters of the VGG16 model
     base_model.trainable = False
 
     model = Sequential([
-        base_model,  # VGG16 模型作为基础
-        GlobalAveragePooling2D(),  # 添加全局平均池化层
-        Dense(dense_units, activation='relu'),  # 全连接层
-        Dropout(dropout_rate),  # Dropout 层
-        Dense(n_classes)  # 输出层，不使用激活函数，预期直接输出 logits
+        base_model,  # VGG16 as basic
+        GlobalAveragePooling2D(),  # GAP layer
+        Dense(dense_units, activation='relu'),  # Full connection layer
+        Dropout(dropout_rate),  # Dropout layer
+        Dense(n_classes)  # Output layer with no activation func, output prediction from logits
     ])
 
     model.compile(optimizer='adam',

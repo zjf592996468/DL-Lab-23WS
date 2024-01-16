@@ -16,48 +16,48 @@ def replace_relu_with_guided_relu(model):
     for layer in model.layers:
         if hasattr(layer, 'activation') and layer.activation == tf.nn.relu:
             layer.activation = guided_relu
-        # 如果层是一个模型，递归替换其ReLU
+        # If the layer is a model, recursively replace its ReLU
         if hasattr(layer, 'layers'):
             replace_relu_with_guided_relu(layer)
 
-    # 修改模型后返回
+    # Return after modifying the model
     return model
 
 
 def guided_grad_cam(model, image, category_index, layer_name):
-    # 创建新的模型，以获取卷积层输出和最终预测
+    # Create a new model to get the convolutional layer output and final prediction
     grad_model = tf.keras.models.Model([model.inputs], [model.get_layer(layer_name).output, model.output])
 
-    # 用 Guided ReLU 替换标准的 ReLU
+    # Replacing Standard ReLUs with Guided ReLUs
     model = replace_relu_with_guided_relu(grad_model)
 
     with tf.GradientTape() as tape:
-        # 正向传播
+        # Forward propagation
         conv_outputs, predictions = model(image)
 
-        # 确保 predictions 是张量
+        # Make sure predictions are tensors
         if isinstance(predictions, list):
             predictions = predictions[0]
 
-        # 计算 loss
+        # Calculate loss
         loss = predictions[:, category_index]
 
-    # 计算梯度
+    # Calculate the gradient
     output = conv_outputs[0]
     grads = tape.gradient(loss, conv_outputs)[0]
 
-    # 计算 Guided Gradients
+    # Calculate Guided Gradients
     gate_f = tf.cast(output > 0, 'float32')
     gate_r = tf.cast(grads > 0, 'float32')
     guided_grads = gate_f * gate_r * grads
 
-    # 计算权重和类激活映射
+    # Calculate weights and class activation mappings
     weights = tf.reduce_mean(guided_grads, axis=(0, 1))
     cam = np.ones(output.shape[0:2], dtype=np.float32)
     for i, w in enumerate(weights):
         cam += w * output[:, :, i]
 
-    # 归一化和生成热力图
+    # Normalisation and generation of heat maps
     cam = np.maximum(cam, 0)
     heatmap = (cam - cam.min()) / (cam.max() - cam.min())
 

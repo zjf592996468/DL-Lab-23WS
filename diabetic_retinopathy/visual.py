@@ -8,13 +8,14 @@ import train
 from models.cnnmodel import create_cnn_nets
 import tensorflow as tf
 import matplotlib.pyplot as plt
-from absl import flags,app
+from absl import flags, app
 from train import Trainer
 import matplotlib
 
-
 FLAGS = flags.FLAGS
 flags.DEFINE_boolean('multi_class', False, 'Specify whether to take multi_classification')
+
+
 def main(argv):
     # generate folder structures
     run_paths = utils_params.gen_run_folder()
@@ -30,7 +31,7 @@ def main(argv):
     # load the model
     ckpt = tf.train.Checkpoint(model=model, optimizer=tf.keras.optimizers.Adam())
     manager = tf.train.CheckpointManager(ckpt, run_paths['path_ckpts_train'], max_to_keep=5)
-    # 加载最新的检查点
+    # load latest checkpoint
     ckpt_restore_path = manager.latest_checkpoint
     print(ckpt_restore_path)
     if ckpt_restore_path:
@@ -39,30 +40,29 @@ def main(argv):
     else:
         print("No checkpoint found at:", run_paths['path_ckpts_train'])
 
-    category_index = 0  # 指定的类别索引
-    layer_name = 'max_pooling2d_2'  # 替换为你选择的卷积层名称
+    category_index = 0  # Specified category index
+    layer_name = 'max_pooling2d_2'  # Replace with the name of the convolutional layer of your choice
 
-    # 从测试数据集中寻找匹配指定类别索引的图像
+    # Find images from the test dataset that match a specified category index
     for images, labels in ds_test:
         for i, label in enumerate(labels):
             if label.numpy() == category_index:
                 image = images[i]
-                image = tf.expand_dims(image, axis=0)  # 扩展维度以符合模型输入
+                image = tf.expand_dims(image, axis=0)  # Extending dimensions to match model inputs
                 found = True
                 break
         if found:
             break
 
-
     heatmap_cam = grad_cam(model, image, category_index, layer_name)
     heatmap_guid = guided_grad_cam(model, image, category_index, layer_name)
     original_image = image[0].numpy()
-    overlayed_image = overlay_heatmap(orig_image=original_image, heatmap=heatmap_cam)
-    overlayed_image1 = overlay_heatmap(orig_image=original_image, heatmap=heatmap_guid)
-    # 创建一个 2x3 的子图
+    overlay_image = overlay_heatmap(orig_image=original_image, heatmap=heatmap_cam)
+    overlay_image1 = overlay_heatmap(orig_image=original_image, heatmap=heatmap_guid)
+    # Create a 2x3 subplot
     fig, axs = plt.subplots(2, 3, figsize=(15, 10))
 
-    # 在第一行显示原始图像和叠加的热力图
+    # Displays the original image and the superimposed heat map on the first line
     axs[0, 0].imshow(original_image)
     axs[0, 0].set_title('Original Image')
     axs[0, 0].axis('off')
@@ -71,11 +71,11 @@ def main(argv):
     axs[0, 1].set_title('Grad-CAM')
     axs[0, 1].axis('off')
 
-    axs[0, 2].imshow(overlayed_image)
+    axs[0, 2].imshow(overlay_image)
     axs[0, 2].set_title('Overlayed Grad-CAM')
     axs[0, 2].axis('off')
 
-    # 在第二行显示原始图像、Guided Grad-CAM 和叠加的 Guided Grad-CAM
+    # Displays the original image, the Guided Grad-CAM, and the superimposed Guided Grad-CAM in the second row.
     axs[1, 0].imshow(original_image)
     axs[1, 0].set_title('Original Image')
     axs[1, 0].axis('off')
@@ -84,7 +84,7 @@ def main(argv):
     axs[1, 1].set_title('Guided Grad-CAM')
     axs[1, 1].axis('off')
 
-    axs[1, 2].imshow(overlayed_image1)
+    axs[1, 2].imshow(overlay_image1)
     axs[1, 2].set_title('Overlayed Guided Grad-CAM')
     axs[1, 2].axis('off')
 

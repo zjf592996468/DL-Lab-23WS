@@ -4,7 +4,6 @@ from PIL import Image
 import cv2
 
 
-
 def grad_cam(model, image, category_index, layer_name):
     # load the model
     grad_model = tf.keras.models.Model([model.inputs], [model.get_layer(layer_name).output, model.output])
@@ -47,17 +46,17 @@ def overlay_heatmap(orig_image, heatmap, threshold=0.1):
     mask = heatmap_resized > threshold
 
     # Create an overlay image, ensuring the data type is uint8
-    overlayed_image = np.zeros_like(orig_array, dtype=np.uint8)
+    overlay_image = np.zeros_like(orig_array, dtype=np.uint8)
 
     # Apply the mask to combine the original image and the heatmap
-    overlayed_image[~mask] = orig_array[~mask]
-    overlayed_image[mask] = heatmap_color[mask]
+    overlay_image[~mask] = orig_array[~mask]
+    overlay_image[mask] = heatmap_color[mask]
 
-    # Convert the overlayed image to uint8 type if not already
-    overlayed_image = np.clip(overlayed_image, 0, 255).astype(np.uint8)
+    # Convert the overlay image to uint8 type if not already
+    overlay_image = np.clip(overlay_image, 0, 255).astype(np.uint8)
 
-    # Return a PIL Image of the overlayed image
-    return Image.fromarray(overlayed_image)
+    # Return a PIL Image of the overlay image
+    return Image.fromarray(overlay_image)
 
 
 '''Model: "vgg_like"

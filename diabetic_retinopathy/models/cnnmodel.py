@@ -5,7 +5,7 @@ import numpy as np
 
 
 @gin.configurable
-def create_cnn_nets(ds_info, num_blocks, filters, kernel_size, dense_units, dropout_rate,seed, l2_lambda):
+def create_cnn_nets(ds_info, num_blocks, filters, kernel_size, dense_units, dropout_rate, seed, l2_lambda):
     """
     Builds an advanced CNN model for binary classification with multiple CNN blocks and L2 regularization.
     Parameters:
@@ -35,10 +35,10 @@ def create_cnn_nets(ds_info, num_blocks, filters, kernel_size, dense_units, drop
     label0_count = ds_info['class0_counts']
     label1_count = ds_info['class1_counts']
 
-    # 计算初始偏差
+    # Calculate the initial bias
     initial_bias_value = np.log([label0_count / label1_count])
 
-    #  initialization for each CNN block
+    # Initialization for each CNN block
     for i in range(num_blocks):
         x = cnn_block(x, filters * (2 ** i), kernel_size, l2_lambda)
 
@@ -47,7 +47,8 @@ def create_cnn_nets(ds_info, num_blocks, filters, kernel_size, dense_units, drop
                                 kernel_regularizer=tf.keras.regularizers.l2(l2_lambda),
                                 kernel_initializer=tf.keras.initializers.glorot_uniform(seed))(out)
     out = tf.keras.layers.Dropout(dropout_rate)(out)
-    outputs = tf.keras.layers.Dense(units=ds_info['num_classes'], kernel_regularizer=tf.keras.regularizers.l2(l2_lambda),
+    outputs = tf.keras.layers.Dense(units=ds_info['num_classes'],
+                                    kernel_regularizer=tf.keras.regularizers.l2(l2_lambda),
                                     kernel_initializer=tf.keras.initializers.glorot_uniform(seed),
                                     bias_initializer=tf.keras.initializers.Constant(initial_bias_value))(out)
 

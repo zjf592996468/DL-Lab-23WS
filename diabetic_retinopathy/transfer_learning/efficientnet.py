@@ -1,6 +1,7 @@
 import tensorflow as tf
 import tensorflow_hub as hub
 
+
 def transfermodel(input_shape, n_classes, trainable=False):
     """
     创建一个预训练的 EfficientNet V2 模型。
@@ -17,14 +18,14 @@ def transfermodel(input_shape, n_classes, trainable=False):
     # EfficientNet V2 预训练模型的 TensorFlow Hub URL
     efficientnet_v2_url = "https://tfhub.dev/google/imagenet/efficientnet_v2_imagenet1k_b0/classification/2"
 
-    # 创建模型
+    # Create Models
     model = tf.keras.Sequential([
         hub.KerasLayer(efficientnet_v2_url, input_shape=input_shape, trainable=trainable),
         tf.keras.layers.Dropout(0.2),
         tf.keras.layers.Dense(n_classes)
     ])
 
-    # 编译模型
+    # Compile Model
     model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
     return model
