@@ -8,15 +8,9 @@ from evaluation.metrics import (recall_score, auc_score, f1score, accuracy_score
 from absl.flags import FLAGS
 
 
-def evaluate(model: tf.keras.Model, checkpoint: object, ds_test: tf.data.Dataset, run_paths: dict,ds_info) -> np.ndarray:
+def evaluate(model: tf.keras.Model, checkpoint: object, ds_test: tf.data.Dataset,ds_info,run_paths: dict) -> np.ndarray:
     ckpt = tf.train.Checkpoint(model=model, optimizer=tf.keras.optimizers.Adam())
     ckpt.restore(checkpoint).expect_partial()
-
-    #because of ds info error, I can only use this way
-    if not FLAGS.multi_class:
-        num=2
-    else:
-        num=5
 
     true_labels = []
     pred_probs = []
@@ -30,12 +24,13 @@ def evaluate(model: tf.keras.Model, checkpoint: object, ds_test: tf.data.Dataset
     pred_labels = np.argmax(pred_probs, axis=1)
 
     # 使用自定义函数计算指标
-    conf_matrix = confusion_matrix(true_labels, pred_labels,num)
+    conf_matrix = confusion_matrix(true_labels, pred_labels,ds_info['num_classes'])
     accuracy = accuracy_score(true_labels, pred_labels)
     logging.info("Confusion Matrix:\n%s", conf_matrix)
     logging.info("Accuracy: %s", accuracy)
-    wandb.log({"confusion_matrix": wandb.plot.confusion_matrix(probs=None, y_true=true_labels, preds=pred_labels,
-                                                               class_names=[f"Class {i}" for i in range(num)]),
+    wandb.log({"confusion_matrix": wandb.plot.confusion_matrix(probs=None, y_true=true_labels,
+                                                               preds=pred_labels,
+                                                               class_names=[f"Class {i}" for i in range(ds_info['num_classes'])]),
                "accuracy": accuracy})
 
     # use flags to control the evaluation
@@ -49,7 +44,6 @@ def evaluate(model: tf.keras.Model, checkpoint: object, ds_test: tf.data.Dataset
         logging.info("ROC/AUC: %s", auc)
         logging.info("f1_score:%s", f1_score)
         wandb.log({"sensitivity": sensitivity,"specificity": specificity,"roc_auc": auc})
-
 
     # Plot the confusion matrix
     plt.figure(figsize=(10, 8))
@@ -65,12 +59,8 @@ def evaluate(model: tf.keras.Model, checkpoint: object, ds_test: tf.data.Dataset
     return conf_matrix
 
 
-def evaluate1(model: tf.keras.Model, ds_test: tf.data.Dataset, run_paths,ds_info) -> np.ndarray:
+def evaluate1(model: tf.keras.Model, ds_test: tf.data.Dataset, ds_info,run_paths,) -> np.ndarray:
 
-    if not FLAGS.multi_class:
-        num=2
-    else:
-        num=5
     true_labels = []
     pred_probs = []
 
@@ -83,12 +73,12 @@ def evaluate1(model: tf.keras.Model, ds_test: tf.data.Dataset, run_paths,ds_info
     pred_labels = np.argmax(pred_probs, axis=1)
 
     # 使用自定义函数计算指标
-    conf_matrix = confusion_matrix(true_labels, pred_labels,num)
+    conf_matrix = confusion_matrix(true_labels, pred_labels,ds_info['num_classes'])
     accuracy = accuracy_score(true_labels, pred_labels)
     logging.info("Confusion Matrix:\n%s", conf_matrix)
     logging.info("Accuracy: %s", accuracy)
     wandb.log({"confusion_matrix": wandb.plot.confusion_matrix(probs=None, y_true=true_labels, preds=pred_labels,
-                                                               class_names=[f"Class {i}" for i in range(num)]),
+                                                               class_names=[f"Class {i}" for i in range(ds_info['num_classes'])]),
                "accuracy": accuracy})
 
     # use flags to control the evaluation
