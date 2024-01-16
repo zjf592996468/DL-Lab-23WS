@@ -15,12 +15,11 @@ def transfermodel(input_shape, n_classes, trainable=False):
     model: 构建的 Keras 模型。
     """
 
-    # EfficientNet V2 预训练模型的 TensorFlow Hub URL
-    efficientnet_v2_url = "https://tfhub.dev/google/imagenet/efficientnet_v2_imagenet1k_b0/classification/2"
 
     # Create Models
     model = tf.keras.Sequential([
-        hub.KerasLayer(efficientnet_v2_url, input_shape=input_shape, trainable=trainable),
+        hub.KerasLayer(r'/st186635/dl-lab-23w-team14/diabetic_retinopathy/transfer_learning',
+                       input_shape=input_shape, trainable=trainable),
         tf.keras.layers.Dropout(0.2),
         tf.keras.layers.Dense(n_classes)
     ])
