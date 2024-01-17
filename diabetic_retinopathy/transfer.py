@@ -13,8 +13,8 @@ from models.cnnmodel import create_cnn_nets
 import tensorflow as tf
 
 FLAGS = flags.FLAGS
-flags.DEFINE_boolean('train', True, 'Specify whether to train or evaluate a model.')
-flags.DEFINE_boolean('multi_class', True, 'Specify whether to take multi_classification')
+flags.DEFINE_boolean('train', False, 'Specify whether to train or evaluate a model.')
+flags.DEFINE_boolean('multi_class', False, 'Specify whether to take multi_classification')
 flags.DEFINE_string('model', 'cnn', 'The name of the model')
 flags.DEFINE_string('wandb', 'idrid-cnn', 'The name of the wandb project')
 

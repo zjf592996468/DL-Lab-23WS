@@ -1,5 +1,7 @@
 import tensorflow as tf
 import tensorflow_hub as hub
+from pathlib import Path
+
 
 
 def transfermodel(input_shape, n_classes, trainable=False):
@@ -8,23 +10,27 @@ def transfermodel(input_shape, n_classes, trainable=False):
 
     参数:
     input_shape (tuple): 输入图像的尺寸，例如 (224, 224, 3)。
-    n_classes (int): 输出类别的数量，默认为 1000（ImageNet 类别数）。
+    n_classes (int): 输出类别的数量。
     trainable (bool): 是否对基础模型层进行训练。
 
     返回:
     model: 构建的 Keras 模型。
     """
 
+    # 当前脚本所在目录
+    current_dir = Path(__file__).parent
 
-    # Create Models
+    # 模型所在的路径
+    model_path = current_dir / "archive"
+
+    # 创建模型
     model = tf.keras.Sequential([
-        hub.KerasLayer(r'/st186635/dl-lab-23w-team14/diabetic_retinopathy/transfer_learning',
-                       input_shape=input_shape, trainable=trainable),
+        hub.KerasLayer(str(model_path), input_shape=input_shape, trainable=trainable),
         tf.keras.layers.Dropout(0.2),
         tf.keras.layers.Dense(n_classes)
     ])
 
-    # Compile Model
+    # 编译模型
     model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
     return model
