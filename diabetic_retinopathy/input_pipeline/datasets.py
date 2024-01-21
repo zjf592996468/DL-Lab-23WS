@@ -102,9 +102,9 @@ def load(name, data_dir, split_frac, seed):
         # Binarise the dataset when not doing multi classification
         if not FLAGS.multi_class:
             # Group all data into 2 groups, with 0 represents NRDR, 1 represents RDR
-            train_dataset.loc['Retinopathy grade'] = (train_dataset['Retinopathy grade'] > 1).astype(int)
-            val_dataset.loc['Retinopathy grade'] = (val_dataset['Retinopathy grade'] > 1).astype(int)
-            test_labels.loc['Retinopathy grade'] = (test_labels['Retinopathy grade'] > 1).astype(int)
+            train_dataset['Retinopathy grade'] = (train_dataset['Retinopathy grade'] > 1).astype(int)
+            val_dataset['Retinopathy grade'] = (val_dataset['Retinopathy grade'] > 1).astype(int)
+            test_labels.['Retinopathy grade'] = (test_labels['Retinopathy grade'] > 1).astype(int)
 
 
             # Check and plot the distribution of binarised dataset
