@@ -32,8 +32,8 @@ def create_cnn_nets(ds_info, num_blocks, filters, kernel_size, dense_units, drop
     inputs = tf.keras.Input(shape=ds_info['shape'])
     x = inputs
     # 这个方案在5分类的时候是否还有用？
-    label0_count = ds_info['class0_counts']
-    label1_count = ds_info['class1_counts']
+    label0_count = ds_info['class0_counts_re']
+    label1_count = ds_info['class1_counts_re']
 
     # Calculate the initial bias
     initial_bias_value = np.log([label0_count / label1_count])
