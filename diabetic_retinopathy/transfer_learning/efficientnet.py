@@ -1,10 +1,12 @@
+import gin
 import tensorflow as tf
 import tensorflow_hub as hub
 from pathlib import Path
 
 
 
-def transfermodel(input_shape, n_classes, trainable=False):
+
+def transfermodel(input_shape, n_classes, l2_lambda=0.05,trainable=False):
     """
     创建一个预训练的 EfficientNet V2 模型。
 
@@ -26,7 +28,9 @@ def transfermodel(input_shape, n_classes, trainable=False):
     # 创建模型
     model = tf.keras.Sequential([
         hub.KerasLayer(str(model_path), input_shape=input_shape, trainable=trainable),
-        tf.keras.layers.Dense(units=1024,activation=tf.nn.relu,kernel_initializer=tf.keras.initializers.glorot_uniform),
+        tf.keras.layers.Dense(units=1024,activation=tf.nn.relu,
+                              kernel_initializer=tf.keras.initializers.glorot_uniform,
+                              kernel_regularizer=tf.keras.regularizers.l2(l2_lambda)),
         tf.keras.layers.Dropout(0.5),
         tf.keras.layers.Dense(n_classes)
     ])

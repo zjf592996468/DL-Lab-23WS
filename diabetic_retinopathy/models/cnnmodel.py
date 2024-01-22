@@ -2,7 +2,7 @@ from models.cnnblocks import cnn_block
 import tensorflow as tf
 import gin
 import numpy as np
-
+from absl.flags import FLAGS
 
 @gin.configurable
 def create_cnn_nets(ds_info, num_blocks, filters, kernel_size, dense_units, dropout_rate, seed, l2_lambda):
@@ -47,9 +47,14 @@ def create_cnn_nets(ds_info, num_blocks, filters, kernel_size, dense_units, drop
                                 kernel_regularizer=tf.keras.regularizers.l2(l2_lambda),
                                 kernel_initializer=tf.keras.initializers.glorot_uniform(seed))(out)
     out = tf.keras.layers.Dropout(dropout_rate)(out)
-    outputs = tf.keras.layers.Dense(units=ds_info['num_classes'],
-                                    kernel_regularizer=tf.keras.regularizers.l2(l2_lambda),
-                                    kernel_initializer=tf.keras.initializers.glorot_uniform(seed),
-                                    bias_initializer=tf.keras.initializers.Constant(initial_bias_value))(out)
+    if FLAGS.multi_class:
+        outputs = tf.keras.layers.Dense(units=ds_info['num_classes'],
+                                        kernel_regularizer=tf.keras.regularizers.l2(l2_lambda),
+                                        kernel_initializer=tf.keras.initializers.glorot_uniform(seed))(out)
+    else:
+        outputs = tf.keras.layers.Dense(units=ds_info['num_classes'],
+                                        kernel_regularizer=tf.keras.regularizers.l2(l2_lambda),
+                                        kernel_initializer=tf.keras.initializers.glorot_uniform(seed),
+                                        bias_initializer=tf.keras.initializers.Constant(initial_bias_value))(out)
 
     return tf.keras.Model(inputs=inputs, outputs=outputs, name='cnn_like')
