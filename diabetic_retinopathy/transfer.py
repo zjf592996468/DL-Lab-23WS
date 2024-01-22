@@ -42,7 +42,7 @@ def main(argv):
     logging.info("Dataset IDRID is successfully loaded")
 
     transfer_model = transfermodel(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
-    transfer_model.build((None, 224, 224, 3))
+    transfer_model.build()
     transfer_model.summary()
 
     # checkpoints

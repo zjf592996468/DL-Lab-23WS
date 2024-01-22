@@ -26,7 +26,8 @@ def transfermodel(input_shape, n_classes, trainable=False):
     # 创建模型
     model = tf.keras.Sequential([
         hub.KerasLayer(str(model_path), input_shape=input_shape, trainable=trainable),
-        tf.keras.layers.Dropout(0.2),
+        tf.keras.layers.Dense(units=1024,activation=tf.nn.relu,kernel_initializer=tf.keras.initializers.glorot_uniform),
+        tf.keras.layers.Dropout(0.5),
         tf.keras.layers.Dense(n_classes)
     ])
 

@@ -104,7 +104,7 @@ def load(name, data_dir, split_frac, seed):
             # Group all data into 2 groups, with 0 represents NRDR, 1 represents RDR
             train_dataset['Retinopathy grade'] = (train_dataset['Retinopathy grade'] > 1).astype(int)
             val_dataset['Retinopathy grade'] = (val_dataset['Retinopathy grade'] > 1).astype(int)
-            test_labels.['Retinopathy grade'] = (test_labels['Retinopathy grade'] > 1).astype(int)
+            test_labels['Retinopathy grade'] = (test_labels['Retinopathy grade'] > 1).astype(int)
 
 
             # Check and plot the distribution of binarised dataset
