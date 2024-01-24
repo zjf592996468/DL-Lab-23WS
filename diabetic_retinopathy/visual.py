@@ -40,52 +40,67 @@ def main(argv):
     else:
         print("No checkpoint found at:", run_paths['path_ckpts_train'])
 
-    category_index = 0  # Specified category index
+    category_index_0 = 0  # Specified category index
     layer_name = 'max_pooling2d_2'  # Replace with the name of the convolutional layer of your choice
 
     # Find images from the test dataset that match a specified category index
     for images, labels in ds_test:
         for i, label in enumerate(labels):
-            if label.numpy() == category_index:
-                image = images[i]
-                image = tf.expand_dims(image, axis=0)  # Extending dimensions to match model inputs
+            if label.numpy() == category_index_0:
+                image_0 = images[i]
+                image_0 = tf.expand_dims(image_0, axis=0)  # Extending dimensions to match model inputs
+                found = True
+                break
+        if found:
+            break
+    category_index_1 = 1  # Specified category index
+
+    # Find images from the test dataset that match a specified category index
+    for images, labels in ds_test:
+        for i, label in enumerate(labels):
+            if label.numpy() == category_index_1:
+                image_1 = images[i]
+                image_1 = tf.expand_dims(image_1, axis=0)  # Extending dimensions to match model inputs
                 found = True
                 break
         if found:
             break
 
-    heatmap_cam = grad_cam(model, image, category_index, layer_name)
-    heatmap_guid = guided_grad_cam(model, image, category_index, layer_name)
-    original_image = image[0].numpy()
-    overlay_image = overlay_heatmap(orig_image=original_image, heatmap=heatmap_cam)
-    overlay_image1 = overlay_heatmap(orig_image=original_image, heatmap=heatmap_guid)
+
+    heatmap_cam_0 = grad_cam(model, image_0, category_index_0, layer_name)
+    heatmap_cam_1 = guided_grad_cam(model, image_1, category_index_1, layer_name)
+    original_image_0 = image_0[0].numpy()
+    original_image_1 = image_1[0].numpy()
+
+    overlay_image = overlay_heatmap(orig_image=original_image_0, heatmap=heatmap_cam_0)
+    overlay_image1 = overlay_heatmap(orig_image=original_image_1, heatmap=heatmap_cam_1)
     # Create a 2x3 subplot
     fig, axs = plt.subplots(2, 3, figsize=(15, 10))
 
     # Displays the original image and the superimposed heat map on the first line
-    axs[0, 0].imshow(original_image)
-    axs[0, 0].set_title('Original Image')
+    axs[0, 0].imshow(original_image_0)
+    axs[0, 0].set_title('Original Image_0')
     axs[0, 0].axis('off')
 
-    axs[0, 1].imshow(heatmap_cam)
-    axs[0, 1].set_title('Grad-CAM')
+    axs[0, 1].imshow(heatmap_cam_0)
+    axs[0, 1].set_title('Grad-CAM_0')
     axs[0, 1].axis('off')
 
     axs[0, 2].imshow(overlay_image)
-    axs[0, 2].set_title('Overlayed Grad-CAM')
+    axs[0, 2].set_title('Overlayed Grad-CAM_0')
     axs[0, 2].axis('off')
 
     # Displays the original image, the Guided Grad-CAM, and the superimposed Guided Grad-CAM in the second row.
-    axs[1, 0].imshow(original_image)
-    axs[1, 0].set_title('Original Image')
+    axs[1, 0].imshow(original_image_1)
+    axs[1, 0].set_title('Original Image_1')
     axs[1, 0].axis('off')
 
-    axs[1, 1].imshow(heatmap_guid)
-    axs[1, 1].set_title('Guided Grad-CAM')
+    axs[1, 1].imshow(heatmap_cam_1)
+    axs[1, 1].set_title('Grad-CAM_1')
     axs[1, 1].axis('off')
 
     axs[1, 2].imshow(overlay_image1)
-    axs[1, 2].set_title('Overlayed Guided Grad-CAM')
+    axs[1, 2].set_title('Overlayed Grad-CAM_1')
     axs[1, 2].axis('off')
 
     plt.tight_layout()

@@ -13,7 +13,7 @@ from models.cnnmodel import create_cnn_nets
 import tensorflow as tf
 
 FLAGS = flags.FLAGS
-flags.DEFINE_boolean('train', False, 'Specify whether to train or evaluate a model.')
+flags.DEFINE_boolean('train', True, 'Specify whether to train or evaluate a model.')
 flags.DEFINE_boolean('multi_class', False, 'Specify whether to take multi_classification')
 flags.DEFINE_string('model', 'cnn', 'The name of the model')
 flags.DEFINE_string('wandb', 'idrid-cnn', 'The name of the wandb project')
@@ -42,7 +42,7 @@ def main(argv):
     logging.info("Dataset IDRID is successfully loaded")
 
     transfer_model = transfermodel(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
-    transfer_model.build()
+    transfer_model.build((None, 224, 224, 3))
     transfer_model.summary()
 
     # checkpoints

@@ -1,12 +1,12 @@
-import gin
+from pathlib import Path
 import tensorflow as tf
 import tensorflow_hub as hub
-from pathlib import Path
+from tensorflow.python.keras.layers import Dense, Dropout
+from tensorflow.python.keras.models import Sequential
 
 
 
-
-def transfermodel(input_shape, n_classes, l2_lambda=0.05,trainable=False):
+def transfermodel(input_shape,n_classes,dense_units=1024,dropout=0.5,trainable=False):
     """
     创建一个预训练的 EfficientNet V2 模型。
 
@@ -25,17 +25,14 @@ def transfermodel(input_shape, n_classes, l2_lambda=0.05,trainable=False):
     # 模型所在的路径
     model_path = current_dir / "archive"
 
-    # 创建模型
-    model = tf.keras.Sequential([
+    model = Sequential([
         hub.KerasLayer(str(model_path), input_shape=input_shape, trainable=trainable),
-        tf.keras.layers.Dense(units=1024,activation=tf.nn.relu,
-                              kernel_initializer=tf.keras.initializers.glorot_uniform,
-                              kernel_regularizer=tf.keras.regularizers.l2(l2_lambda)),
-        tf.keras.layers.Dropout(0.5),
-        tf.keras.layers.Dense(n_classes)
+        Dense(dense_units, activation='relu'),  # 调整神经元数量
+        Dropout(dropout),
+        Dense(units=n_classes)
     ])
 
-    # 编译模型
-    model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-
+    model.compile(optimizer='adam',
+                  loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                  metrics=['accuracy'])
     return model
