@@ -1,6 +1,5 @@
 import tensorflow as tf
 import gin
-import numpy as np
 
 
 @gin.configurable

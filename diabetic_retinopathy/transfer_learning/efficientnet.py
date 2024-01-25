@@ -1,8 +1,8 @@
 from pathlib import Path
 import tensorflow as tf
 import tensorflow_hub as hub
-from tensorflow.python.keras.layers import Dense, Dropout
-from tensorflow.python.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout
+from tensorflow.keras.models import Sequential
 from absl.flags import FLAGS
 
 
