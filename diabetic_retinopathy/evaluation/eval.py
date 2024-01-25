@@ -24,7 +24,10 @@ def evaluate(model: tf.keras.Model, checkpoint: object, ds_test: tf.data.Dataset
         pred_probs.extend(y_pred.numpy())  # Conversion with numpy()
 
     true_labels = np.array(true_labels)
-    pred_labels = np.argmax(pred_probs, axis=1)
+    if FLAGS.multi_class:
+        pred_labels = np.clip(np.round(pred_probs), 0, 4).astype(int).squeeze()
+    else:
+        pred_labels = np.argmax(pred_probs, axis=1)
 
     # Calculating metrics using custom functions
     conf_matrix = confusion_matrix(true_labels, pred_labels, ds_info['num_classes'])
@@ -79,7 +82,10 @@ def evaluate1(model: tf.keras.Model, ds_test: tf.data.Dataset, ds_info, run_path
         pred_probs.extend(y_pred.numpy())  # Conversion with numpy()
 
     true_labels = np.array(true_labels)
-    pred_labels = np.argmax(pred_probs, axis=1)
+    if FLAGS.multi_class:
+        pred_labels = np.clip(np.round(pred_probs), 0, 4).astype(int).squeeze()
+    else:
+        pred_labels = np.argmax(pred_probs, axis=1)
 
     # Calculating metrics using custom functions
     conf_matrix = confusion_matrix(true_labels, pred_labels, ds_info['num_classes'])

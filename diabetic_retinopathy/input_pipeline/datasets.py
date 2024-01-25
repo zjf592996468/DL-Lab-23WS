@@ -155,9 +155,15 @@ def load(name, data_dir, split_frac, seed):
 
         # Check and plot the distribution of resampled dataset
         fig = check_imb(train_labels_re)
-        fig.title('Class Distribution Of Train Set After Resampling')
-        fig.savefig(store_dir / 'Class distribution of train set after resampling.png')
-        logging.info(f"Class distribution of train set after resampling is saved to {store_dir.resolve()}")
+        if FLAGS.multi_class:
+            fig.title('Class Distribution Of Train Set After Resampling For Multi-Class')
+            fig.savefig(store_dir / 'Class distribution of train set after resampling for multi-class.png')
+            logging.info(
+                f"Class distribution of train set after resampling for multi-class is saved to {store_dir.resolve()}")
+        else:
+            fig.title('Class Distribution Of Train Set After Resampling')
+            fig.savefig(store_dir / 'Class distribution of train set after resampling.png')
+            logging.info(f"Class distribution of train set after resampling is saved to {store_dir.resolve()}")
         fig.close()
 
         # Update ds_info with resampled dataset
