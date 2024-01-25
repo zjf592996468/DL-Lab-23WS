@@ -13,9 +13,11 @@ def evaluate(model: tf.keras.Model, checkpoint: object, ds_test: tf.data.Dataset
     ckpt = tf.train.Checkpoint(model=model, optimizer=tf.keras.optimizers.Adam())
     ckpt.restore(checkpoint).expect_partial()
 
+    # make one empty dict to get value
     true_labels = []
     pred_probs = []
 
+    # put the value into empty dict
     for x, y in ds_test:
         y_pred = model(x, training=False)  # Calling x directly on the model
         true_labels.extend(y.numpy())
@@ -27,6 +29,8 @@ def evaluate(model: tf.keras.Model, checkpoint: object, ds_test: tf.data.Dataset
     # Calculating metrics using custom functions
     conf_matrix = confusion_matrix(true_labels, pred_labels, ds_info['num_classes'])
     accuracy = accuracy_score(true_labels, pred_labels)
+
+    # login and wandb login
     logging.info("Confusion Matrix:\n%s", conf_matrix)
     logging.info("Accuracy: %s", accuracy)
     wandb.log({"confusion_matrix": wandb.plot.confusion_matrix(probs=None, y_true=true_labels,
@@ -62,9 +66,13 @@ def evaluate(model: tf.keras.Model, checkpoint: object, ds_test: tf.data.Dataset
 
 
 def evaluate1(model: tf.keras.Model, ds_test: tf.data.Dataset, ds_info, run_paths) -> np.ndarray:
+    # this function can directly evaluate the model
+
+    # make one empty dict to get value
     true_labels = []
     pred_probs = []
 
+    # put the value into empty dict
     for x, y in ds_test:
         y_pred = model(x, training=False)  # Calling x directly on the model
         true_labels.extend(y.numpy())
@@ -76,9 +84,12 @@ def evaluate1(model: tf.keras.Model, ds_test: tf.data.Dataset, ds_info, run_path
     # Calculating metrics using custom functions
     conf_matrix = confusion_matrix(true_labels, pred_labels, ds_info['num_classes'])
     accuracy = accuracy_score(true_labels, pred_labels)
+
+    # login and wandb login
     logging.info("Confusion Matrix:\n%s", conf_matrix)
     logging.info("Accuracy: %s", accuracy)
-    wandb.log({"confusion_matrix": wandb.plot.confusion_matrix(probs=None, y_true=true_labels, preds=pred_labels,
+    wandb.log({"confusion_matrix": wandb.plot.confusion_matrix(probs=None, y_true=true_labels,
+                                                               preds=pred_labels,
                                                                class_names=[f"Class {i}" for i in
                                                                             range(ds_info['num_classes'])]),
                "accuracy": accuracy})

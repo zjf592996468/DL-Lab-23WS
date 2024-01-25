@@ -5,7 +5,7 @@ from tensorflow.python.keras.layers import Dense, Dropout
 from tensorflow.python.keras.models import Sequential
 
 
-def transfermodel(input_shape, n_classes, dense_units=1024,l2_lambda=0.05, dropout=0.5):
+def transfermodel(input_shape, n_classes, dense_units=1024, dropout=0.5):
     """
     创建一个预训练的 EfficientNet V2 模型。
 
@@ -26,8 +26,7 @@ def transfermodel(input_shape, n_classes, dense_units=1024,l2_lambda=0.05, dropo
 
     model = Sequential([
         hub.KerasLayer(str(model_path), input_shape=input_shape, trainable=False),
-        Dense(dense_units, activation='relu',
-              kernel_regularizer=tf.keras.regularizers.l2(l2_lambda)),  # 调整神经元数量
+        Dense(dense_units, activation='relu'),
         Dropout(dropout),
         Dense(units=n_classes)
     ])
