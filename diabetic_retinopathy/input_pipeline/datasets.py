@@ -37,8 +37,8 @@ def create_tfrecord(tfrd_path, img_dir, labels):
 
                 example = tf.train.Example(features=tf.train.Features(feature=feature))
                 writer.write(example.SerializeToString())
-            except FileNotFoundError:
-                print(f"File not found: {img_path}")
+            except FileNotFoundError as e:
+                print(f"File not found: {img_path}. Error: {e}")
             except Exception as e:
                 print(f"Error processing file {img_path}: {e}")
 
@@ -69,17 +69,29 @@ def load(name, data_dir, split_frac, seed):
         train_img_dir = Path(data_dir) / 'images' / 'train'
         test_img_dir = Path(data_dir) / 'images' / 'test'
         labels_dir = Path(data_dir) / 'labels'
-        store_dir = Path.cwd().parent.parent
+        store_dir = Path.cwd().parent / 'results' / 'p1_DRD'
 
         # Path to create TFRecord
-        train_tfrd_path = store_dir / 'train.tfrecord'
-        val_tfrd_path = store_dir / 'val.tfrecord'
-        test_tfrd_path = store_dir / 'test.tfrecord'
+        if FLAGS.multi_class:
+            train_tfrd_path = store_dir / 'train_5.tfrecord'
+            val_tfrd_path = store_dir / 'val_5.tfrecord'
+            test_tfrd_path = store_dir / 'test_5.tfrecord'
+        else:
+            train_tfrd_path = store_dir / 'train.tfrecord'
+            val_tfrd_path = store_dir / 'val.tfrecord'
+            test_tfrd_path = store_dir / 'test.tfrecord'
 
         # Read label files, only read rows of "Image name" and "Retinopathy grade"
-        train_labels = pd.read_csv(Path(labels_dir) / 'train.csv', usecols=['Image name', 'Retinopathy grade'])
-        train_labels = train_labels.drop_duplicates()  # Drop duplicate data
-        test_labels = pd.read_csv(Path(labels_dir) / 'test.csv', usecols=['Image name', 'Retinopathy grade'])
+        try:
+            train_labels = pd.read_csv(labels_dir / 'train.csv', usecols=['Image name', 'Retinopathy grade'])
+        except FileNotFoundError as e:
+            logging.warning(f"File not found: {labels_dir / 'train.csv'}. Error: {e}")
+            train_labels = train_labels.drop_duplicates()  # Drop duplicate data
+
+        try:
+            test_labels = pd.read_csv(labels_dir / 'test.csv', usecols=['Image name', 'Retinopathy grade'])
+        except FileNotFoundError as e:
+            logging.warning(f"File not found: {labels_dir / 'test.csv'}. Error: {e}")
 
         # Check and plot the distribution of raw dataset
         fig = check_imb(train_labels)
@@ -92,8 +104,8 @@ def load(name, data_dir, split_frac, seed):
         # Split train and val dataset with split_frac
         val_size = int(split_frac * train_labels.shape[0])
         train_size = train_labels.shape[0] - val_size
-        val_dataset = train_labels[train_size:]
-        train_dataset = train_labels[:train_size]
+        val_labels = train_labels[train_size:]
+        train_labels = train_labels.iloc[:train_size]
         logging.info(f"Dataset is divided into train and validation with rate: {split_frac}")
         logging.info(f"Num of train samples before resampling is: {train_size}")
         logging.info(f"Num of val samples is: {val_size}")
@@ -102,20 +114,20 @@ def load(name, data_dir, split_frac, seed):
         # Binarise the dataset when not doing multi classification
         if not FLAGS.multi_class:
             # Group all data into 2 groups, with 0 represents NRDR, 1 represents RDR
-            train_dataset['Retinopathy grade'] = (train_dataset['Retinopathy grade'] > 1).astype(int)
-            val_dataset['Retinopathy grade'] = (val_dataset['Retinopathy grade'] > 1).astype(int)
+            # todo: 解决可能出现的warn
+            train_labels['Retinopathy grade'] = (train_labels['Retinopathy grade'] > 1).astype(int)
+            val_labels['Retinopathy grade'] = (val_labels['Retinopathy grade'] > 1).astype(int)
             test_labels['Retinopathy grade'] = (test_labels['Retinopathy grade'] > 1).astype(int)
 
-
             # Check and plot the distribution of binarised dataset
-            fig = check_imb(train_dataset)
+            fig = check_imb(train_labels)
             fig.title('Class Distribution Of Train Set After Binarisation')
             fig.savefig(store_dir / 'Class distribution of train set after binarisation.png')
             logging.info(f"Class distribution of train set after binarisation is saved to {store_dir.resolve()}")
             fig.close()
 
         # Build origin dataset info
-        class_counts = train_dataset['Retinopathy grade'].value_counts().sort_index()
+        class_counts = train_labels['Retinopathy grade'].value_counts().sort_index()
         ds_info = {
             'train_size': train_size,
             'val_size': val_size,
@@ -135,7 +147,7 @@ def load(name, data_dir, split_frac, seed):
 
         # Resample the train dataset with oversampling
         targ_size = class_counts.max()
-        train_dataset_re = train_dataset.groupby('Retinopathy grade').apply(
+        train_dataset_re = train_labels.groupby('Retinopathy grade').apply(
             lambda x: x.sample(targ_size, replace=True, random_state=seed))
         train_dataset_re = train_dataset_re.sample(frac=1, random_state=seed).reset_index(drop=True)
         logging.info(f"Train dataset is resampled.")
@@ -164,8 +176,8 @@ def load(name, data_dir, split_frac, seed):
             })
 
         # Create TFRecord files for train, val and test
-        create_tfrecord(train_tfrd_path, train_img_dir, train_dataset)
-        create_tfrecord(val_tfrd_path, train_img_dir, val_dataset)
+        create_tfrecord(train_tfrd_path, train_img_dir, train_labels)
+        create_tfrecord(val_tfrd_path, train_img_dir, val_labels)
         create_tfrecord(test_tfrd_path, test_img_dir, test_labels)
         logging.info(f"TFRecord files are created in {store_dir.resolve()}.")
 

@@ -19,18 +19,21 @@ flags.DEFINE_boolean('multi_class', False, 'Specify whether to take multi_classi
 def main(argv):
     # generate folder structures
     run_paths = utils_params.gen_run_folder()
-
     gin.parse_config_files_and_bindings(['configs/config.gin'], [])
     utils_params.save_config(run_paths['path_gin'], gin.config_str())
+
     # load dataset
     ds_train, ds_val, ds_test, ds_info = load()
+
     # model vgg
     # model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
     # model cnn
     model = create_cnn_nets(ds_info)
-    # load the model
+
+    # load the checkpoint
     ckpt = tf.train.Checkpoint(model=model, optimizer=tf.keras.optimizers.Adam())
     manager = tf.train.CheckpointManager(ckpt, run_paths['path_ckpts_train'], max_to_keep=5)
+
     # load latest checkpoint
     ckpt_restore_path = manager.latest_checkpoint
     print(ckpt_restore_path)
@@ -40,11 +43,11 @@ def main(argv):
     else:
         print("No checkpoint found at:", run_paths['path_ckpts_train'])
 
-    category_index_0 = 0  # Specified category index
-    layer_name = 'max_pooling2d_2'  # Replace with the name of the convolutional layer of your choice
-
     # Find images from the test dataset that match a specified category index
-    for images, labels in ds_test:
+    layer_name = 'max_pooling2d_2'  # Replace the max pooling layer
+    category_index_0 = 0  # Specified category index
+    found = False
+    for images, labels in ds_test:  # Look into a batch
         for i, label in enumerate(labels):
             if label.numpy() == category_index_0:
                 image_0 = images[i]
@@ -53,27 +56,33 @@ def main(argv):
                 break
         if found:
             break
-    category_index_1 = 1  # Specified category index
 
     # Find images from the test dataset that match a specified category index
+    category_index_1 = 1  # Specified category index
+    image_count = 0
+    found = False
     for images, labels in ds_test:
         for i, label in enumerate(labels):
             if label.numpy() == category_index_1:
-                image_1 = images[i]
-                image_1 = tf.expand_dims(image_1, axis=0)  # Extending dimensions to match model inputs
-                found = True
-                break
+                image_count += 1
+                if image_count == 9:
+                    image_1 = images[i]
+                    image_1 = tf.expand_dims(image_1, axis=0)  # Extending dimensions to match model inputs
+                    found = True
+                    break
         if found:
             break
 
-
+    # Get the heatmap and original img
     heatmap_cam_0 = grad_cam(model, image_0, category_index_0, layer_name)
-    heatmap_cam_1 = guided_grad_cam(model, image_1, category_index_1, layer_name)
+    heatmap_cam_1 = grad_cam(model, image_1, category_index_1, layer_name)
     original_image_0 = image_0[0].numpy()
     original_image_1 = image_1[0].numpy()
 
-    overlay_image = overlay_heatmap(orig_image=original_image_0, heatmap=heatmap_cam_0)
-    overlay_image1 = overlay_heatmap(orig_image=original_image_1, heatmap=heatmap_cam_1)
+    # Overlay the heatmap on original img
+    overlay_image = overlay_heatmap(original_image_0, heatmap_cam_0, 0.1, 0.6)
+    overlay_image1 = overlay_heatmap(original_image_1, heatmap_cam_1, 0.1, 0.6)
+
     # Create a 2x3 subplot
     fig, axs = plt.subplots(2, 3, figsize=(15, 10))
 
@@ -90,7 +99,7 @@ def main(argv):
     axs[0, 2].set_title('Overlayed Grad-CAM_0')
     axs[0, 2].axis('off')
 
-    # Displays the original image, the Guided Grad-CAM, and the superimposed Guided Grad-CAM in the second row.
+    # Displays the original image, the Grad-CAM, and the superimposed Grad-CAM in the second row.
     axs[1, 0].imshow(original_image_1)
     axs[1, 0].set_title('Original Image_1')
     axs[1, 0].axis('off')

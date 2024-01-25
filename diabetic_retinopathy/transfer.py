@@ -15,7 +15,6 @@ import tensorflow as tf
 FLAGS = flags.FLAGS
 flags.DEFINE_boolean('train', True, 'Specify whether to train or evaluate a model.')
 flags.DEFINE_boolean('multi_class', False, 'Specify whether to take multi_classification')
-flags.DEFINE_string('model', 'cnn', 'The name of the model')
 flags.DEFINE_string('wandb', 'idrid-cnn', 'The name of the wandb project')
 flags.DEFINE_boolean('l2_loss', False, 'Specify whether to use l2 regularization')
 
@@ -41,14 +40,16 @@ def main(argv):
     ds_train, ds_val, ds_test, ds_info = datasets.load()
     logging.info("Dataset IDRID is successfully loaded")
 
+    # load model
     transfer_model = transfermodel(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
     transfer_model.build((None, 224, 224, 3))
     transfer_model.summary()
 
     # checkpoints
     ckpt = tf.train.Checkpoint(model=transfer_model, optimizer=tf.keras.optimizers.Adam())
-    manager = tf.train.CheckpointManager(ckpt, run_paths['path_ckpts_train'], max_to_keep=3)
-    # 加载最新的检查点
+    manager = tf.train.CheckpointManager(ckpt, run_paths['path_ckpts_train'], max_to_keep=5)
+
+    # load latest checkpoint
     ckpt_restore_path = manager.latest_checkpoint
     print(ckpt_restore_path)
 

@@ -8,12 +8,13 @@ def cnn_block(inputs, filters, kernel_size, l2_lambda, seed, pool_size=(2, 2)):
     """
     Creates a CNN block with convolution, activation, batch normalization, max pooling, and L2 regularization.
     Parameters:
+
         inputs (Tensor): Input tensor for the CNN block.
         filters (int): Number of filters for the convolutional layer.
         kernel_size (tuple): Size of the kernel for the convolutional layer.
         pool_size (tuple): Size of the pooling window.
         l2_lambda (float): Lambda value for L2 regularization.
-        initializer: Initializer for the convolutional layer.
+        seed (int): Random seed
         # pick up what you like
         initializer = @tf.keras.initializers.HeNormal
         #initializer = @tf.keras.initializers.glorot_uniform(seed=2023)

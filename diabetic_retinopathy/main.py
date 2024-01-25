@@ -8,6 +8,7 @@ from input_pipeline.datasets import load
 from utils import utils_params, utils_misc
 from models.architectures import vgg_like
 from models.cnnmodel import create_cnn_nets
+# from transfer_learning.efficientnet import transfermodel
 import tensorflow as tf
 
 FLAGS = flags.FLAGS
@@ -16,6 +17,7 @@ flags.DEFINE_boolean('multi_class', False, 'Specify whether to take multi_classi
 flags.DEFINE_string('model', 'cnn', 'The name of the model')
 flags.DEFINE_string('wandb', 'idrid-cnn', 'The name of the wandb project')
 flags.DEFINE_boolean('l2_loss', True, 'Specify whether to use l2 regularization')
+
 
 def main(argv):
     # generate folder structures
@@ -36,23 +38,27 @@ def main(argv):
 
     # setup pipeline
     ds_train, ds_val, ds_test, ds_info = load()
-    logging.info("Dataset IDRID is successfully loaded")
+    logging.info("Dataset IDRID is successfully loaded.")
 
     # use chosen model
-    logging.info("start model initialization")
-    # model vgg
-    if FLAGS.model == 'vgg':
+    if FLAGS.model == 'vgg':  # model vgg
         model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
-        logging.info("model-vgg_like initialized")
-    # model cnn
-    elif FLAGS.model == 'cnn':
+        logging.info("model-vgg_like initialized.")
+
+    elif FLAGS.model == 'cnn':  # model cnn
         model = create_cnn_nets(ds_info=ds_info)
-        logging.info("model-cnn initialized")
+        logging.info("model-cnn initialized.")
+
+    # elif FLAGS.model == 'effnet':  # model efficientnet
+    #     model = transfermodel(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
+    #     model.build((None, 224, 224, 3))
+    #     logging.info("model-efficientnet initialized.")
     logging.info(f"{model.summary()}")
 
     # checkpoints
     ckpt = tf.train.Checkpoint(model=model, optimizer=tf.keras.optimizers.Adam())
     manager = tf.train.CheckpointManager(ckpt, run_paths['path_ckpts_train'], max_to_keep=5)
+
     # load latest checkpoint
     ckpt_restore_path = manager.latest_checkpoint
     print(ckpt_restore_path)
@@ -74,7 +80,6 @@ def main(argv):
                  ds_info,
                  run_paths
                  )
-
     wandb.finish()
 
 

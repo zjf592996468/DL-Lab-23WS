@@ -4,21 +4,19 @@ import gin
 import numpy as np
 from absl.flags import FLAGS
 
+
 @gin.configurable
 def create_cnn_nets(ds_info, num_blocks, filters, kernel_size, dense_units, dropout_rate, seed, l2_lambda):
     """
     Builds an advanced CNN model for binary classification with multiple CNN blocks and L2 regularization.
     Parameters:
         ds_info: Dataset info dictionary
-        input_shape (tuple): Shape of the input images.
         num_blocks (int): Number of CNN blocks to be used.
-        n_classes (int): output
         filters (int): Number of filters for the first CNN block.
         kernel_size (tuple): Size of the kernel for the CNN blocks.
         dense_units (int): Number of units in the dense layer.
         dropout_rate (float): Dropout rate to be used before the dense layer.
-        initializer: Initializer for the convolutional layer.
-         # pick up what you like
+        # pick up what you like
         initializer = @tf.keras.initializers.HeNormal
         #initializer = @tf.keras.initializers.glorot_uniform(seed=2023)
         #initializer = @tf.keras.initializers.RandomNormal(mean=0.0, stddev=0.05, seed=2023)

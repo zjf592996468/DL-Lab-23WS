@@ -8,22 +8,22 @@ from absl.flags import FLAGS
 @gin.configurable
 class Trainer(object):
     def __init__(self, model, ds_train, ds_val, ds_info, run_paths, total_steps, log_interval, ckpt_interval):
-        # Summary Writer
-        # ....
-
-        # Checkpoint Manager
-        # ...
-
         # Loss objective
-        self.loss_object = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+        if FLAGS.multi_class:
+            self.loss_object = tf.keras.losses.MeanAbsoluteError()
+            self.train_accuracy = tf.keras.metrics.Accuracy(name='train_accuracy')
+            self.val_accuracy = tf.keras.metrics.Accuracy(name='val_accuracy')
+        else:
+            self.loss_object = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+            self.train_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='train_accuracy')
+            self.val_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='val_accuracy')
+
+        # Optimizer
         self.optimizer = tf.keras.optimizers.Adam()
 
         # Metrics
         self.train_loss = tf.keras.metrics.Mean(name='train_loss')
-        self.train_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='train_accuracy')
-
         self.val_loss = tf.keras.metrics.Mean(name='val_loss')
-        self.val_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='val_accuracy')
 
         self.model = model
         self.ds_train = ds_train
@@ -33,10 +33,11 @@ class Trainer(object):
         self.total_steps = total_steps
         self.log_interval = log_interval
         self.ckpt_interval = ckpt_interval
+
         # Checkpoint Manager
         self.ckpt = tf.train.Checkpoint(model=model, optimizer=self.optimizer)
         self.manager = tf.train.CheckpointManager(self.ckpt, self.run_paths['path_ckpts_train'],
-                                                  max_to_keep=round(total_steps/ckpt_interval))
+                                                  max_to_keep=round(total_steps / ckpt_interval))
 
     @tf.function
     def train_step(self, images, labels):
@@ -85,7 +86,7 @@ class Trainer(object):
             if FLAGS.l2_loss:
                 self.train_step_l2(images, labels)
             else:
-                self.train_step(images,labels)
+                self.train_step(images, labels)
 
             if step % self.log_interval == 0:
                 # Reset val metrics
@@ -108,27 +109,21 @@ class Trainer(object):
                            'val_acc': self.val_accuracy.result() * 100, 'val_loss': self.val_loss.result(),
                            'step': step})
 
-                # Write summary to tensorboard
-                # ...
-
                 # Reset train metrics
                 self.train_loss.reset_states()
                 self.train_accuracy.reset_states()
 
                 yield self.val_accuracy.result().numpy()
 
+            # Save checkpoints
             if step % self.ckpt_interval == 0:
                 save_path = self.manager.save()
                 logging.info(f'Saving checkpoint to {self.run_paths["path_ckpts_train"]}.')
                 print("Saved checkpoint for step {}: {}".format(int(step), save_path))
 
-                # Save checkpoint
-                # ...
-
+            # Save final checkpoint
             if step % self.total_steps == 0:
                 logging.info(f'Finished training after {step} steps.')
-                # Save final checkpoint
-
                 save_path = self.manager.save()
                 print("Saved checkpoint for step {}: {}".format(int(step), save_path))
                 return self.val_accuracy.result().numpy()

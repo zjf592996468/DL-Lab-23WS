@@ -1,4 +1,4 @@
-# Global Seed
+# Global Parameters
 GLOBAL_SEED = 2023
 l2_lambda = 0.005058818116971791
 

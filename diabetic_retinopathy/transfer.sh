@@ -10,4 +10,4 @@
 module load cuda/11.8
 
 # Run your python code
-python3 transfer.py --train=True --multi_class=False --model='transfermodel' --wandb='idrid-transfer' --l2_loss=False
+python3 transfer.py --train=True --multi_class=False --wandb='idrid-transfer' --l2_loss=False
