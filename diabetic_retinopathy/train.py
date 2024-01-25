@@ -35,7 +35,7 @@ class Trainer(object):
         self.ckpt_interval = ckpt_interval
 
         # Checkpoint Manager, save up to 10 checkpoints
-        self.ckpt = tf.train.Checkpoint(model=model, optimizer=self.optimizer)
+        self.ckpt = tf.train.Checkpoint(model=self.model, optimizer=self.optimizer)
         self.manager = tf.train.CheckpointManager(self.ckpt, self.run_paths['path_ckpts_train'],
                                                   max_to_keep=10)
 
@@ -51,7 +51,7 @@ class Trainer(object):
         self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
         self.train_loss(loss)
         if FLAGS.multi_class:
-            predictions = tf.cast(tf.clip_by_value(round(predictions), 0, 4), tf.int32)
+            predictions = tf.cast(tf.clip_by_value(tf.round(predictions), 0, 4), tf.int32)
         self.train_accuracy(labels, predictions)
 
     # this is train step with l2
@@ -71,7 +71,7 @@ class Trainer(object):
         self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
         self.train_loss(total_loss)
         if FLAGS.multi_class:
-            predictions = tf.cast(tf.clip_by_value(round(predictions), 0, 4), tf.int32)
+            predictions = tf.cast(tf.clip_by_value(tf.round(predictions), 0, 4), tf.int32)
         self.train_accuracy(labels, predictions)
 
     @tf.function
@@ -82,7 +82,7 @@ class Trainer(object):
         v_loss = self.loss_object(labels, predictions)
         self.val_loss(v_loss)
         if FLAGS.multi_class:
-            predictions = tf.cast(tf.clip_by_value(round(predictions), 0, 4), tf.int32)
+            predictions = tf.cast(tf.clip_by_value(tf.round(predictions), 0, 4), tf.int32)
         self.val_accuracy(labels, predictions)
 
     def train(self):

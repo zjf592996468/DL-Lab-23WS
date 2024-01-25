@@ -114,7 +114,6 @@ def load(name, data_dir, split_frac, seed):
         # Binarise the dataset when not doing multi classification
         if not FLAGS.multi_class:
             # Group all data into 2 groups, with 0 represents NRDR, 1 represents RDR
-            # todo: 解决可能出现的warn
             train_labels['Retinopathy grade'] = (train_labels['Retinopathy grade'] > 1).astype(int)
             val_labels['Retinopathy grade'] = (val_labels['Retinopathy grade'] > 1).astype(int)
             test_labels['Retinopathy grade'] = (test_labels['Retinopathy grade'] > 1).astype(int)
@@ -147,22 +146,22 @@ def load(name, data_dir, split_frac, seed):
 
         # Resample the train dataset with oversampling
         targ_size = class_counts.max()
-        train_dataset_re = train_labels.groupby('Retinopathy grade').apply(
+        train_labels_re = train_labels.groupby('Retinopathy grade').apply(
             lambda x: x.sample(targ_size, replace=True, random_state=seed))
-        train_dataset_re = train_dataset_re.sample(frac=1, random_state=seed).reset_index(drop=True)
+        train_labels_re = train_labels_re.sample(frac=1, random_state=seed).reset_index(drop=True)
         logging.info(f"Train dataset is resampled.")
-        train_size_re = train_dataset_re.shape[0]
+        train_size_re = train_labels_re.shape[0]
         logging.info(f"Num of train samples after resampling is: {train_size_re}")
 
         # Check and plot the distribution of resampled dataset
-        fig = check_imb(train_dataset_re)
+        fig = check_imb(train_labels_re)
         fig.title('Class Distribution Of Train Set After Resampling')
         fig.savefig(store_dir / 'Class distribution of train set after resampling.png')
         logging.info(f"Class distribution of train set after resampling is saved to {store_dir.resolve()}")
         fig.close()
 
         # Update ds_info with resampled dataset
-        class_counts_re = train_dataset_re['Retinopathy grade'].value_counts().sort_index()
+        class_counts_re = train_labels_re['Retinopathy grade'].value_counts().sort_index()
         ds_info.update({
             'train_size_re': train_size_re,
             'class0_counts_re': class_counts_re.values[0],
