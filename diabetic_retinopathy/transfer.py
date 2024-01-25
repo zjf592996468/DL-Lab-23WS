@@ -15,7 +15,7 @@ import tensorflow as tf
 FLAGS = flags.FLAGS
 flags.DEFINE_boolean('train', True, 'Specify whether to train or evaluate a model.')
 flags.DEFINE_boolean('multi_class', False, 'Specify whether to take multi_classification')
-flags.DEFINE_string('wandb', 'idrid-cnn', 'The name of the wandb project')
+flags.DEFINE_string('wandb', 'idrid-transfer', 'The name of the wandb project')
 flags.DEFINE_boolean('l2_loss', False, 'Specify whether to use l2 regularization')
 
 
@@ -32,7 +32,7 @@ def main(argv):
 
     # setup wandb
     wandb.login(key="f27c584f9e444901abf85615134f27d2da6e411d")
-    wandb.init(project='idrid-transfer', name=run_paths['model_id'],
+    wandb.init(project=FLAGS.wandb, name=run_paths['model_id'],
                config=utils_params.gin_config_to_readable_dictionary(gin.config._CONFIG))
     logging.info("Wandb logged in")
 
