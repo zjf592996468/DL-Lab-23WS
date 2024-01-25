@@ -50,6 +50,8 @@ class Trainer(object):
         gradients = tape.gradient(loss, self.model.trainable_variables)
         self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
         self.train_loss(loss)
+        if FLAGS.multi_class:
+            predictions = tf.cast(tf.clip_by_value(round(predictions), 0, 4), tf.int32)
         self.train_accuracy(labels, predictions)
 
     # this is train step with l2
@@ -68,6 +70,8 @@ class Trainer(object):
         gradients = tape.gradient(total_loss, self.model.trainable_variables)
         self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
         self.train_loss(total_loss)
+        if FLAGS.multi_class:
+            predictions = tf.cast(tf.clip_by_value(round(predictions), 0, 4), tf.int32)
         self.train_accuracy(labels, predictions)
 
     @tf.function
@@ -75,8 +79,10 @@ class Trainer(object):
         # training=False is only needed if there are layers with different
         # behavior during training versus inference (e.g. Dropout).
         predictions = self.model(images, training=False)
-        t_loss = self.loss_object(labels, predictions)
-        self.val_loss(t_loss)
+        v_loss = self.loss_object(labels, predictions)
+        self.val_loss(v_loss)
+        if FLAGS.multi_class:
+            predictions = tf.cast(tf.clip_by_value(round(predictions), 0, 4), tf.int32)
         self.val_accuracy(labels, predictions)
 
     def train(self):

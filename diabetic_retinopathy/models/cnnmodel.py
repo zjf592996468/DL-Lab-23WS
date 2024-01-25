@@ -41,12 +41,13 @@ def create_cnn_nets(ds_info, num_blocks, filters, kernel_size, dense_units, drop
         x = cnn_block(x, filters * (2 ** i), kernel_size, l2_lambda)
 
     out = tf.keras.layers.GlobalAveragePooling2D()(x)
-    out = tf.keras.layers.Dense(dense_units, activation=tf.nn.relu,
+    out = tf.keras.layers.Dense(dense_units,
+                                activation=tf.nn.relu,
                                 kernel_regularizer=tf.keras.regularizers.l2(l2_lambda),
                                 kernel_initializer=tf.keras.initializers.glorot_uniform(seed))(out)
     out = tf.keras.layers.Dropout(dropout_rate)(out)
     if FLAGS.multi_class:
-        outputs = tf.keras.layers.Dense(units=ds_info['num_classes'],
+        outputs = tf.keras.layers.Dense(units=1,
                                         kernel_regularizer=tf.keras.regularizers.l2(l2_lambda),
                                         kernel_initializer=tf.keras.initializers.glorot_uniform(seed))(out)
     else:
