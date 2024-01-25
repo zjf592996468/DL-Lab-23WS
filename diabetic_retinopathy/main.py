@@ -8,7 +8,7 @@ from input_pipeline.datasets import load
 from utils import utils_params, utils_misc
 from models.architectures import vgg_like
 from models.cnnmodel import create_cnn_nets
-# from transfer_learning.efficientnet import transfermodel
+from transfer_learning.efficientnet import transfermodel
 import tensorflow as tf
 
 FLAGS = flags.FLAGS
@@ -49,10 +49,10 @@ def main(argv):
         model = create_cnn_nets(ds_info=ds_info)
         logging.info("model-cnn initialized.")
 
-    # elif FLAGS.model == 'effnet':  # model efficientnet
-    #     model = transfermodel(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
-    #     model.build((None, 224, 224, 3))
-    #     logging.info("model-efficientnet initialized.")
+    elif FLAGS.model == 'effnet':  # model efficientnet
+        model = transfermodel(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
+        model.build((None, 224, 224, 3))
+        logging.info("model-efficientnet initialized.")
     logging.info(f"{model.summary()}")
 
     # checkpoints

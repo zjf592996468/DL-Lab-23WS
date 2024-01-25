@@ -34,10 +34,10 @@ class Trainer(object):
         self.log_interval = log_interval
         self.ckpt_interval = ckpt_interval
 
-        # Checkpoint Manager
+        # Checkpoint Manager, save up to 10 checkpoints
         self.ckpt = tf.train.Checkpoint(model=model, optimizer=self.optimizer)
         self.manager = tf.train.CheckpointManager(self.ckpt, self.run_paths['path_ckpts_train'],
-                                                  max_to_keep=round(total_steps / ckpt_interval))
+                                                  max_to_keep=10)
 
     @tf.function
     def train_step(self, images, labels):
