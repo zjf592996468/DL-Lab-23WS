@@ -53,7 +53,9 @@ def main(argv):
         model = transfermodel(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
         model.build((None, 224, 224, 3))
         logging.info("model-efficientnet initialized.")
-    logging.info(f"{model.summary()}")
+    else:
+        raise ValueError
+    model.summary()
 
     # checkpoints
     ckpt = tf.train.Checkpoint(model=model, optimizer=tf.keras.optimizers.Adam())
