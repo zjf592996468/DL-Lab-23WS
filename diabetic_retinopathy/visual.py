@@ -1,6 +1,5 @@
 import gin
 from deep_visualization.cam import grad_cam, overlay_heatmap
-from deep_visualization.guidcam import guided_grad_cam
 from input_pipeline.datasets import load
 from utils import utils_params, utils_misc
 from models.architectures import vgg_like
@@ -58,6 +57,7 @@ def main(argv):
             break
 
     # Find images from the test dataset that match a specified category index
+    # We find the image 9 is suitable
     category_index_1 = 1  # Specified category index
     image_count = 0
     found = False
@@ -65,7 +65,7 @@ def main(argv):
         for i, label in enumerate(labels):
             if label.numpy() == category_index_1:
                 image_count += 1
-                if image_count == 9:
+                if image_count == 40:
                     image_1 = images[i]
                     image_1 = tf.expand_dims(image_1, axis=0)  # Extending dimensions to match model inputs
                     found = True
@@ -86,7 +86,7 @@ def main(argv):
     # Create a 2x3 subplot
     fig, axs = plt.subplots(2, 3, figsize=(15, 10))
 
-    # Displays the original image and the superimposed heat map on the first line
+    # Displays the original image Grad CAM,and the superimposed heat map on the first line
     axs[0, 0].imshow(original_image_0)
     axs[0, 0].set_title('Original Image_0')
     axs[0, 0].axis('off')

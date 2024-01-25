@@ -8,6 +8,7 @@ def grad_cam(model, image, category_index, layer_name):
     # load the model
     grad_model = tf.keras.models.Model([model.inputs], [model.get_layer(layer_name).output, model.output])
 
+    # calculate the grad with GradientTape
     with tf.GradientTape() as tape:
         conv_outputs, predictions = grad_model(image)
         loss = predictions[:, category_index]
@@ -15,12 +16,14 @@ def grad_cam(model, image, category_index, layer_name):
     output = conv_outputs[0]
     grads = tape.gradient(loss, conv_outputs)[0]
 
+    # we haven nur interest in positive influence
     gate_f = tf.cast(output > 0, 'float32')
     gate_r = tf.cast(grads > 0, 'float32')
     guided_grads = gate_f * gate_r * grads
 
     weights = tf.reduce_mean(guided_grads, axis=(0, 1))
 
+    # plot heatmap
     cam = np.ones(output.shape[0:2], dtype=np.float32)
     for i, w in enumerate(weights):
         cam += w * output[:, :, i]

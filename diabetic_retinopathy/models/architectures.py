@@ -1,6 +1,5 @@
 import gin
 import tensorflow as tf
-
 from models.layers import vgg_block
 
 
