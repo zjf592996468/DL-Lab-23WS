@@ -69,7 +69,6 @@ def augment(image, label, seed):
     y_scaling = scaling[1]
     out_h = tf.cast(in_h * y_scaling, dtype=tf.int32)
     out_w = tf.cast(in_w * x_scaling, dtype=tf.int32)
-    seed = np.random.randint(2020)
     image = tf.image.random_crop(image, size=[out_h, out_w, 3], seed=seed)
     image = tf.image.resize(image, size=(in_h, in_w))
 
