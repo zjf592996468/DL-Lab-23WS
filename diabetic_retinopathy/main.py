@@ -40,7 +40,7 @@ def main(argv):
     ds_train, ds_val, ds_test, ds_info = load()
     logging.info("Dataset IDRID is successfully loaded.")
 
-    # use chosen model
+    # choose model
     if FLAGS.model == 'vgg':  # model vgg
         model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
         logging.info("model-vgg_like initialized.")
@@ -53,8 +53,9 @@ def main(argv):
         model = transfermodel(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
         model.build((None, 224, 224, 3))
         logging.info("model-efficientnet initialized.")
+
     else:
-        raise ValueError
+        raise ValueError("Invalid model name. Please choose model name from 'vgg', 'cnn', 'effnet'.")
     model.summary()
 
     # checkpoints

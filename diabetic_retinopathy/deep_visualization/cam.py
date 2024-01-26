@@ -16,7 +16,7 @@ def grad_cam(model, image, category_index, layer_name):
     output = conv_outputs[0]
     grads = tape.gradient(loss, conv_outputs)[0]
 
-    # we haven nur interest in positive influence
+    # we only have interest in positive influence
     gate_f = tf.cast(output > 0, 'float32')
     gate_r = tf.cast(grads > 0, 'float32')
     guided_grads = gate_f * gate_r * grads

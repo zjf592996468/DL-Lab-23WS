@@ -184,7 +184,7 @@ def load(name, data_dir, split_frac, seed):
         create_tfrecord(train_tfrd_path, train_img_dir, train_labels)
         create_tfrecord(val_tfrd_path, train_img_dir, val_labels)
         create_tfrecord(test_tfrd_path, test_img_dir, test_labels)
-        logging.info(f"TFRecord files are created in {store_dir.resolve()}.")
+        logging.info(f"TFRecord files are created in {store_dir.resolve()}")
 
         # Read TFRecord files and create dataset
         ds_train = tf.data.TFRecordDataset(train_tfrd_path).map(_parse_tfrd_function)

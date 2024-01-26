@@ -77,6 +77,7 @@ def augment(image, label, seed):
     x_shear = tf.random.uniform([1], minval=-0.1, maxval=0.1, dtype=tf.float32)[0]
     y_shear = tf.random.uniform([1], minval=-0.1, maxval=0.1, dtype=tf.float32)[0]
     image = tfa.image.transform(image, [1.0, x_shear, 0, y_shear, 1.0, 0.0, 0.0, 0.0])
+
     # Random brightness
     image = tf.image.random_brightness(image, max_delta=0.1, seed=seed)
 

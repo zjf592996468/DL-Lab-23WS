@@ -30,8 +30,13 @@ def transfermodel(input_shape, n_classes, dense_units=1024, dropout=0.5):
             hub.KerasLayer(str(model_path), input_shape=input_shape, trainable=False),
             Dense(dense_units, activation='relu'),
             Dropout(dropout),
-            Dense(units=1)
+            Dense(units=1)  # Use regression for multi-class
         ])
+
+        model.compile(optimizer='adam',
+                      loss=tf.keras.losses.MeanAbsoluteError(),  # Use MAE as loss
+                      metrics=['accuracy'])
+
     else:
         model = Sequential([
             hub.KerasLayer(str(model_path), input_shape=input_shape, trainable=False),
@@ -40,7 +45,8 @@ def transfermodel(input_shape, n_classes, dense_units=1024, dropout=0.5):
             Dense(units=n_classes)
         ])
 
-    model.compile(optimizer='adam',
-                  loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                  metrics=['accuracy'])
+        model.compile(optimizer='adam',
+                      loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                      metrics=['accuracy'])
+
     return model

@@ -29,7 +29,6 @@ def create_cnn_nets(ds_info, num_blocks, filters, kernel_size, dense_units, drop
 
     inputs = tf.keras.Input(shape=ds_info['shape'])
     x = inputs
-    # 这个方案在5分类的时候是否还有用？
     label0_count = ds_info['class0_counts_re']
     label1_count = ds_info['class1_counts_re']
 
@@ -40,13 +39,21 @@ def create_cnn_nets(ds_info, num_blocks, filters, kernel_size, dense_units, drop
     for i in range(num_blocks):
         x = cnn_block(x, filters * (2 ** i), kernel_size, l2_lambda)
 
+    # GlobalAveragePolling layer
     out = tf.keras.layers.GlobalAveragePooling2D()(x)
+
+    # Dense layer
     out = tf.keras.layers.Dense(dense_units,
                                 activation=tf.nn.relu,
                                 kernel_regularizer=tf.keras.regularizers.l2(l2_lambda),
                                 kernel_initializer=tf.keras.initializers.glorot_uniform(seed))(out)
+
+    # Dropout layer
     out = tf.keras.layers.Dropout(dropout_rate)(out)
+
+    # Output layer
     if FLAGS.multi_class:
+        # Use regression for multi-class
         outputs = tf.keras.layers.Dense(units=1,
                                         kernel_regularizer=tf.keras.regularizers.l2(l2_lambda),
                                         kernel_initializer=tf.keras.initializers.glorot_uniform(seed))(out)
