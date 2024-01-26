@@ -64,7 +64,7 @@ def augment(image, label, seed):
     image = tf.image.convert_image_dtype(image, dtype=tf.float32)
     in_h = image.shape[0]
     in_w = image.shape[1]
-    scaling = tf.random.uniform([2], 0.8, 1)
+    scaling = tf.random.uniform([2], 0.8, 1, seed=seed)
     x_scaling = scaling[0]
     y_scaling = scaling[1]
     out_h = tf.cast(in_h * y_scaling, dtype=tf.int32)
@@ -73,8 +73,8 @@ def augment(image, label, seed):
     image = tf.image.resize(image, size=(in_h, in_w))
 
     # Random shearing
-    x_shear = tf.random.uniform([1], minval=-0.1, maxval=0.1, dtype=tf.float32)[0]
-    y_shear = tf.random.uniform([1], minval=-0.1, maxval=0.1, dtype=tf.float32)[0]
+    x_shear = tf.random.uniform([1], minval=-0.1, maxval=0.1, dtype=tf.float32, seed=seed)[0]
+    y_shear = tf.random.uniform([1], minval=-0.1, maxval=0.1, dtype=tf.float32, seed=seed)[0]
     image = tfa.image.transform(image, [1.0, x_shear, 0, y_shear, 1.0, 0.0, 0.0, 0.0])
 
     # Random brightness
