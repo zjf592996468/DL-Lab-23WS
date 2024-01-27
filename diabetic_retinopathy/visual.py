@@ -15,6 +15,7 @@ FLAGS = flags.FLAGS
 flags.DEFINE_boolean('multi_class', False, 'Specify whether to take multi_classification')
 flags.DEFINE_string('model', 'cnn', 'The name of the model')
 
+
 def main(argv):
     # generate folder structures
     run_paths = utils_params.gen_run_folder()

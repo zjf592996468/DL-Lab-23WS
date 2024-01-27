@@ -87,7 +87,6 @@ sweep_config = {
 }
 
 if __name__ == '__main__':
-
     FLAGS(sys.argv)
     wandb.login(key="f27c584f9e444901abf85615134f27d2da6e411d")
     sweep_id = wandb.sweep(sweep_config)

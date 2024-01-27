@@ -1,5 +1,6 @@
 import numpy as np
 
+
 # this task we use package, do not use this
 def confusion_matrix(y_true, y_pred, classes):
     matrix = np.zeros((classes, classes), dtype=int)

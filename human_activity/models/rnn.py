@@ -5,6 +5,7 @@ from keras.regularizers import l2
 from absl.flags import FLAGS
 import tensorflow as tf
 
+
 @gin.configurable
 def create_rnn(ds_info, lstm_units, dense_units, dropout_rate, regularization_factor):
     """
@@ -56,7 +57,8 @@ def create_rnn(ds_info, lstm_units, dense_units, dropout_rate, regularization_fa
     model.add(Dropout(dropout_rate))
 
     # Dense layer
-    model.add(Dense(dense_units, activation='relu',
+    model.add(Dense(dense_units,
+                    activation='relu',
                     kernel_initializer=tf.keras.initializers.glorot_uniform,
                     kernel_regularizer=l2(regularization_factor)))
 
