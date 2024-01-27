@@ -1,5 +1,7 @@
-# Global Seed
+# Global parameters
 GLOBAL_SEED = 2024
+WIN_LEN = 250
+WIN_SHIFT = 125
 
 # Training
 Trainer.total_steps = 5e4
@@ -7,8 +9,21 @@ Trainer.log_interval = 5e3
 Trainer.ckpt_interval = 5e3
 
 # Input pipeline
-load.name = 'idrid'
-#load.data_dir = r'/home/data/HAPT_dataset'
-load.data_dir = r'C:\DL-lab\HAPT Data Set'
-#load.data_dir = r''
-load.seed = %GLOBAL_SEED
+load.name = 'hapt'
+load.data_dir = r'/home/data/HAPT_dataset'
+#load.data_dir = r'C:\DL-lab\HAPT Data Set'
+#load.data_dir = r'D:\HAPT Data Set'
+prepare.seed = %GLOBAL_SEED
+prepare.caching = True
+prepare.batch_size = 32
+parse_tfrecord_function.win_len = %WIN_LEN
+
+# Preprocessing
+slide_window.win_len = %WIN_LEN
+slide_window.win_shift = %WIN_SHIFT
+
+# model
+create_rnn.lstm_units = 182
+create_rnn.dense_units = 180
+create_rnn.dropout_rate = 0.5257264395344566
+create_rnn.regularization_factor = 0.009979811625772815

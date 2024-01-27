@@ -14,7 +14,6 @@ def gen_run_folder(path_model_id='har-ckpt'):
         run_paths['path_model_id'] = os.path.join(path_model_root, 'har-ckpt')
     else:
         run_paths['path_model_id'] = path_model_id
-    run_paths['model_id'] = run_paths['path_model_id'].split(os.sep)[-1]
 
     run_paths['model_id'] = run_paths['path_model_id'].split(os.sep)[-1]
     run_paths['path_logs_train'] = os.path.join(run_paths['path_model_id'], 'logs', 'run.log')

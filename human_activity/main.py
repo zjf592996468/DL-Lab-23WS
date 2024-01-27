@@ -3,14 +3,16 @@ import logging
 import wandb
 from absl import app, flags
 from train import Trainer
-from evaluation.eval import evaluate
+from evaluation.eval import evaluate, evaluate1
 from input_pipeline.datasets import load
+from models.rnn import create_rnn
 from utils import utils_params, utils_misc
 import tensorflow as tf
 
 FLAGS = flags.FLAGS
 flags.DEFINE_boolean('train', True, 'Specify whether to train or evaluate a model.')
-flags.DEFINE_string('wandb', 'hapt-debug', 'The name of the wandb project')
+flags.DEFINE_string('wandb', 'hapt', 'The name of the wandb project.')
+flags.DEFINE_string('layer', 'Bidirectional LSTM', 'Choose which layer to use in RNN.')
 
 
 def main(argv):
@@ -28,23 +30,23 @@ def main(argv):
     wandb.login(key="f27c584f9e444901abf85615134f27d2da6e411d")
     wandb.init(project=FLAGS.wandb, name=run_paths['model_id'],
                config=utils_params.gin_config_to_readable_dictionary(gin.config._CONFIG))
-    logging.info("Wandb logged in")
+    logging.info("Wandb logged in.")
 
     # setup pipeline
     ds_train, ds_val, ds_test, ds_info = load()
-    logging.info("Dataset HAPT is successfully loaded")
+    logging.info("Dataset HAPT is successfully loaded.")
 
-    # todo: implement rnn model here
-    # # model rnn
-    # logging.info("start model initialization")
-    # model = rnn()
-    # logging.info("model-rnn initialized")
-    # logging.info(f"{model.summary()}")
+    # model rnn with bi_LSTM
+    logging.info("Start model initialization...")
+    model = create_rnn(ds_info)
+    logging.info("model-rnn initialized.")
+    model.summary()
 
     # checkpoints
     ckpt = tf.train.Checkpoint(model=model, optimizer=tf.keras.optimizers.Adam())
-    manager = tf.train.CheckpointManager(ckpt, run_paths['path_ckpts_train'], max_to_keep=5)
-    # 加载最新的检查点
+    manager = tf.train.CheckpointManager(ckpt, run_paths['path_ckpts_train'], max_to_keep=10)
+
+    # Load latest checkpoint
     ckpt_restore_path = manager.latest_checkpoint
     print(ckpt_restore_path)
 
@@ -57,12 +59,12 @@ def main(argv):
         trainer = Trainer(model, ds_train, ds_val, ds_info, run_paths)
         for _ in trainer.train():
             continue
-        # evaluate1(model, ds_test, run_paths)
+        evaluate1(model, ds_test, ds_info)
     else:
         evaluate(model,
                  ckpt_restore_path,
                  ds_test,
-                 run_paths
+                 ds_info
                  )
     wandb.finish()
 

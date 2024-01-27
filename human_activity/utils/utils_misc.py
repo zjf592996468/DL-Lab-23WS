@@ -3,7 +3,6 @@ import tensorflow as tf
 
 
 def set_loggers(path_log=None, logging_level=0, b_stream=False, b_debug=False):
-
     # std. logger
     logger = logging.getLogger()
     logger.setLevel(logging_level)
