@@ -13,7 +13,7 @@ import matplotlib
 
 FLAGS = flags.FLAGS
 flags.DEFINE_boolean('multi_class', False, 'Specify whether to take multi_classification')
-
+flags.DEFINE_string('model', 'cnn', 'The name of the model')
 
 def main(argv):
     # generate folder structures
@@ -24,10 +24,12 @@ def main(argv):
     # load dataset
     ds_train, ds_val, ds_test, ds_info = load()
 
-    # model vgg
-    # model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
-    # model cnn
-    model = create_cnn_nets(ds_info)
+    # choose model
+    if FLAGS.model == 'vgg':  # model vgg
+        model = vgg_like(input_shape=ds_info['shape'], n_classes=ds_info['num_classes'])
+
+    elif FLAGS.model == 'cnn':  # model cnn
+        model = create_cnn_nets(ds_info=ds_info)
 
     # load the checkpoint
     ckpt = tf.train.Checkpoint(model=model, optimizer=tf.keras.optimizers.Adam())

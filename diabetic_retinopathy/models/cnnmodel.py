@@ -58,6 +58,7 @@ def create_cnn_nets(ds_info, num_blocks, filters, kernel_size, dense_units, drop
                                         kernel_regularizer=tf.keras.regularizers.l2(l2_lambda),
                                         kernel_initializer=tf.keras.initializers.glorot_uniform(seed))(out)
     else:
+        # can also use this for multi-classification
         outputs = tf.keras.layers.Dense(units=ds_info['num_classes'],
                                         kernel_regularizer=tf.keras.regularizers.l2(l2_lambda),
                                         kernel_initializer=tf.keras.initializers.glorot_uniform(seed),

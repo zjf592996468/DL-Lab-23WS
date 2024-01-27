@@ -12,7 +12,7 @@ from transfer_learning.efficientnet import transfermodel
 import tensorflow as tf
 
 FLAGS = flags.FLAGS
-flags.DEFINE_boolean('train', False, 'Specify whether to train or evaluate a model.')
+flags.DEFINE_boolean('train', True, 'Specify whether to train or evaluate a model.')
 flags.DEFINE_boolean('multi_class', False, 'Specify whether to take multi_classification')
 flags.DEFINE_string('model', 'cnn', 'The name of the model')
 flags.DEFINE_string('wandb', 'idrid-cnn', 'The name of the wandb project')
@@ -75,13 +75,12 @@ def main(argv):
         trainer = Trainer(model, ds_train, ds_val, ds_info, run_paths)
         for _ in trainer.train():
             continue
-        evaluate1(model, ds_test, ds_info, run_paths)
+        evaluate1(model, ds_test, ds_info)
     else:
         evaluate(model,
                  ckpt_restore_path,
                  ds_test,
-                 ds_info,
-                 run_paths
+                 ds_info
                  )
     wandb.finish()
 

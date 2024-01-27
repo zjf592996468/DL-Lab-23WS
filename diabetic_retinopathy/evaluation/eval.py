@@ -8,8 +8,7 @@ from evaluation.metrics import recall_score, auc_score, f1score, accuracy_score,
 from absl.flags import FLAGS
 
 
-def evaluate(model: tf.keras.Model, checkpoint: object, ds_test: tf.data.Dataset, ds_info,
-             run_paths: dict) -> np.ndarray:
+def evaluate(model: tf.keras.Model, checkpoint: object, ds_test: tf.data.Dataset, ds_info) -> np.ndarray:
     ckpt = tf.train.Checkpoint(model=model, optimizer=tf.keras.optimizers.Adam())
     ckpt.restore(checkpoint).expect_partial()
 
@@ -68,7 +67,7 @@ def evaluate(model: tf.keras.Model, checkpoint: object, ds_test: tf.data.Dataset
     return conf_matrix
 
 
-def evaluate1(model: tf.keras.Model, ds_test: tf.data.Dataset, ds_info, run_paths) -> np.ndarray:
+def evaluate1(model: tf.keras.Model, ds_test: tf.data.Dataset, ds_info) -> np.ndarray:
     # this function can directly evaluate the model
 
     # make one empty dict to get value
