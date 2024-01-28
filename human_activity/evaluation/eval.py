@@ -33,11 +33,11 @@ def evaluate(model: tf.keras.Model, checkpoint: object, ds_test: tf.data.Dataset
     # Calculate confusion matrix
     conf_matrix = confusion_matrix(true_labels, pred_labels)
     # Convert confusion matrix to percentage
-    conf_matrix_percentage = conf_matrix.astype('float') / conf_matrix.sum(axis=1)[:, np.newaxis]
+    conf_matrix = conf_matrix.astype('float') / conf_matrix.sum(axis=1)[:, np.newaxis]
 
     accuracy = accuracy_score(true_labels, pred_labels)
 
-    logging.info("Confusion Matrix:\n%s", conf_matrix_percentage)
+    logging.info("Confusion Matrix:\n%s", conf_matrix)
     logging.info("Accuracy: %s", accuracy)
 
     # Use wandb to record confusion matrix and accuracy
@@ -47,16 +47,16 @@ def evaluate(model: tf.keras.Model, checkpoint: object, ds_test: tf.data.Dataset
 
     # Plot the confusion matrix
     plt.figure(figsize=(10, 8))
-    sns.heatmap(conf_matrix_percentage, annot=True, fmt=".2%", cmap='Blues',
+    sns.heatmap(conf_matrix, annot=True, fmt=".2%", cmap='Blues',
                 xticklabels=ds_info['act_names'], yticklabels=ds_info['act_names'])
 
     plt.xlabel('Predicted labels')
     plt.ylabel('True labels')
-    plt.title('Confusion Matrix with Action Names (Percentage)')
+    plt.title('Confusion Matrix')
     plt.xticks(rotation=45)
     plt.show()
 
-    return conf_matrix_percentage
+    return conf_matrix
 
 
 def evaluate1(model: tf.keras.Model, ds_test: tf.data.Dataset, ds_info) -> np.ndarray:
@@ -101,7 +101,7 @@ def evaluate1(model: tf.keras.Model, ds_test: tf.data.Dataset, ds_info) -> np.nd
 
     plt.xlabel('Predicted labels')
     plt.ylabel('True labels')
-    plt.title('Confusion Matrix with Action Names (Percentage)')
+    plt.title('Confusion Matrix')
     plt.xticks(rotation=45)
     plt.show()
 

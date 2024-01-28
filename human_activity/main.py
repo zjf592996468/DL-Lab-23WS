@@ -9,8 +9,9 @@ from models.rnn import create_rnn
 from utils import utils_params, utils_misc
 import tensorflow as tf
 
+
 FLAGS = flags.FLAGS
-flags.DEFINE_boolean('train', True, 'Specify whether to train or evaluate a model.')
+flags.DEFINE_boolean('train', False, 'Specify whether to train or evaluate a model.')
 flags.DEFINE_string('wandb', 'hapt', 'The name of the wandb project.')
 flags.DEFINE_string('layer', 'Bidirectional LSTM', 'Choose which layer to use in RNN.')
 
@@ -35,7 +36,6 @@ def main(argv):
     # setup pipeline
     ds_train, ds_val, ds_test, ds_info = load()
     logging.info("Dataset HAPT is successfully loaded.")
-
     # model rnn with bi_LSTM
     logging.info("Start model initialization...")
     model = create_rnn(ds_info)
