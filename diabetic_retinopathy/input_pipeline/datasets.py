@@ -102,9 +102,9 @@ def load(name, data_dir, split_frac, seed):
         fig.close()
 
         # Split train and val dataset with split_frac
-        val_size = int(split_frac * train_labels.shape[0])
+        val_size = round(split_frac * train_labels.shape[0])
         train_size = train_labels.shape[0] - val_size
-        val_labels = train_labels[train_size:]
+        val_labels = train_labels[train_size:].copy()
         train_labels = train_labels.iloc[:train_size]
         logging.info(f"Dataset is divided into train and validation with rate: {split_frac}")
         logging.info(f"Num of train samples before resampling is: {train_size}")
@@ -114,9 +114,9 @@ def load(name, data_dir, split_frac, seed):
         # Binarise the dataset when not doing multi classification
         if not FLAGS.multi_class:
             # Group all data into 2 groups, with 0 represents NRDR, 1 represents RDR
-            train_labels['Retinopathy grade'] = (train_labels['Retinopathy grade'] > 1).astype(int)
-            val_labels['Retinopathy grade'] = (val_labels['Retinopathy grade'] > 1).astype(int)
-            test_labels['Retinopathy grade'] = (test_labels['Retinopathy grade'] > 1).astype(int)
+            train_labels.loc[:, 'Retinopathy grade'] = (train_labels['Retinopathy grade'] > 1).astype(int)
+            val_labels.loc[:, 'Retinopathy grade'] = (val_labels['Retinopathy grade'] > 1).astype(int)
+            test_labels.loc[:, 'Retinopathy grade'] = (test_labels['Retinopathy grade'] > 1).astype(int)
 
             # Check and plot the distribution of binarised dataset
             fig = check_imb(train_labels)

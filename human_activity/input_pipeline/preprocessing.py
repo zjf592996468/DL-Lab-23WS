@@ -21,8 +21,8 @@ def slide_window(dataset, win_len, win_shift):
     dataset = dataset.window(win_len, shift=win_shift, stride=1, drop_remainder=True)
 
     # Flatten the windowed dataset
-    dataset = dataset.flat_map(lambda feature, label: tf.data.Dataset.zip((feature, label))).batch(win_len,
-                                                                                                   drop_remainder=True)
+    dataset = (dataset.flat_map(lambda feature, label: tf.data.Dataset.zip((feature, label)))
+               .batch(win_len, drop_remainder=True))
 
     return dataset
 

@@ -69,7 +69,7 @@ def load(name, data_dir):
         rawdata_dir = Path(data_dir) / 'RawData'
         labels_path = Path(data_dir) / 'RawData' / 'labels.txt'
         act_labels_path = Path(data_dir) / 'activity_labels.txt'
-        store_dir = Path.cwd().parent.parent
+        store_dir = Path.cwd().parent / 'results' / 'p2_HAR'
 
         # Path to create TFRecord
         train_tfrd_path = store_dir / 'hapt_train.tfrecord'
@@ -98,7 +98,7 @@ def load(name, data_dir):
             for _, row in labels_df.iterrows():
                 exp_id = row['exp_id']
                 user_id = row['user_id']
-                act_id = row['act_id'] - 1
+                act_id = row['act_id'] - 1  # Use as integer labels
                 start = row['start']
                 end = row['end']
 
@@ -209,7 +209,7 @@ def load(name, data_dir):
             logging.warning(f"File not found: {test_tfrd_path}. Error: {e}")
         logging.info("Train, val and test datasets are created from TFRecords.")
 
-        # # Check dataset element
+        # # Check dataset labels
         # for parsed_record in ds_train.take(10):
         #     print(repr(parsed_record))
 
