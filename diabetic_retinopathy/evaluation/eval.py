@@ -55,10 +55,10 @@ def evaluate(model: tf.keras.Model, checkpoint: object, ds_test: tf.data.Dataset
 
     # Plot the confusion matrix
     plt.figure(figsize=(10, 8))
-    sns.heatmap(conf_matrix, annot=True, fmt='g', cmap='Blues')
-    plt.xlabel('Predicted labels')
-    plt.ylabel('True labels')
-    plt.title('Confusion Matrix')
+    sns.heatmap(conf_matrix, annot=True, fmt='g', cmap='Blues', annot_kws={"size": 48})
+    plt.xlabel('Predicted labels', fontsize=32)
+    plt.ylabel('True labels', fontsize=32)
+    plt.title('Confusion Matrix', fontsize=36)
     plt.show()
 
     # Ensure wandb run finishes
