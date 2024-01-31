@@ -23,7 +23,7 @@ def evaluate(model: tf.keras.Model, checkpoint: object, ds_test: tf.data.Dataset
         pred_probs.extend(y_pred.numpy())  # Conversion with numpy()
 
     true_labels = np.array(true_labels)
-    if FLAGS.multi_class:
+    if FLAGS.multi_class and not FLAGS.classification:
         pred_labels = np.clip(np.round(pred_probs), 0, 4).astype(int).squeeze()
     else:
         pred_labels = np.argmax(pred_probs, axis=1)
@@ -42,7 +42,7 @@ def evaluate(model: tf.keras.Model, checkpoint: object, ds_test: tf.data.Dataset
                "accuracy": accuracy})
 
     # Use flags to control the evaluation
-    if not FLAGS.multi_class:
+    if not FLAGS.multi_class :
         sensitivity = recall_score(true_labels, pred_labels, 1)
         specificity = recall_score(true_labels, pred_labels, 0)
         auc = auc_score(true_labels, [pred[1] for pred in pred_probs])
@@ -55,7 +55,7 @@ def evaluate(model: tf.keras.Model, checkpoint: object, ds_test: tf.data.Dataset
 
     # Plot the confusion matrix
     plt.figure(figsize=(10, 8))
-    sns.heatmap(conf_matrix, annot=True, fmt='g', cmap='Blues', annot_kws={"size": 48})
+    sns.heatmap(conf_matrix, annot=True, fmt='g', cmap='Blues', annot_kws={"size": 32})
     plt.xlabel('Predicted labels', fontsize=32)
     plt.ylabel('True labels', fontsize=32)
     plt.title('Confusion Matrix', fontsize=36)

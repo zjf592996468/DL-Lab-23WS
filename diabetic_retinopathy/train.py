@@ -70,7 +70,7 @@ class Trainer(object):
         gradients = tape.gradient(total_loss, self.model.trainable_variables)
         self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
         self.train_loss(total_loss)
-        if FLAGS.multi_class:
+        if FLAGS.multi_class and not FLAGS.classification :
             predictions = tf.cast(tf.clip_by_value(tf.round(predictions), 0, 4), tf.int32)
         self.train_accuracy(labels, predictions)
 

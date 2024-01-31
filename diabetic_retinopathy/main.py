@@ -12,9 +12,10 @@ from transfer_learning.efficientnet import transfermodel
 import tensorflow as tf
 
 FLAGS = flags.FLAGS
-flags.DEFINE_boolean('train', True, 'Specify whether to train or evaluate a model.')
+flags.DEFINE_boolean('train', False, 'Specify whether to train or evaluate a model.')
 flags.DEFINE_boolean('multi_class', False, 'Specify whether to take multi_classification')
-flags.DEFINE_string('model', 'cnn', 'The name of the model')
+flags.DEFINE_boolean('classification', True, 'Specify whether to take multi_classification with classification')
+flags.DEFINE_string('model', 'effnet', 'The name of the model')
 flags.DEFINE_string('wandb', 'idrid-cnn', 'The name of the wandb project')
 flags.DEFINE_boolean('l2_loss', True, 'Specify whether to use l2 regularization')
 

@@ -52,7 +52,7 @@ def create_cnn_nets(ds_info, num_blocks, filters, kernel_size, dense_units, drop
     out = tf.keras.layers.Dropout(dropout_rate)(out)
 
     # Output layer
-    if FLAGS.multi_class:
+    if FLAGS.multi_class and not FLAGS.classification:
         # Use regression for multi-class
         outputs = tf.keras.layers.Dense(units=1,
                                         kernel_regularizer=tf.keras.regularizers.l2(l2_lambda),
