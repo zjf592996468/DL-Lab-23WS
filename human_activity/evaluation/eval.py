@@ -8,6 +8,7 @@ import tensorflow as tf
 
 
 def evaluate(model: tf.keras.Model, checkpoint: object, ds_test: tf.data.Dataset, ds_info) -> np.ndarray:
+    # load the trained model
     ckpt = tf.train.Checkpoint(model=model, optimizer=tf.keras.optimizers.Adam())
     ckpt.restore(checkpoint).expect_partial()
 
