@@ -55,6 +55,7 @@ def evaluate(model: tf.keras.Model, checkpoint: object, ds_test: tf.data.Dataset
     plt.ylabel('True labels')
     plt.title('Confusion Matrix')
     plt.xticks(rotation=45)
+    plt.tight_layout()
     plt.show()
 
     return conf_matrix

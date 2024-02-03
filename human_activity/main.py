@@ -70,7 +70,7 @@ def main(argv):
                  )
 
         # Plot result
-        fig = visual(model, ckpt_restore_path, ds_show, ds_info)
+        visual(model, ckpt_restore_path, ds_show, ds_info)
     wandb.finish()
 
 

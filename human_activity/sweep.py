@@ -34,12 +34,12 @@ def train_func():
         utils_params.save_config(run_paths['path_gin'], gin.config_str())
 
         # setup pipeline
-        ds_train, ds_val, ds_test, ds_info = load()
+        ds_train, ds_val, ds_test, ds_show, ds_info = load()
 
         # model
         model = create_rnn(ds_info=ds_info)
 
-        trainer = Trainer(model, ds_train, ds_test, ds_info, run_paths)
+        trainer = Trainer(model, ds_train, ds_val, ds_info, run_paths)
         for _ in trainer.train():
             continue
 
