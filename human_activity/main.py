@@ -8,7 +8,8 @@ from input_pipeline.datasets import load
 from models.rnn import create_rnn
 from utils import utils_params, utils_misc
 import tensorflow as tf
-
+from evaluation.visualization import visual
+from pathlib import Path
 
 FLAGS = flags.FLAGS
 flags.DEFINE_boolean('train', False, 'Specify whether to train or evaluate a model.')
@@ -34,7 +35,7 @@ def main(argv):
     logging.info("Wandb logged in.")
 
     # setup pipeline
-    ds_train, ds_val, ds_test, ds_info = load()
+    ds_train, ds_val, ds_test, ds_show, ds_info = load()
     logging.info("Dataset HAPT is successfully loaded.")
     # model rnn with bi_LSTM
     logging.info("Start model initialization...")
@@ -60,12 +61,16 @@ def main(argv):
         for _ in trainer.train():
             continue
         evaluate1(model, ds_test, ds_info)
+
     else:
         evaluate(model,
                  ckpt_restore_path,
                  ds_test,
                  ds_info
                  )
+
+        # Plot result
+        fig = visual(model, ckpt_restore_path, ds_show, ds_info)
     wandb.finish()
 
 

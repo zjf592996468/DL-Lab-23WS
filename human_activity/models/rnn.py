@@ -57,9 +57,6 @@ def create_rnn(ds_info, lstm_units, dense_units, dropout_rate, regularization_fa
     model.add(Dense(dense_units,
                     activation='relu',
                     kernel_regularizer=l2(regularization_factor)))
-    model.add(Dense(dense_units,
-                    activation='relu',
-                    kernel_regularizer=l2(regularization_factor)))
 
     # Output layer
     model.add(Dense(ds_info['num_acts'], activation='softmax'))

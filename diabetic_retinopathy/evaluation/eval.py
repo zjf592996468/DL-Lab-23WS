@@ -42,7 +42,7 @@ def evaluate(model: tf.keras.Model, checkpoint: object, ds_test: tf.data.Dataset
                "accuracy": accuracy})
 
     # Use flags to control the evaluation
-    if not FLAGS.multi_class :
+    if not FLAGS.multi_class:
         sensitivity = recall_score(true_labels, pred_labels, 1)
         specificity = recall_score(true_labels, pred_labels, 0)
         auc = auc_score(true_labels, [pred[1] for pred in pred_probs])

@@ -75,7 +75,8 @@ def load(name, data_dir):
         train_tfrd_path = store_dir / 'hapt_train.tfrecord'
         val_tfrd_path = store_dir / 'hapt_val.tfrecord'
         test_tfrd_path = store_dir / 'hapt_test.tfrecord'
-        tfrd_paths = [train_tfrd_path, val_tfrd_path, test_tfrd_path]
+        show_tfrd_path = store_dir / 'hapt_show.tfrecord'
+        tfrd_paths = [train_tfrd_path, val_tfrd_path, test_tfrd_path, show_tfrd_path]
 
         # Create TFRecord when no TFRecord file exist and plot figure
         logging.info(f"Checking if TFRecord file exists in {store_dir}...")
@@ -163,7 +164,15 @@ def load(name, data_dir):
             ds_val = None
             ds_test = None
 
-            for exp_id, df in exp_dfs.items():
+            # Get show dataset
+            features = exp_dfs_z[50].drop(['label'], axis=1).values
+            labels = exp_dfs_z[50]['label'].values
+            ds_show = tf.data.Dataset.from_tensor_slices((features.astype(np.float64), labels.astype(np.int32)))
+            ds_show = ds_show.window(250, shift=250, stride=1, drop_remainder=True)
+            ds_show = (ds_show.flat_map(lambda feature, label: tf.data.Dataset.zip((feature, label)))
+                       .batch(250, drop_remainder=True))
+
+            for exp_id, df in exp_dfs_z.items():
                 if 1 <= exp_id <= 43:
                     win_train = df2win(df)
                     if ds_train is None:
@@ -189,6 +198,7 @@ def load(name, data_dir):
             create_tfrecord(ds_train, train_tfrd_path)
             create_tfrecord(ds_val, val_tfrd_path)
             create_tfrecord(ds_test, test_tfrd_path)
+            create_tfrecord(ds_show, show_tfrd_path)
             logging.info(f"TFRecord files are created in {store_dir.resolve()}.")
 
         # Read TFRecord files and create dataset
@@ -207,7 +217,12 @@ def load(name, data_dir):
             ds_test = tf.data.TFRecordDataset(test_tfrd_path).map(parse_tfrecord_function)
         except FileNotFoundError as e:
             logging.warning(f"File not found: {test_tfrd_path}. Error: {e}")
-        logging.info("Train, val and test datasets are created from TFRecords.")
+
+        try:
+            ds_show = tf.data.TFRecordDataset(show_tfrd_path).map(parse_tfrecord_function)
+        except FileNotFoundError as e:
+            logging.warning(f"File not found: {show_tfrd_path}. Error: {e}")
+        logging.info("Train, val, test and show datasets are created from TFRecords.")
 
         # # Check dataset labels
         # for parsed_record in ds_train.take(10):
@@ -245,11 +260,11 @@ def load(name, data_dir):
         })
         logging.info(f"ds_info is created: {ds_info}")
 
-        return prepare(ds_train, ds_val, ds_test, ds_info)
+        return prepare(ds_train, ds_val, ds_test, ds_show, ds_info)
 
 
 @gin.configurable
-def prepare(ds_train, ds_val, ds_test, ds_info, seed, batch_size, caching):
+def prepare(ds_train, ds_val, ds_test, ds_show, ds_info, seed, batch_size, caching):
     """Prepare the dataset for training, validation and test"""
     # Prepare training dataset
     # ds_train = ds_train.map(
@@ -277,4 +292,10 @@ def prepare(ds_train, ds_val, ds_test, ds_info, seed, batch_size, caching):
         ds_test = ds_test.cache()
     ds_test = ds_test.prefetch(tf.data.AUTOTUNE)
 
-    return ds_train, ds_val, ds_test, ds_info
+    # Prepare show dataset
+    ds_show = ds_show.batch(batch_size)
+    if caching:
+        ds_show = ds_show.cache()
+    ds_show = ds_show.prefetch(tf.data.AUTOTUNE)
+
+    return ds_train, ds_val, ds_test, ds_show, ds_info
