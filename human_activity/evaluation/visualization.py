@@ -1,10 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.colors import to_rgba
 import seaborn as sns
-from sklearn.metrics import confusion_matrix, accuracy_score
+from sklearn.metrics import confusion_matrix, accuracy_score,balanced_accuracy_score
 import logging
 import wandb
 import tensorflow as tf
+
 
 def visual(model, checkpoint, ds_test, ds_info):
     # load the trained model
@@ -44,6 +46,8 @@ def visual(model, checkpoint, ds_test, ds_info):
     # colr mapping
     unique_labels = np.unique(true_labels)
     colors_pred = plt.cm.rainbow(np.linspace(0, 1, len(unique_labels)))
+    for i, color in enumerate(colors_pred):
+        colors_pred[i, :] = to_rgba(color, alpha=0.5)
 
     # get length of data
     data_indices = np.arange(len(acc_data))
@@ -51,13 +55,15 @@ def visual(model, checkpoint, ds_test, ds_info):
     # plot the predict and true label
     acc_labels = ['ACC X', 'ACC Y', 'ACC Z']
     gyro_labels = ['GYRO X', 'GYRO Y', 'GYRO Z']
-    ig, axs = plt.subplots(5, 1, figsize=(16, 13))
+
+    # Create subplots using the GridSpec object
+    fig, axs = plt.subplots(5, 1, figsize=(16, 13), gridspec_kw={'height_ratios': [1, 1, 1, 1, 0.3]})
 
     # plot 1 'Accelerometer Data with True Label Background'
     for i, label in enumerate(true_labels):
         label_index = np.where(unique_labels == label)[0][0]
         color = colors_pred[label_index]
-        axs[0].axvspan(i, i + 1, color=color, alpha=0.1)
+        axs[0].axvspan(i, i + 1, color=color, linewidth=0)
     for i in range(3):
         axs[0].plot(data_indices, acc_data[:, i], label=acc_labels[i])
     axs[0].legend()
@@ -67,7 +73,7 @@ def visual(model, checkpoint, ds_test, ds_info):
     for i, label in enumerate(pred_labels):
         label_index = np.where(unique_labels == label)[0][0]
         color = colors_pred[label_index]
-        axs[1].axvspan(i, i + 1, color=color, alpha=0.1)
+        axs[1].axvspan(i, i + 1, color=color, linewidth=0)
     for i in range(3):
         axs[1].plot(data_indices, acc_data[:, i], label=gyro_labels[i])
     axs[1].legend()
@@ -77,7 +83,7 @@ def visual(model, checkpoint, ds_test, ds_info):
     for i, label in enumerate(true_labels):
         label_index = np.where(unique_labels == label)[0][0]
         color = colors_pred[label_index]
-        axs[2].axvspan(i, i + 1, color=color, alpha=0.1)
+        axs[2].axvspan(i, i + 1, color=color, linewidth=0)
     for i in range(3):
         axs[2].plot(data_indices, gyro_data[:, i], label=acc_labels[i])
     axs[2].legend()
@@ -87,7 +93,7 @@ def visual(model, checkpoint, ds_test, ds_info):
     for i, label in enumerate(pred_labels):
         label_index = np.where(unique_labels == label)[0][0]
         color = colors_pred[label_index]
-        axs[3].axvspan(i, i + 1, color=color, alpha=0.1)
+        axs[3].axvspan(i, i + 1, color=color, linewidth=0)
     for i in range(3):
         axs[3].plot(data_indices, gyro_data[:, i], label=gyro_labels[i])
     axs[3].legend()
@@ -95,12 +101,12 @@ def visual(model, checkpoint, ds_test, ds_info):
 
     action_names = ds_info['act_names']
     num_actions = len(action_names)
+
     # Create a color map for these actions
     colors_actions = plt.cm.rainbow(np.linspace(0, 1, num_actions))
 
-
     for i, color in enumerate(colors_actions):
-        axs[4].fill_between([i, i + 1], 0, 1, color=color, alpha=1)  # Fill the entire horizontal space
+        axs[4].fill_between([i, i + 1], 0, 1, color=color, alpha=0.5, linewidth=0)  # Fill the entire horizontal space
 
     # Set the x-axis to span the width of the color bands
     axs[4].set_xlim(0, num_actions)
@@ -121,18 +127,19 @@ def visual(model, checkpoint, ds_test, ds_info):
 
     # Calculate confusion matrix
     conf_matrix = confusion_matrix(true_labels, pred_labels)
+
     # Convert confusion matrix to percentage
     conf_matrix = conf_matrix.astype('float') / conf_matrix.sum(axis=1)[:, np.newaxis]
-
     accuracy = accuracy_score(true_labels, pred_labels)
-
+    balanced_accuracy = balanced_accuracy_score(true_labels, pred_labels)
     logging.info("Confusion Matrix:\n%s", conf_matrix)
     logging.info("Accuracy: %s", accuracy)
-
+    logging.info("balanced Accuracy: %s", balanced_accuracy)
     # Use wandb to record confusion matrix and accuracy
     wandb.log({"confusion_matrix": wandb.plot.confusion_matrix(probs=None, y_true=true_labels, preds=pred_labels,
                                                                class_names=ds_info['act_names']),
-               "accuracy": accuracy})
+               "accuracy": accuracy,
+               "balanced Accuracy": balanced_accuracy})
 
     # Plot the confusion matrix
     plt.figure(figsize=(10, 8))
@@ -142,7 +149,9 @@ def visual(model, checkpoint, ds_test, ds_info):
     plt.xlabel('Predicted labels')
     plt.ylabel('True labels')
     plt.title('Confusion Matrix')
-    plt.xticks(rotation=45)
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
     plt.show()
 
     return conf_matrix
+

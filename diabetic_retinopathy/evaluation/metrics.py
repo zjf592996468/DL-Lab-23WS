@@ -1,7 +1,11 @@
 import numpy as np
 
 
-def confusion_matrix(y_true, y_pred, classes=2):
+def loss_mae(y_true, y_pred):
+    return np.mean(np.abs(y_true - y_pred))
+
+
+def confusion_matrix(y_true, y_pred, classes):
     matrix = np.zeros((classes, classes), dtype=int)
     for t, p in zip(y_true, y_pred):
         matrix[t][p] += 1

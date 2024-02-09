@@ -7,7 +7,7 @@ def gen_run_folder(path_model_id='ckpt'):
 
     if not os.path.isdir(path_model_id):
         path_model_root = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, 'experiments'))
-        # date_creation = datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S-%f')
+        # date_creation = datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S')
         # run_id = 'run_' + date_creation
         # if path_model_id:
         #     run_id += '_' + path_model_id
@@ -17,9 +17,9 @@ def gen_run_folder(path_model_id='ckpt'):
 
     run_paths['model_id'] = run_paths['path_model_id'].split(os.sep)[-1]
     run_paths['path_logs_train'] = os.path.join(run_paths['path_model_id'], 'logs', 'run.log')
-    run_paths['path_logs_eval'] = os.path.join(run_paths['path_model_id'], 'logs', 'eval', 'run.log')
+    # run_paths['path_logs_eval'] = os.path.join(run_paths['path_model_id'], 'logs', 'eval', 'run.log')
     run_paths['path_ckpts_train'] = os.path.join(run_paths['path_model_id'], 'ckpts')
-    run_paths['path_ckpts_eval'] = os.path.join(run_paths['path_model_id'], 'ckpts', 'eval')
+    # run_paths['path_ckpts_eval'] = os.path.join(run_paths['path_model_id'], 'ckpts', 'eval')
     run_paths['path_gin'] = os.path.join(run_paths['path_model_id'], 'config_operative.gin')
 
     # Create folders

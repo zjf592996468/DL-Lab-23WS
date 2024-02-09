@@ -19,7 +19,7 @@ def create_rnn(ds_info, lstm_units, dense_units, dropout_rate, regularization_fa
     Returns:
     model: Constructed Keras model.
     """
-    model = Sequential()
+    model = Sequential(name='myRNN')
 
     # LSTM layer/Bidirectional LSTM layer/GRU/Bidirectional GRU
     if FLAGS.layer == 'Bidirectional LSTM':

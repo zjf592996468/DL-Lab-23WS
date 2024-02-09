@@ -43,7 +43,7 @@ def overlay_heatmap(orig_image, heatmap, threshold, alpha):
     heatmap_resized = cv2.resize(heatmap, (orig_array.shape[1], orig_array.shape[0]))
 
     # Convert heatmap to color using a colormap
-    heatmap_color = cv2.applyColorMap(np.uint8(255 * heatmap_resized), cv2.COLORMAP_RAINBOW)
+    heatmap_color = cv2.applyColorMap(np.uint8(-255 * heatmap_resized), cv2.COLORMAP_JET)
 
     # Create a mask where the heatmap is above the threshold
     mask = heatmap_resized > threshold
@@ -84,8 +84,8 @@ _________________________________________________________________
  max_pooling2d_1 (MaxPoolin  (None, 64, 64, 172)       0         
  g2D)                                                            
 
- global_average_pooling2d (  (None, 172)               0         
- GlobalAveragePooling2D)                                         
+ global_max_pooling2d (  (None, 172)               0         
+ GlobalMaxPooling2D)                                         
 
  dense (Dense)               (None, 32)                5536      
 
@@ -130,8 +130,8 @@ _________________________________________________________________
  max_pooling2d_2 (MaxPoolin  (None, 32, 32, 32)        0         
  g2D)                                                            
 
- global_average_pooling2d (  (None, 32)                0         
- GlobalAveragePooling2D)                                         
+ global_max_pooling2d (  (None, 36)                0         
+ GlobalMaxPooling2D)                                         
 
  dense (Dense)               (None, 128)               4224      
 

@@ -13,6 +13,7 @@ from models.architectures import vgg_like
 FLAGS = flags.FLAGS
 flags.DEFINE_boolean('multi_class', False, 'Specify whether to take multi_classification')
 flags.DEFINE_boolean('l2_loss', True, 'Specify whether to use l2 regularization')
+flags.DEFINE_string('model', 'cnn', 'The name of the model')
 
 
 def train_func():
@@ -46,7 +47,7 @@ def train_func():
 
 sweep_config = {
     'name': 'idrid-sweep',
-    'method': 'random',
+    'method': 'bayes',
     'metric': {
         'name': 'val_acc',
         'goal': 'maximize'

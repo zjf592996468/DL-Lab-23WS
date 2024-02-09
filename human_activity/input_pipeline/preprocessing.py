@@ -2,6 +2,9 @@ import gin
 import tensorflow as tf
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.colors import to_rgba
+import numpy as np
+from itertools import groupby
 
 
 def z_score(dataframe):
@@ -27,29 +30,49 @@ def slide_window(dataset, win_len, win_shift):
     return dataset
 
 
-def plot_df(dataframe, title='exp_50'):
+def plot_df(dataframe, title):
     """Plot the dataframe"""
     columns_acc = ['acc_x', 'acc_y', 'acc_z']
     columns_gyro = ['gyro_x', 'gyro_y', 'gyro_z']
 
     # Create a figure with two subplots (2 rows, 1 column)
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 6))  # sharex=True,
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 6))  # option: sharex=True
 
     # Check whether dataframe is dataframe
     if isinstance(dataframe, pd.DataFrame):
+        # Get label column
+        label_column = np.sort(dataframe['label'].unique())
+        label_column = label_column[label_column != -1]
+
+        for label in label_column:
+            conditions = (dataframe['label'] == label)
+
+            # Find multiple start and end points
+            sorted_indices = sorted(dataframe.index[conditions].tolist())
+            grouped_indices = [list(group) for _, group in
+                               groupby(enumerate(sorted_indices), key=lambda x: x[0] - x[1])]
+
+            # Plot labels as background
+            for group in grouped_indices:
+                start_index = group[0][1]
+                end_index = group[-1][1]
+
+                # Get rainbow color for each label
+                rgba_color = to_rgba(plt.cm.rainbow(label / (len(label_column) - 1)))
+                ax1.axvspan(start_index, end_index + 1, color=rgba_color, alpha=0.5, linewidth=0)
+                ax2.axvspan(start_index, end_index + 1, color=rgba_color, alpha=0.5, linewidth=0)
+
         for column in columns_acc:
             ax1.plot(dataframe[column], label=column)
         for column in columns_gyro:
             ax2.plot(dataframe[column], label=column)
 
     else:
-        feature, label = dataframe
-        for column, values in zip(columns_acc, tf.unstack(feature, axis=-1)):
+        features, labels = dataframe
+        for column, values in zip(columns_acc, tf.unstack(features, axis=-1)):
             ax1.plot(values, label=column)
-            # ax1.plot(dataframe.map(lambda x, y: x[index]), label=column)
-        for column, values in zip(columns_gyro, tf.unstack(feature, axis=-1)):
+        for column, values in zip(columns_gyro, tf.unstack(features, axis=-1)):
             ax2.plot(values, label=column)
-            # ax2.plot(dataframe.map(lambda x, y: x[index]), label=column)
 
     # Plot accelerometer data
     ax1.set_ylabel('Accelerometer Value')

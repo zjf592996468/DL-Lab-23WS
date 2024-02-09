@@ -3,8 +3,9 @@ import logging
 import wandb
 from absl import app, flags
 from train import Trainer
-from evaluation.eval import evaluate, evaluate1
+from evaluation.eval import evaluate
 from input_pipeline.datasets import load
+from input_pipeline.preprocessing import plot_augment
 from utils import utils_params, utils_misc
 from models.architectures import vgg_like
 from models.cnnmodel import create_cnn_nets
@@ -15,8 +16,8 @@ FLAGS = flags.FLAGS
 flags.DEFINE_boolean('train', False, 'Specify whether to train or evaluate a model.')
 flags.DEFINE_boolean('multi_class', False, 'Specify whether to take multi_classification')
 flags.DEFINE_boolean('classification', True, 'Specify whether to take multi_classification with classification')
-flags.DEFINE_string('model', 'effnet', 'The name of the model')
-flags.DEFINE_string('wandb', 'idrid-cnn', 'The name of the wandb project')
+flags.DEFINE_string('model', 'cnn', 'The name of the model')
+flags.DEFINE_string('wandb', 'idrid', 'The name of the wandb project')
 flags.DEFINE_boolean('l2_loss', True, 'Specify whether to use l2 regularization')
 
 
@@ -40,6 +41,11 @@ def main(argv):
     # setup pipeline
     ds_train, ds_val, ds_test, ds_info = load()
     logging.info("Dataset IDRID is successfully loaded.")
+
+    # plot augmentation
+    for image, label in ds_test.take(1):
+        plot_augment(image[8])
+    logging.info("Augmentation plot is saved in results.")
 
     # choose model
     if FLAGS.model == 'vgg':  # model vgg
@@ -65,18 +71,20 @@ def main(argv):
 
     # load latest checkpoint
     ckpt_restore_path = manager.latest_checkpoint
-    print(ckpt_restore_path)
+    logging.info(f"Current checkpoint restore path: {ckpt_restore_path}")
 
     if FLAGS.train:
         if ckpt_restore_path:
             ckpt.restore(ckpt_restore_path).expect_partial()
-            print("Checkpoint restored from:", ckpt_restore_path)
+            logging.info(f"Checkpoint restored from: {ckpt_restore_path}")
         else:
-            print("No checkpoint found at:", run_paths['path_ckpts_train'])
+            logging.info(f"No checkpoint found at: {run_paths['path_ckpts_train']}")
+
         trainer = Trainer(model, ds_train, ds_val, ds_info, run_paths)
         for _ in trainer.train():
             continue
-        evaluate1(model, ds_test, ds_info)
+
+        evaluate(model, ckpt_restore_path, ds_test, ds_info)
     else:
         evaluate(model,
                  ckpt_restore_path,

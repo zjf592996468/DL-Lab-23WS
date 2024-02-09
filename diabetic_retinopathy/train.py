@@ -36,8 +36,7 @@ class Trainer(object):
 
         # Checkpoint Manager, save up to 10 checkpoints
         self.ckpt = tf.train.Checkpoint(model=self.model, optimizer=self.optimizer)
-        self.manager = tf.train.CheckpointManager(self.ckpt, self.run_paths['path_ckpts_train'],
-                                                  max_to_keep=10)
+        self.manager = tf.train.CheckpointManager(self.ckpt, self.run_paths['path_ckpts_train'], max_to_keep=20)
 
     @tf.function
     def train_step(self, images, labels):

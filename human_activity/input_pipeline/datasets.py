@@ -29,6 +29,16 @@ def create_tfrecord(dataset, tfrecord_path):
             writer.write(example_proto.SerializeToString())
 
 
+def load_tfrd(tfrd_path, dataset_name):
+    try:
+        dataset = tf.data.TFRecordDataset(tfrd_path).map(parse_tfrecord_function)
+    except FileNotFoundError as e:
+        logging.warning(f"File not found for {dataset_name}: {tfrd_path}. Error: {e}")
+        dataset = None
+
+    return dataset
+
+
 @gin.configurable()
 def parse_tfrecord_function(example_proto, win_len):
     """Parse the example_proto from TensorFlow Examples"""
@@ -60,7 +70,7 @@ def df2win(df):
 
 
 @gin.configurable
-def load(name, data_dir):
+def load(name, data_dir, show_exp_id):
     """Load the dataset"""
     if name == "hapt":
         logging.info(f"Preparing dataset {name}...")
@@ -70,6 +80,7 @@ def load(name, data_dir):
         labels_path = Path(data_dir) / 'RawData' / 'labels.txt'
         act_labels_path = Path(data_dir) / 'activity_labels.txt'
         store_dir = Path.cwd().parent / 'results' / 'p2_HAR'
+        store_dir.mkdir(parents=True, exist_ok=True)
 
         # Path to create TFRecord
         train_tfrd_path = store_dir / 'hapt_train.tfrecord'
@@ -82,6 +93,7 @@ def load(name, data_dir):
         logging.info(f"Checking if TFRecord file exists in {store_dir}...")
         if not all(tfrd_path.is_file() for tfrd_path in tfrd_paths):
             logging.info(f"No TFRecord file found in {store_dir}, so creating.")
+
             # Load label data
             try:
                 labels_df = pd.read_csv(labels_path, delim_whitespace=True, header=None,
@@ -129,8 +141,17 @@ def load(name, data_dir):
                     # Combine acc and gyro data
                     sensor_data = pd.concat([acc_data, gyro_data], axis=1)
 
+                    # Create -1 df of show_exp
+                    if current_exp_id == show_exp_id:
+                        plot_data = sensor_data.copy()
+                        plot_data['label'] = -1
+
+                # Label show_exp
+                if current_exp_id == show_exp_id:
+                    plot_data.loc[start:end, 'label'] = act_id
+
                 # Extract labeled data from start point to end point
-                sensor_subset = sensor_data.iloc[start:end + 1, :].copy()
+                sensor_subset = sensor_data.iloc[start:end, :].copy()
                 sensor_subset['label'] = act_id
 
                 # Create a new exp_df when exp changes
@@ -141,10 +162,16 @@ def load(name, data_dir):
                 exp_dfs[exp_id] = pd.concat([exp_dfs[exp_id], sensor_subset], ignore_index=True)
             logging.info("Acc and gyro data with labels are extracted and combined.")
 
-            # Plot exp_50 with labeled data and save to file
-            fig = plot_df(exp_dfs[50])
-            fig.savefig(store_dir / 'HAPT labeled sensor data of exp_50.png')
-            logging.info(f"HAPT labeled sensor data of exp_50 is saved to {store_dir.resolve()}")
+            # Plot raw data of show_exp
+            fig = plot_df(plot_data, f'raw exp_{show_exp_id}')
+            fig.savefig(store_dir / f'HAPT raw data of exp_{show_exp_id}.png')
+            logging.info(f"HAPT raw data of exp_{show_exp_id} is saved to {store_dir.resolve()}")
+            fig.close()
+
+            # Plot show_exp with labeled data and save to file
+            fig = plot_df(exp_dfs[show_exp_id], f'exp_{show_exp_id}')
+            fig.savefig(store_dir / f'HAPT labeled data of exp_{show_exp_id}.png')
+            logging.info(f"HAPT labeled data of exp_{show_exp_id} is saved to {store_dir.resolve()}")
             fig.close()
 
             # Z-score normalize
@@ -153,25 +180,26 @@ def load(name, data_dir):
                 exp_dfs_z[exp_id] = z_score(exp_dfs[exp_id].copy())
             logging.info("Sensor data with labels are z-score normalized on each channel.")
 
-            # Plot exp_50 after z-score and save to file
-            fig = plot_df(exp_dfs_z[50], 'exp_50 after z-score')
-            fig.savefig(store_dir / 'HAPT labeled sensor data of exp_50 after z-score.png')
-            logging.info(f"HAPT labeled sensor data of exp_50 after z-score is saved to {store_dir.resolve()}")
+            # Plot show_exp after z-score and save to file
+            fig = plot_df(exp_dfs_z[show_exp_id], f'exp_{show_exp_id} after z-score')
+            fig.savefig(store_dir / f'HAPT labeled data of exp_{show_exp_id} after z-score.png')
+            logging.info(f"HAPT labeled data of exp_{show_exp_id} after z-score is saved to {store_dir.resolve()}")
             fig.close()
 
-            # Initialize and fill train, val and test dataset
+            # Initialize train, val and test dataset
             ds_train = None
             ds_val = None
             ds_test = None
 
-            # Get show dataset
-            features = exp_dfs_z[50].drop(['label'], axis=1).values
-            labels = exp_dfs_z[50]['label'].values
+            # Get show dataset for evaluation
+            features = exp_dfs_z[show_exp_id].drop(['label'], axis=1).values
+            labels = exp_dfs_z[show_exp_id]['label'].values
             ds_show = tf.data.Dataset.from_tensor_slices((features.astype(np.float64), labels.astype(np.int32)))
-            ds_show = ds_show.window(250, shift=250, stride=1, drop_remainder=True)
+            ds_show = ds_show.window(250, shift=250, stride=1, drop_remainder=True)  # Without oversample
             ds_show = (ds_show.flat_map(lambda feature, label: tf.data.Dataset.zip((feature, label)))
                        .batch(250, drop_remainder=True))
 
+            # Window and build datasets
             for exp_id, df in exp_dfs_z.items():
                 if 1 <= exp_id <= 43:
                     win_train = df2win(df)
@@ -203,25 +231,10 @@ def load(name, data_dir):
 
         # Read TFRecord files and create dataset
         logging.info(f"Reading TFRecord files from {store_dir.resolve()}...")
-        try:
-            ds_train = tf.data.TFRecordDataset(train_tfrd_path).map(parse_tfrecord_function)
-        except FileNotFoundError as e:
-            logging.warning(f"File not found: {train_tfrd_path}. Error: {e}")
-
-        try:
-            ds_val = tf.data.TFRecordDataset(val_tfrd_path).map(parse_tfrecord_function)
-        except FileNotFoundError as e:
-            logging.warning(f"File not found: {val_tfrd_path}. Error: {e}")
-
-        try:
-            ds_test = tf.data.TFRecordDataset(test_tfrd_path).map(parse_tfrecord_function)
-        except FileNotFoundError as e:
-            logging.warning(f"File not found: {test_tfrd_path}. Error: {e}")
-
-        try:
-            ds_show = tf.data.TFRecordDataset(show_tfrd_path).map(parse_tfrecord_function)
-        except FileNotFoundError as e:
-            logging.warning(f"File not found: {show_tfrd_path}. Error: {e}")
+        ds_train = load_tfrd(train_tfrd_path, 'train')
+        ds_val = load_tfrd(val_tfrd_path, 'val')
+        ds_test = load_tfrd(test_tfrd_path, 'test')
+        ds_show = load_tfrd(show_tfrd_path, 'show')
         logging.info("Train, val, test and show datasets are created from TFRecords.")
 
         # # Check dataset labels
@@ -267,8 +280,6 @@ def load(name, data_dir):
 def prepare(ds_train, ds_val, ds_test, ds_show, ds_info, seed, batch_size, caching):
     """Prepare the dataset for training, validation and test"""
     # Prepare training dataset
-    # ds_train = ds_train.map(
-    #     preprocess, num_parallel_calls=tf.data.AUTOTUNE)
     if caching:
         ds_train = ds_train.cache()
     ds_train = ds_train.shuffle(ds_info['train_size'], seed=seed)  # shuffle whole dataset
@@ -277,16 +288,12 @@ def prepare(ds_train, ds_val, ds_test, ds_show, ds_info, seed, batch_size, cachi
     ds_train = ds_train.prefetch(tf.data.AUTOTUNE)
 
     # Prepare validation dataset
-    # ds_val = ds_val.map(
-    #     preprocess, num_parallel_calls=tf.data.AUTOTUNE)
     ds_val = ds_val.batch(batch_size)
     if caching:
         ds_val = ds_val.cache()
     ds_val = ds_val.prefetch(tf.data.AUTOTUNE)
 
     # Prepare test dataset
-    # ds_test = ds_test.map(
-    #     preprocess, num_parallel_calls=tf.data.AUTOTUNE)
     ds_test = ds_test.batch(batch_size)
     if caching:
         ds_test = ds_test.cache()

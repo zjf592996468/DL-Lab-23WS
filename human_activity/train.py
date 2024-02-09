@@ -29,8 +29,8 @@ class Trainer(object):
         self.ckpt_interval = ckpt_interval
 
         # Checkpoint Manager
-        self.ckpt = tf.train.Checkpoint(model=model, optimizer=self.optimizer)
-        self.manager = tf.train.CheckpointManager(self.ckpt, self.run_paths['path_ckpts_train'], max_to_keep=3)
+        self.ckpt = tf.train.Checkpoint(model=self.model, optimizer=self.optimizer)
+        self.manager = tf.train.CheckpointManager(self.ckpt, self.run_paths['path_ckpts_train'], max_to_keep=20)
 
     @tf.function
     def train_step(self, images, labels):

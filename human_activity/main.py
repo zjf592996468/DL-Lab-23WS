@@ -3,13 +3,12 @@ import logging
 import wandb
 from absl import app, flags
 from train import Trainer
-from evaluation.eval import evaluate, evaluate1
+from evaluation.eval import evaluate
 from input_pipeline.datasets import load
 from models.rnn import create_rnn
 from utils import utils_params, utils_misc
 import tensorflow as tf
 from evaluation.visualization import visual
-from pathlib import Path
 
 FLAGS = flags.FLAGS
 flags.DEFINE_boolean('train', False, 'Specify whether to train or evaluate a model.')
@@ -37,6 +36,7 @@ def main(argv):
     # setup pipeline
     ds_train, ds_val, ds_test, ds_show, ds_info = load()
     logging.info("Dataset HAPT is successfully loaded.")
+
     # model rnn with bi_LSTM
     logging.info("Start model initialization...")
     model = create_rnn(ds_info)
@@ -45,31 +45,32 @@ def main(argv):
 
     # checkpoints
     ckpt = tf.train.Checkpoint(model=model, optimizer=tf.keras.optimizers.Adam())
-    manager = tf.train.CheckpointManager(ckpt, run_paths['path_ckpts_train'], max_to_keep=10)
+    manager = tf.train.CheckpointManager(ckpt, run_paths['path_ckpts_train'], max_to_keep=5)
 
     # Load latest checkpoint
     ckpt_restore_path = manager.latest_checkpoint
-    print(ckpt_restore_path)
+    logging.info(f"Current checkpoint restore path: {ckpt_restore_path}")
 
     if FLAGS.train:
         if ckpt_restore_path:
             ckpt.restore(ckpt_restore_path).expect_partial()
-            print("Checkpoint restored from:", ckpt_restore_path)
+            logging.info(f"Checkpoint restored from: {ckpt_restore_path}")
         else:
-            print("No checkpoint found at:", run_paths['path_ckpts_train'])
+            logging.info(f"No checkpoint found at: {run_paths['path_ckpts_train']}")
+
         trainer = Trainer(model, ds_train, ds_val, ds_info, run_paths)
         for _ in trainer.train():
             continue
-        evaluate1(model, ds_test, ds_info)
 
+        evaluate(model, ckpt_restore_path, ds_test, ds_info)
     else:
         evaluate(model,
                  ckpt_restore_path,
                  ds_test,
-                 ds_info
+                 ds_info,
                  )
 
-        # Plot result
+        # Plot predicted result
         visual(model, ckpt_restore_path, ds_show, ds_info)
     wandb.finish()
 

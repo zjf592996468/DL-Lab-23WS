@@ -10,9 +10,10 @@ Trainer.ckpt_interval = 5e3
 
 # Input pipeline
 load.name = 'hapt'
-#load.data_dir = r'/home/data/HAPT_dataset'
+load.data_dir = r'/home/data/HAPT_dataset'
 #load.data_dir = r'C:\DL-lab\HAPT Data Set'
-load.data_dir = r'D:\HAPT Data Set'
+#load.data_dir = r'D:\HAPT Data Set'
+load.show_exp_id = 50
 prepare.seed = %GLOBAL_SEED
 prepare.caching = True
 prepare.batch_size = 32

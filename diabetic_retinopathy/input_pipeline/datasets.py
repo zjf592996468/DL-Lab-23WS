@@ -70,6 +70,7 @@ def load(name, data_dir, split_frac, seed):
         test_img_dir = Path(data_dir) / 'images' / 'test'
         labels_dir = Path(data_dir) / 'labels'
         store_dir = Path.cwd().parent / 'results' / 'p1_DRD'
+        store_dir.mkdir(parents=True, exist_ok=True)
 
         # Path to create TFRecord
         if FLAGS.multi_class:

@@ -39,8 +39,8 @@ def create_cnn_nets(ds_info, num_blocks, filters, kernel_size, dense_units, drop
     for i in range(num_blocks):
         x = cnn_block(x, filters * (2 ** i), kernel_size, l2_lambda)
 
-    # GlobalAveragePolling layer
-    out = tf.keras.layers.GlobalAveragePooling2D()(x)
+    # GlobalMaxPolling layer
+    out = tf.keras.layers.GlobalMaxPooling2D()(x)
 
     # Dense layer
     out = tf.keras.layers.Dense(dense_units,
