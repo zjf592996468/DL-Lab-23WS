@@ -7,12 +7,11 @@
 
 ## Attention!
 
-The checkpoint logic of our code is different from the original code.
-We are, if there is a checkpoint it is loaded.
+The checkpoint mechanism in our code differs from the original implementation. In our case, if a checkpoint exists, it is automatically loaded. So it's important to note that the code cannot be run consecutively due to the need to prevent the automatic loading of checkpoint files.
 
-So please rename the `ckpt` file before running it if you don't want to use checkpoint.
-Equally, if you want to use a good checkpoint just drag the file into `experiments`
-and rename it to '**ckpt**', for P2 is '**har-ckpt**'.
+Therefore, if you prefer not to utilize a checkpoint, please rename the checkpoint file before execution. Conversely, if you wish to use a specific, high-quality checkpoint, simply drag the file into the 'experiments' directory and rename it to 'ckpt'. For project P2, rename it to 'har-ckpt'.
+
+
 
 ## P1: Diabetic Retinopathy Detection
 
