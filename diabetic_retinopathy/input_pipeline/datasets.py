@@ -94,13 +94,13 @@ def load(name, data_dir, split_frac, seed):
         except FileNotFoundError as e:
             logging.warning(f"File not found: {labels_dir / 'test.csv'}. Error: {e}")
 
-        # Check and plot the distribution of raw dataset
-        fig = check_imb(train_labels)
-        fig.xlabel('Retinopathy grade')
-        fig.title('Class Distribution of IDRID dataset')
-        fig.savefig(store_dir / 'Class distribution of IDRID dataset.png')
-        logging.info(f"Class distribution of IDRID dataset is saved to {store_dir.resolve()}")
-        fig.close()
+        # # Check and plot the distribution of raw dataset
+        # fig = check_imb(train_labels)
+        # fig.xlabel('Retinopathy grade')
+        # fig.title('Class Distribution of IDRID dataset')
+        # fig.savefig(store_dir / 'Class distribution of IDRID dataset.png')
+        # logging.info(f"Class distribution of IDRID dataset is saved to {store_dir.resolve()}")
+        # fig.close()
 
         # Split train and val dataset with split_frac
         val_size = round(split_frac * train_labels.shape[0])
@@ -119,12 +119,12 @@ def load(name, data_dir, split_frac, seed):
             val_labels.loc[:, 'Retinopathy grade'] = (val_labels['Retinopathy grade'] > 1).astype(int)
             test_labels.loc[:, 'Retinopathy grade'] = (test_labels['Retinopathy grade'] > 1).astype(int)
 
-            # Check and plot the distribution of binarised dataset
-            fig = check_imb(train_labels)
-            fig.title('Class Distribution Of Train Set After Binarisation')
-            fig.savefig(store_dir / 'Class distribution of train set after binarisation.png')
-            logging.info(f"Class distribution of train set after binarisation is saved to {store_dir.resolve()}")
-            fig.close()
+            # # Check and plot the distribution of binarised dataset
+            # fig = check_imb(train_labels)
+            # fig.title('Class Distribution Of Train Set After Binarisation')
+            # fig.savefig(store_dir / 'Class distribution of train set after binarisation.png')
+            # logging.info(f"Class distribution of train set after binarisation is saved to {store_dir.resolve()}")
+            # fig.close()
 
         # Build origin dataset info
         class_counts = train_labels['Retinopathy grade'].value_counts().sort_index()
@@ -154,18 +154,18 @@ def load(name, data_dir, split_frac, seed):
         train_size_re = train_labels_re.shape[0]
         logging.info(f"Num of train samples after resampling is: {train_size_re}")
 
-        # Check and plot the distribution of resampled dataset
-        fig = check_imb(train_labels_re)
-        if FLAGS.multi_class:
-            fig.title('Class Distribution Of Train Set After Resampling For Multi-Class')
-            fig.savefig(store_dir / 'Class distribution of train set after resampling for multi-class.png')
-            logging.info(
-                f"Class distribution of train set after resampling for multi-class is saved to {store_dir.resolve()}")
-        else:
-            fig.title('Class Distribution Of Train Set After Resampling')
-            fig.savefig(store_dir / 'Class distribution of train set after resampling.png')
-            logging.info(f"Class distribution of train set after resampling is saved to {store_dir.resolve()}")
-        fig.close()
+        # # Check and plot the distribution of resampled dataset
+        # fig = check_imb(train_labels_re)
+        # if FLAGS.multi_class:
+        #     fig.title('Class Distribution Of Train Set After Resampling For Multi-Class')
+        #     fig.savefig(store_dir / 'Class distribution of train set after resampling for multi-class.png')
+        #     logging.info(
+        #         f"Class distribution of train set after resampling for multi-class is saved to {store_dir.resolve()}")
+        # else:
+        #     fig.title('Class Distribution Of Train Set After Resampling')
+        #     fig.savefig(store_dir / 'Class distribution of train set after resampling.png')
+        #     logging.info(f"Class distribution of train set after resampling is saved to {store_dir.resolve()}")
+        # fig.close()
 
         # Update ds_info with resampled dataset
         class_counts_re = train_labels_re['Retinopathy grade'].value_counts().sort_index()

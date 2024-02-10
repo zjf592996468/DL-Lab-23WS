@@ -42,10 +42,10 @@ def main(argv):
     ds_train, ds_val, ds_test, ds_info = load()
     logging.info("Dataset IDRID is successfully loaded.")
 
-    # plot augmentation
-    for image, label in ds_test.take(1):
-        plot_augment(image[8])
-    logging.info("Augmentation plot is saved in results.")
+    # # plot augmentation
+    # for image, label in ds_test.take(1):
+    #     plot_augment(image[8])
+    # logging.info("Augmentation plot is saved in results.")
 
     # choose model
     if FLAGS.model == 'vgg':  # model vgg

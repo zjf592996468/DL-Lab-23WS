@@ -162,17 +162,17 @@ def load(name, data_dir, show_exp_id):
                 exp_dfs[exp_id] = pd.concat([exp_dfs[exp_id], sensor_subset], ignore_index=True)
             logging.info("Acc and gyro data with labels are extracted and combined.")
 
-            # Plot raw data of show_exp
-            fig = plot_df(plot_data, f'raw exp_{show_exp_id}')
-            fig.savefig(store_dir / f'HAPT raw data of exp_{show_exp_id}.png')
-            logging.info(f"HAPT raw data of exp_{show_exp_id} is saved to {store_dir.resolve()}")
-            fig.close()
+            # # Plot raw data of show_exp
+            # fig = plot_df(plot_data, f'raw exp_{show_exp_id}')
+            # fig.savefig(store_dir / f'HAPT raw data of exp_{show_exp_id}.png')
+            # logging.info(f"HAPT raw data of exp_{show_exp_id} is saved to {store_dir.resolve()}")
+            # fig.close()
 
-            # Plot show_exp with labeled data and save to file
-            fig = plot_df(exp_dfs[show_exp_id], f'exp_{show_exp_id}')
-            fig.savefig(store_dir / f'HAPT labeled data of exp_{show_exp_id}.png')
-            logging.info(f"HAPT labeled data of exp_{show_exp_id} is saved to {store_dir.resolve()}")
-            fig.close()
+            # # Plot show_exp with labeled data and save to file
+            # fig = plot_df(exp_dfs[show_exp_id], f'exp_{show_exp_id}')
+            # fig.savefig(store_dir / f'HAPT labeled data of exp_{show_exp_id}.png')
+            # logging.info(f"HAPT labeled data of exp_{show_exp_id} is saved to {store_dir.resolve()}")
+            # fig.close()
 
             # Z-score normalize
             exp_dfs_z = {}
@@ -180,11 +180,11 @@ def load(name, data_dir, show_exp_id):
                 exp_dfs_z[exp_id] = z_score(exp_dfs[exp_id].copy())
             logging.info("Sensor data with labels are z-score normalized on each channel.")
 
-            # Plot show_exp after z-score and save to file
-            fig = plot_df(exp_dfs_z[show_exp_id], f'exp_{show_exp_id} after z-score')
-            fig.savefig(store_dir / f'HAPT labeled data of exp_{show_exp_id} after z-score.png')
-            logging.info(f"HAPT labeled data of exp_{show_exp_id} after z-score is saved to {store_dir.resolve()}")
-            fig.close()
+            # # Plot show_exp after z-score and save to file
+            # fig = plot_df(exp_dfs_z[show_exp_id], f'exp_{show_exp_id} after z-score')
+            # fig.savefig(store_dir / f'HAPT labeled data of exp_{show_exp_id} after z-score.png')
+            # logging.info(f"HAPT labeled data of exp_{show_exp_id} after z-score is saved to {store_dir.resolve()}")
+            # fig.close()
 
             # Initialize train, val and test dataset
             ds_train = None

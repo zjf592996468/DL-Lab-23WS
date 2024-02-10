@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import to_rgba
 import seaborn as sns
-from sklearn.metrics import confusion_matrix, accuracy_score,balanced_accuracy_score
+from sklearn.metrics import confusion_matrix, accuracy_score, balanced_accuracy_score
 import logging
 import wandb
 import tensorflow as tf
@@ -135,6 +135,7 @@ def visual(model, checkpoint, ds_test, ds_info):
     logging.info("Confusion Matrix:\n%s", conf_matrix)
     logging.info("Accuracy: %s", accuracy)
     logging.info("balanced Accuracy: %s", balanced_accuracy)
+
     # Use wandb to record confusion matrix and accuracy
     wandb.log({"confusion_matrix": wandb.plot.confusion_matrix(probs=None, y_true=true_labels, preds=pred_labels,
                                                                class_names=ds_info['act_names']),
@@ -154,4 +155,3 @@ def visual(model, checkpoint, ds_test, ds_info):
     plt.show()
 
     return conf_matrix
-

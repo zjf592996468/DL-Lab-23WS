@@ -40,6 +40,7 @@ def evaluate(model, checkpoint, ds_test, ds_info):
     logging.info("Confusion Matrix:\n%s", conf_matrix)
     logging.info("Accuracy: %s", accuracy)
     logging.info("balanced Accuracy: %s", balanced_accuracy)
+
     # Use wandb to record confusion matrix and accuracy
     wandb.log({"confusion_matrix": wandb.plot.confusion_matrix(probs=None, y_true=true_labels, preds=pred_labels,
                                                                class_names=ds_info['act_names']),

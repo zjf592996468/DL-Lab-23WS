@@ -70,8 +70,8 @@ def main(argv):
                  ds_info,
                  )
 
-        # Plot predicted result
-        visual(model, ckpt_restore_path, ds_show, ds_info)
+        # # Plot predicted result
+        # visual(model, ckpt_restore_path, ds_show, ds_info)
     wandb.finish()
 
 
