@@ -39,7 +39,7 @@ Train other model:
 * Transfer learning:
 
     `python3 main.py --train=True --multi_class=False --classification=False --model='effnet'
-      --l2_loss=flase`
+      --l2_loss=False`
 
 
 Train '**cnn**' model for multi-class classification:
