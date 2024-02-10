@@ -69,6 +69,7 @@ def evaluate(model, checkpoint, ds_test, ds_info):
 
     return conf_matrix
 
+# this evaluate do not need load the checkpoint
 # def evaluate1(model: tf.keras.Model, ds_test: tf.data.Dataset, ds_info) -> np.ndarray:
 #     # this function can directly evaluate the model
 #

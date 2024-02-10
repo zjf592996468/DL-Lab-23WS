@@ -9,7 +9,7 @@ from absl.flags import FLAGS
 class Trainer(object):
     def __init__(self, model, ds_train, ds_val, ds_info, run_paths, total_steps, log_interval, ckpt_interval):
         # Loss objective
-        if FLAGS.multi_class:
+        if FLAGS.multi_class and not FLAGS.classification:
             self.loss_object = tf.keras.losses.MeanAbsoluteError()
             self.train_accuracy = tf.keras.metrics.Accuracy(name='train_accuracy')
             self.val_accuracy = tf.keras.metrics.Accuracy(name='val_accuracy')

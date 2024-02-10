@@ -36,7 +36,7 @@ Deep visualization:
 
 Transfer learning:
 
-`python3 main.py --train=True --multi_class=False --model='effnet --l2_loss=False'`
+`python3 main.py --train=True --multi_class=False --model='effnet' --l2_loss=False`
 
 Train '**cnn**' model for multi-class classification:
 

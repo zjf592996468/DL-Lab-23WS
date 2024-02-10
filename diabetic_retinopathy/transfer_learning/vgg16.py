@@ -9,7 +9,8 @@ def transfermodel(input_shape, n_classes, dropout_rate=0.5, dense_units=1024):
     base_model = VGG16(weights='imagenet', include_top=False, input_shape=input_shape)
 
     # Freezing the parameters of the VGG16 model
-    base_model.trainable = False
+    for layer in base_model.layers:
+        layer.trainable = False
 
     model = Sequential([
         base_model,  # VGG16 as basic

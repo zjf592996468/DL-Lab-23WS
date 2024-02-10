@@ -39,16 +39,22 @@ def check_imb(labels):
 def preprocess(image, label, img_height, img_width):
     """Dataset preprocessing: Normalizing and resizing"""
     # Origin img size: 4288x2848
-    # Crop the blank place in the image
-    image = tf.image.crop_to_bounding_box(image, 0, 270, 2848, 3418)
-
-    # Normalize image: `uint8` -> `float32`.
-    image = tf.cast(image, tf.float32) / 255.
-
     # Resize image with pad to avoid distortions
+
     if FLAGS.model == 'effnet':  # When use transfer learning
+        # Normalize image: `uint8` -> `float32`.
+        image = tf.cast(image, tf.float32) / 255.
+
+        # Resize image with pad to avoid distortions
         image = tf.image.resize_with_pad(image, 224, 224)
+
     else:
+        # Crop the blank place in the image
+        image = tf.image.crop_to_bounding_box(image, 0, 270, 2848, 3418)
+
+        # Normalize image: `uint8` -> `float32`.
+        image = tf.cast(image, tf.float32) / 255.
+
         image = tf.image.resize_with_pad(image, img_height, img_width)
 
     return image, label

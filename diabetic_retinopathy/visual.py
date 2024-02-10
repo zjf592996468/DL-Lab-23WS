@@ -31,7 +31,7 @@ def main(argv):
 
     elif FLAGS.model == 'cnn':  # model cnn
         model = create_cnn_nets(ds_info=ds_info)
-
+    model.summary()
     # load the checkpoint
     ckpt = tf.train.Checkpoint(model=model, optimizer=tf.keras.optimizers.Adam())
     manager = tf.train.CheckpointManager(ckpt, run_paths['path_ckpts_train'], max_to_keep=5)
@@ -45,7 +45,7 @@ def main(argv):
     else:
         print("No checkpoint found at:", run_paths['path_ckpts_train'])
 
-    # Find images from the test dataset that match a specified category index
+    # Find 30 images from the test dataset that match a specified category index
     layer_name = 'max_pooling2d_2'  # Replace the max pooling layer
     category_index_1 = 1  # The label we're interested in
     images_found = 0  # Counter for images processed
@@ -62,7 +62,7 @@ def main(argv):
 
                 # Overlay heatmap
                 original_image = image.numpy()
-                overlay_image = overlay_heatmap(original_image, heatmap, 0.4, 0.5)
+                overlay_image = overlay_heatmap(original_image, heatmap, 0.35, 0.5)
 
                 # Plotting
                 fig, axs = plt.subplots(1, 3, figsize=(15, 5))  # Create a 1x3 subplot

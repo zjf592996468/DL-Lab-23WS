@@ -64,84 +64,44 @@ def overlay_heatmap(orig_image, heatmap, threshold, alpha):
     return Image.fromarray(overlay_image)
 
 
-'''Model: "vgg_like"
-_________________________________________________________________
- Layer (type)                Output Shape              Param #   
-=================================================================
- input_1 (InputLayer)        [(None, 256, 256, 3)]     0         
-
- conv2d (Conv2D)             (None, 256, 256, 43)      1204      
-
- conv2d_1 (Conv2D)           (None, 256, 256, 43)      16684     
-
- max_pooling2d (MaxPooling2  (None, 128, 128, 43)      0         
- D)                                                              
-
- conv2d_2 (Conv2D)           (None, 128, 128, 172)     66736     
-
- conv2d_3 (Conv2D)           (None, 128, 128, 172)     266428    
-
- max_pooling2d_1 (MaxPoolin  (None, 64, 64, 172)       0         
- g2D)                                                            
-
- global_max_pooling2d (  (None, 172)               0         
- GlobalMaxPooling2D)                                         
-
- dense (Dense)               (None, 32)                5536      
-
- dropout (Dropout)           (None, 32)                0         
-
- dense_1 (Dense)             (None, 2)                 66        
-
-=================================================================
-Total params: 356654 (1.36 MB)
-Trainable params: 356654 (1.36 MB)
-Non-trainable params: 0 (0.00 Byte)
-_________________________________________________________________
-'''
-
 '''Model: "cnn_like"
 _________________________________________________________________
  Layer (type)                Output Shape              Param #   
 =================================================================
  input_1 (InputLayer)        [(None, 256, 256, 3)]     0         
-
- conv2d (Conv2D)             (None, 256, 256, 8)       224       
-
- batch_normalization (Batch  (None, 256, 256, 8)       32        
- Normalization)                                                  
-
- max_pooling2d (MaxPooling2  (None, 128, 128, 8)       0         
- D)                                                              
-
- conv2d_1 (Conv2D)           (None, 128, 128, 16)      1168      
-
- batch_normalization_1 (Bat  (None, 128, 128, 16)      64        
- chNormalization)                                                
-
- max_pooling2d_1 (MaxPoolin  (None, 64, 64, 16)        0         
- g2D)                                                            
-
- conv2d_2 (Conv2D)           (None, 64, 64, 32)        4640      
-
- batch_normalization_2 (Bat  (None, 64, 64, 32)        128       
- chNormalization)                                                
-
- max_pooling2d_2 (MaxPoolin  (None, 32, 32, 32)        0         
- g2D)                                                            
-
- global_max_pooling2d (  (None, 36)                0         
- GlobalMaxPooling2D)                                         
-
- dense (Dense)               (None, 128)               4224      
-
- dropout (Dropout)           (None, 128)               0         
-
- dense_1 (Dense)             (None, 2)                 258       
-
+                                                                 
+ conv2d (Conv2D)             (None, 256, 256, 19)      532       
+                                                                 
+ batch_normalization (BatchN  (None, 256, 256, 19)     76        
+ ormalization)                                                   
+                                                                 
+ max_pooling2d (MaxPooling2D  (None, 128, 128, 19)     0         
+ )                                                               
+                                                                 
+ conv2d_1 (Conv2D)           (None, 128, 128, 38)      6536      
+                                                                 
+ batch_normalization_1 (Batc  (None, 128, 128, 38)     152       
+ hNormalization)                                                 
+                                                                 
+ max_pooling2d_1 (MaxPooling  (None, 64, 64, 38)       0         
+ 2D)                                                             
+                                                                 
+ conv2d_2 (Conv2D)           (None, 64, 64, 76)        26068     
+                                                                 
+ batch_normalization_2 (Batc  (None, 64, 64, 76)       304       
+ hNormalization)                                                 
+                                                                 
+ max_pooling2d_2 (MaxPooling  (None, 32, 32, 76)       0         
+ 2D)                                                             
+                                                                 
+ global_max_pooling2d (Globa  (None, 76)               0         
+ lMaxPooling2D)                                                  
+                                                                 
+ dense (Dense)               (None, 33)                2541      
+                                                                 
+ dropout (Dropout)           (None, 33)                0         
+                                                                 
+ dense_1 (Dense)             (None, 2)                 68        
+                                                                 
 =================================================================
-Total params: 10738 (41.95 KB)
-Trainable params: 10626 (41.51 KB)
-Non-trainable params: 112 (448.00 Byte)
-_________________________________________________________________
 '''
