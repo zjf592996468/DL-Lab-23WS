@@ -21,13 +21,8 @@ Train default '**cnn**' model with **L2-regularization** on IDRID dataset for bi
 Run batch file: `sbatch run.sh`
 
 Train other model:
-flags.DEFINE_boolean('train', False, 'Specify whether to train or evaluate a model.')
-flags.DEFINE_boolean('multi_class', False, 'Specify whether to take multi_classification')
-flags.DEFINE_boolean('classification', True, 'Specify whether to take multi_classification with classification')
-flags.DEFINE_string('model', 'cnn', 'The name of the model')
-flags.DEFINE_string('wandb', 'idrid', 'The name of the wandb project')
-flags.DEFINE_boolean('l2_loss', True, 'Specify whether to use l2 regularization')
-* vgg(need raise train steps to 12e4:
+
+* vgg(need raise train steps to 12e4):
 
   `python3 main.py --train=True --multi_class=False --classification=False --model='vgg'
    --l2_loss=flase`
@@ -39,12 +34,12 @@ Tune hyperparameters:
 
 Deep visualization(need ckpt in `experiments`):
 
-`python3 visual.py`
+    `python3 visual.py`
 
 Transfer learning:
 
-`python3 main.py --train=True --multi_class=False --classification=False --model='effnet'
-   --l2_loss=flase`
+    `python3 main.py --train=True --multi_class=False --classification=False --model='effnet'
+      --l2_loss=flase`
 
 
 Train '**cnn**' model for multi-class classification:
@@ -58,14 +53,14 @@ Train '**cnn**' model for multi-class classification:
 
   `python3 main.py --train=True --multi_class=True --classification=False --model='cnn'
    --l2_loss=True`
-* Use evaluation(use the corresponding model):
+* Use evaluation(use the corresponding model):\
    `python3 main.py --train=False...`
 
 ## P2: Human Activity Recognition
 
 Train RNN model with '**Bidirectional LSTM**' layer on HAPT dataset:
 
-`python3 main.py --train=True`
+    `python3 main.py --train=True`
 
 Train RNN model with other RNN layer:
 
@@ -78,10 +73,10 @@ Train RNN model with other RNN layer:
   `python3 main.py --train=True --layer='Bidirectional GRU'`
 
 * GRU:
-
   `python3 main.py --train=True --layer='GRU'`
-Evaluation:
- `python3 main.py --train=False`
+
+Evaluation:\
+`python3 main.py --train=False`
 
 # Results
 
