@@ -22,46 +22,41 @@ Run batch file: `sbatch run.sh`
 
 Train other model:
 
-* vgg(need raise train steps to 12e4):
+* vgg(need to raise train steps to 12e4):
 
-  `python3 main.py --train=True --multi_class=False --classification=False --model='vgg'
-   --l2_loss=flase`
+  `python3 main.py --train=True --multi_class=False --classification=False --model='vgg' --l2_loss=flase`
 
 * Tune hyperparameters:
 
-  `python3 main.py --train=True --multi_class=False --classification=False --model='cnn'
-   --l2_loss=True`
+  `python3 main.py --train=True --multi_class=False --classification=False --model='cnn' --l2_loss=True`
 
 * Deep visualization(need ckpt in `experiments`):
 
-    `python3 visual.py`
+  `python3 visual.py`
 
 * Transfer learning:
 
-    `python3 main.py --train=True --multi_class=False --classification=False --model='effnet'
-      --l2_loss=False`
-
+  `python3 main.py --train=True --multi_class=False --classification=False --model='effnet' --l2_loss=False`
 
 Train '**cnn**' model for multi-class classification:
 
 * Use classification:
 
-  `python3 main.py --train=True --multi_class=True --classification=True --model='cnn'
-   --l2_loss=True`
+  `python3 main.py --train=True --multi_class=True --classification=True --model='cnn' --l2_loss=True`
 
 * Use regression:
 
-  `python3 main.py --train=True --multi_class=True --classification=False --model='cnn'
-   --l2_loss=True`
+  `python3 main.py --train=True --multi_class=True --classification=False --model='cnn' --l2_loss=True`
+
 * Use evaluation(use the corresponding model):
 
-   `python3 main.py --train=False...`
+  `python3 main.py --train=False...`
 
 ## P2: Human Activity Recognition
 
 Train RNN model with '**Bidirectional LSTM**' layer on HAPT dataset:
 
-    python3 main.py --train=True
+`python3 main.py --train=True`
 
 Train RNN model with other RNN layer:
 
@@ -101,7 +96,6 @@ Train RNN model with other RNN layer:
 splitting the first 20% of the original Train set into the Validation set._\
 *_The results of this project vary greatly because the test set is small.
 We took the highest record and uploaded the ckpt file to result._
-
 
 ## P2: Human Activity Recognition
 

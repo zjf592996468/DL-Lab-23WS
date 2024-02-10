@@ -50,6 +50,7 @@ def _parse_tfrd_function(example_proto):
         'image': tf.io.FixedLenFeature([], tf.string),
         'label': tf.io.FixedLenFeature([], tf.int64),
     }
+
     # Parsing features from proto
     example = tf.io.parse_single_example(example_proto, feature_description)
 

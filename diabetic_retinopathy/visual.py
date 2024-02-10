@@ -32,6 +32,7 @@ def main(argv):
     elif FLAGS.model == 'cnn':  # model cnn
         model = create_cnn_nets(ds_info=ds_info)
     model.summary()
+
     # load the checkpoint
     ckpt = tf.train.Checkpoint(model=model, optimizer=tf.keras.optimizers.Adam())
     manager = tf.train.CheckpointManager(ckpt, run_paths['path_ckpts_train'], max_to_keep=5)
@@ -77,7 +78,7 @@ def main(argv):
                 axs[1].set_title(f'Grad-CAM {images_found + 1}')
                 axs[1].axis('off')
 
-                # Overlayed Image
+                # Overlay Image
                 axs[2].imshow(overlay_image)
                 axs[2].set_title(f'Overlayed Grad-CAM {images_found + 1}')
                 axs[2].axis('off')

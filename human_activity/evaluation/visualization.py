@@ -1,12 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import to_rgba
-import seaborn as sns
-from sklearn.metrics import confusion_matrix, accuracy_score, balanced_accuracy_score
-import logging
-import wandb
 import tensorflow as tf
 from evaluation.eval import log_and_plot_metrics
+
 
 def visual(model, checkpoint, ds_test, ds_info):
     # load the trained model
@@ -125,6 +122,7 @@ def visual(model, checkpoint, ds_test, ds_info):
     # Add a title and show the plot
     plt.title("Action Classes Legend")
 
+    # Plot confusion matrix and log into wandb
     conf_matrix = log_and_plot_metrics(true_labels, pred_labels, ds_info, False)
 
     return conf_matrix

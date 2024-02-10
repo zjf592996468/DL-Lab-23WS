@@ -3,7 +3,7 @@ import tensorflow as tf
 import tensorflow_hub as hub
 from tensorflow.keras.layers import Dense, Dropout
 from tensorflow.keras.models import Sequential
-from keras.applications import EfficientNetB0
+from keras.applications.efficientnet import EfficientNetB0
 from absl.flags import FLAGS
 
 
