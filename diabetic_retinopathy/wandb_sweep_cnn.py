@@ -47,14 +47,14 @@ def train_func():
 
 sweep_config = {
     'name': 'idrid-sweep',
-    'method': 'bayes',
+    'method': 'random',
     'metric': {
         'name': 'val_acc',
         'goal': 'maximize'
     },
     'parameters': {
         'Trainer.total_steps': {
-            'values': [50000, 55000, 40000, 45000]
+            'values': [35000, 40000, 45000]
         },
         'create_cnn_nets.filters': {
             'distribution': 'q_log_uniform',
@@ -66,7 +66,7 @@ sweep_config = {
             'distribution': 'q_uniform',
             'q': 1,
             'min': 2,
-            'max': 5
+            'max': 4
         },
         'create_cnn_nets.dense_units': {
             'distribution': 'q_log_uniform',
@@ -83,6 +83,9 @@ sweep_config = {
             'distribution': 'uniform',
             'min': 0.001,
             'max': 0.01
+        },
+        'prepare.batch_size': {
+            'values': [16, 32, 64]
         }
     }
 }
