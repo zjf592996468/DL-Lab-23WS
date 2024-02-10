@@ -53,7 +53,8 @@ Train '**cnn**' model for multi-class classification:
 
   `python3 main.py --train=True --multi_class=True --classification=False --model='cnn'
    --l2_loss=True`
-* Use evaluation(use the corresponding model):\
+* Use evaluation(use the corresponding model):
+
    `python3 main.py --train=False...`
 
 ## P2: Human Activity Recognition
@@ -72,11 +73,13 @@ Train RNN model with other RNN layer:
 
   `python3 main.py --train=True --layer='Bidirectional GRU'`
 
-* GRU:\
+* GRU:
+
   `python3 main.py --train=True --layer='GRU'`
 
-* Evaluation:\
-`python3 main.py --train=False`
+* Evaluation:
+
+  `python3 main.py --train=False`
 
 # Results
 
