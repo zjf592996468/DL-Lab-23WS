@@ -61,7 +61,7 @@ Train '**cnn**' model for multi-class classification:
 
 Train RNN model with '**Bidirectional LSTM**' layer on HAPT dataset:
 
-    `python3 main.py --train=True`
+    python3 main.py --train=True
 
 Train RNN model with other RNN layer:
 

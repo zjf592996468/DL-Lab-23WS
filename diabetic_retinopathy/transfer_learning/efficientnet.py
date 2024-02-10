@@ -3,6 +3,7 @@ import tensorflow as tf
 import tensorflow_hub as hub
 from tensorflow.keras.layers import Dense, Dropout
 from tensorflow.keras.models import Sequential
+from keras.applications import EfficientNetB0
 from absl.flags import FLAGS
 
 
@@ -24,8 +25,9 @@ def transfermodel(input_shape, n_classes, dense_units=1024, dropout=0.5):
 
     # Path to the model
     model_path = current_dir / "archive"
+    # model = EfficientNetB0(weights='imagenet', include_top=False, input_shape=input_shape)
 
-    if FLAGS.multi_class:
+    if FLAGS.multi_class and not FLAGS.classification:
         model = Sequential([
             hub.KerasLayer(str(model_path), input_shape=input_shape, trainable=False),
             Dense(dense_units, activation='relu'),
