@@ -27,16 +27,16 @@ Train other model:
   `python3 main.py --train=True --multi_class=False --classification=False --model='vgg'
    --l2_loss=flase`
 
-Tune hyperparameters:
+* Tune hyperparameters:
 
   `python3 main.py --train=True --multi_class=False --classification=False --model='cnn'
    --l2_loss=True`
 
-Deep visualization(need ckpt in `experiments`):
+* Deep visualization(need ckpt in `experiments`):
 
     `python3 visual.py`
 
-Transfer learning:
+* Transfer learning:
 
     `python3 main.py --train=True --multi_class=False --classification=False --model='effnet'
       --l2_loss=flase`
@@ -72,10 +72,10 @@ Train RNN model with other RNN layer:
 
   `python3 main.py --train=True --layer='Bidirectional GRU'`
 
-* GRU:
+* GRU:\
   `python3 main.py --train=True --layer='GRU'`
 
-Evaluation:\
+* Evaluation:\
 `python3 main.py --train=False`
 
 # Results
