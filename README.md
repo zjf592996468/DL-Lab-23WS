@@ -21,32 +21,45 @@ Train default '**cnn**' model with **L2-regularization** on IDRID dataset for bi
 Run batch file: `sbatch run.sh`
 
 Train other model:
+flags.DEFINE_boolean('train', False, 'Specify whether to train or evaluate a model.')
+flags.DEFINE_boolean('multi_class', False, 'Specify whether to take multi_classification')
+flags.DEFINE_boolean('classification', True, 'Specify whether to take multi_classification with classification')
+flags.DEFINE_string('model', 'cnn', 'The name of the model')
+flags.DEFINE_string('wandb', 'idrid', 'The name of the wandb project')
+flags.DEFINE_boolean('l2_loss', True, 'Specify whether to use l2 regularization')
+* vgg(need raise train steps to 12e4:
 
-* vgg:
-
-  `python3 main.py --train=True --multi_class=False --model='vgg'`
+  `python3 main.py --train=True --multi_class=False --classification=False --model='vgg'
+   --l2_loss=flase`
 
 Tune hyperparameters:
 
-`python3 wandb_sweep_cnn.py --train=True --multi_class=False --model='cnn'`
+  `python3 main.py --train=True --multi_class=False --classification=False --model='cnn'
+   --l2_loss=True`
 
-Deep visualization:
+Deep visualization(need ckpt in `experiments`):
 
 `python3 visual.py`
 
 Transfer learning:
 
-`python3 main.py --train=True --multi_class=False --model='effnet' --l2_loss=False`
+`python3 main.py --train=True --multi_class=False --classification=False --model='effnet'
+   --l2_loss=flase`
+
 
 Train '**cnn**' model for multi-class classification:
 
 * Use classification:
 
-  `python3 main.py --train=True --multi_class=True --model='cnn'`
+  `python3 main.py --train=True --multi_class=True --classification=True --model='cnn'
+   --l2_loss=True`
 
 * Use regression:
 
-  `python3 main.py --train=True --multi_class=True --model='cnn' --classification=False`
+  `python3 main.py --train=True --multi_class=True --classification=False --model='cnn'
+   --l2_loss=True`
+* Use evaluation(use the corresponding model):
+   `python3 main.py --train=False...`
 
 ## P2: Human Activity Recognition
 
@@ -67,6 +80,8 @@ Train RNN model with other RNN layer:
 * GRU:
 
   `python3 main.py --train=True --layer='GRU'`
+Evaluation:
+ `python3 main.py --train=False`
 
 # Results
 
@@ -85,14 +100,10 @@ Train RNN model with other RNN layer:
 | **Test Accuracy (%)** | 57                 | 43             |
 
 *_The best record of EfficientNet was achieved by
-splitting the first 20% of the original Train set into the Validation set._
+splitting the first 20% of the original Train set into the Validation set._\
+*_The results of this project vary greatly because the test set is small.
+We took the highest record and uploaded the ckpt file to result._
 
-We found that there is a quarter checkpoint around step 2w,
-and its test accuracy can reach 89%, but we cannot find it accurately every time,
-so we chose step 4w to stabilize it at 86%.
-
-By using **transfer learning**, you can easily achieve an accuracy of about 86%,
-in about 10,000 steps, which saves a lot of computing power.
 
 ## P2: Human Activity Recognition
 
@@ -100,4 +111,7 @@ in about 10,000 steps, which saves a lot of computing power.
 |---------------------------|-----------------------------|
 | **Test Accuracy (%)**     | 95                          |
 | **Balanced Accuracy (%)** | 83                          |
+
+Our model achieved great success in basic activities, but need improvement when it comes to
+postural transition.
 
