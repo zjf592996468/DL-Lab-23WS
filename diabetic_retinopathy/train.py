@@ -36,7 +36,7 @@ class Trainer(object):
 
         # Checkpoint Manager, save up to 10 checkpoints
         self.ckpt = tf.train.Checkpoint(model=self.model, optimizer=self.optimizer)
-        self.manager = tf.train.CheckpointManager(self.ckpt, self.run_paths['path_ckpts_train'], max_to_keep=20)
+        self.manager = tf.train.CheckpointManager(self.ckpt, self.run_paths['path_ckpts_train'], max_to_keep=10)
 
     @tf.function
     def train_step(self, images, labels):
@@ -82,7 +82,7 @@ class Trainer(object):
         predictions = self.model(images, training=False)
         v_loss = self.loss_object(labels, predictions)
         self.val_loss(v_loss)
-        if FLAGS.multi_class:
+        if FLAGS.multi_class and not FLAGS.classification:
             # round for Acc calculation
             predictions = tf.cast(tf.clip_by_value(predictions + 0.5, 0, 4), tf.int32)
         self.val_accuracy(labels, predictions)
