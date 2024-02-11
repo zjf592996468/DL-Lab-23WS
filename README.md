@@ -7,57 +7,61 @@
 
 ## Attention!
 
-The checkpoint mechanism in our code differs from the original implementation. In our case, if a checkpoint exists, it is automatically loaded. So it's important to note that the code cannot be run consecutively due to the need to prevent the automatic loading of checkpoint files.
+The checkpoint mechanism in our code differs from the original implementation. In our case, if a checkpoint exists, it
+is automatically loaded. So it's important to note that the code cannot be run consecutively due to the need to prevent
+the automatic loading of checkpoint files.
 
-Therefore, if you prefer not to utilize a checkpoint, please rename the checkpoint file before execution. Conversely, if you wish to use a specific, high-quality checkpoint, simply drag the file into the 'experiments' directory and rename it to 'ckpt'. For project P2, rename it to 'har-ckpt'.
-
-
+Therefore, if you prefer not to utilize a checkpoint, please rename the checkpoint file before execution. Conversely, if
+you wish to use a specific, high-quality checkpoint, simply drag the file into the '**experiments**' directory and
+rename it to '**ckpt**'. For project 2, rename it to '**har-ckpt**'.
 
 ## P1: Diabetic Retinopathy Detection
 
-Train default '**cnn**' model with **L2-regularization** on IDRID dataset for binary classification:
+Train '**cnn**' model with **L2-regularization** on IDRID dataset for **binary classification**:
 
 Run batch file: `sbatch run.sh`
 
 Train other model:
 
-* vgg(need to raise train steps to 12e4):
+* vgg(need to raise train steps to **12e4**):
 
-  `python3 main.py --train=True --multi_class=False --classification=False --model='vgg' --l2_loss=flase`
+  `python3 main.py --train=True --multi_class=False --Classification=True --model='vgg' --l2_loss=False`
 
-* Tune hyperparameters:
+Tune hyperparameters:
 
-  `python3 main.py --train=True --multi_class=False --classification=False --model='cnn' --l2_loss=True`
+Run batch file: `sbatch tune.sh`
 
-* Deep visualization(need ckpt in `experiments`):
+Deep visualization (need ckpt in `experiments`):
 
-  `python3 visual.py`
+`python3 visual.py`
 
-* Transfer learning:
+Transfer learning:
 
-  `python3 main.py --train=True --multi_class=False --classification=False --model='effnet' --l2_loss=False`
+* EfficientNet:
+
+  `python3 main.py --train=True --multi_class=False --Classification=True --model='effnet' --l2_loss=False`
 
 Train '**cnn**' model for multi-class classification:
 
-* Use classification:
+* Classification:
 
   `python3 main.py --train=True --multi_class=True --classification=True --model='cnn' --l2_loss=True`
 
-* Use regression:
+* Regression:
 
   `python3 main.py --train=True --multi_class=True --classification=False --model='cnn' --l2_loss=True`
 
-* Use evaluation(use the corresponding model):
+Evaluation (use the corresponding model):
 
-  `python3 main.py --train=False...`
+`python3 main.py --train=False ...`
 
 ## P2: Human Activity Recognition
 
-Train RNN model with '**Bidirectional LSTM**' layer on HAPT dataset:
+Train '**myRNN**' model with '**Bidirectional LSTM**' layer on HAPT dataset:
 
-`python3 main.py --train=True`
+Run batch file: `sbatch run.sh`
 
-Train RNN model with other RNN layer:
+Train model with other RNN layer:
 
 * LSTM:
 
@@ -71,9 +75,9 @@ Train RNN model with other RNN layer:
 
   `python3 main.py --train=True --layer='GRU'`
 
-* Evaluation:
+Evaluation:
 
-  `python3 main.py --train=False`
+`python3 main.py --train=False`
 
 # Results
 
@@ -105,4 +109,3 @@ We took the highest record and uploaded the ckpt file to result._
 
 Our model achieved great success in basic activities, but need improvement when it comes to
 postural transition.
-

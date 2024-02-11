@@ -80,7 +80,7 @@ def main(argv):
 
                 # Overlay Image
                 axs[2].imshow(overlay_image)
-                axs[2].set_title(f'Overlayed Grad-CAM {images_found + 1}')
+                axs[2].set_title(f'Overlay Grad-CAM {images_found + 1}')
                 axs[2].axis('off')
 
                 plt.tight_layout()

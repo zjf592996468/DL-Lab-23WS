@@ -9,7 +9,7 @@ from absl.flags import FLAGS
 
 def transfermodel(input_shape, n_classes, dense_units=1024, dropout=0.5):
     """
-    Create a pretrained EfficientNet V2 model.
+    Create a pretrained EfficientNetB0 model.
 
     Parameters:
     input_shape (tuple): The size of the input image, e.g., (224, 224, 3).
@@ -32,7 +32,7 @@ def transfermodel(input_shape, n_classes, dense_units=1024, dropout=0.5):
             hub.KerasLayer(str(model_path), input_shape=input_shape, trainable=False),
             Dense(dense_units, activation='relu'),
             Dropout(dropout),
-            Dense(units=1)  # Use regression for multi-class
+            Dense(units=1)  # Use regression for multi-classification
         ])
 
         model.compile(optimizer='adam',

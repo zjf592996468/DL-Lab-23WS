@@ -10,4 +10,4 @@
 module load cuda/11.8
 
 # Run your python code
-python3 main.py --train=True --wandb='hapt' --layer='Bidirectional LSTM'
+python3 main.py --train=True --layer='Bidirectional LSTM'

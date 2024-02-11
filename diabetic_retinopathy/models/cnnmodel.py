@@ -53,11 +53,12 @@ def create_cnn_nets(ds_info, num_blocks, filters, kernel_size, dense_units, drop
 
     # Output layer
     if FLAGS.multi_class and not FLAGS.classification:
-        # Use regression for multi-class
+        # Use regression for multi-classification
         outputs = tf.keras.layers.Dense(units=1,
                                         kernel_regularizer=tf.keras.regularizers.l2(l2_lambda),
                                         kernel_initializer=tf.keras.initializers.glorot_uniform(seed))(out)
     else:
+
         # can also use this for multi-classification
         outputs = tf.keras.layers.Dense(units=ds_info['num_classes'],
                                         kernel_regularizer=tf.keras.regularizers.l2(l2_lambda),
