@@ -30,20 +30,7 @@ class Trainer(object):
 
         # Checkpoint Manager
         self.ckpt = tf.train.Checkpoint(model=self.model, optimizer=self.optimizer)
-        self.manager = tf.train.CheckpointManager(self.ckpt, self.run_paths['path_ckpts_train'], max_to_keep=20)
-
-    @tf.function
-    def train_step(self, images, labels):
-        with tf.GradientTape() as tape:
-            # training=True is only needed if there are layers with different
-            # behavior during training versus inference (e.g. Dropout).
-            predictions = self.model(images, training=True)
-            loss = self.loss_object(labels, predictions)
-
-        gradients = tape.gradient(loss, self.model.trainable_variables)
-        self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
-        self.train_loss(loss)
-        self.train_accuracy(labels, predictions)
+        self.manager = tf.train.CheckpointManager(self.ckpt, self.run_paths['path_ckpts_train'], max_to_keep=5)
 
     # this is train step with l2
     @tf.function

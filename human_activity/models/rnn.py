@@ -32,18 +32,21 @@ def create_rnn(ds_info, lstm_units, dense_units, dropout_rate, regularization_fa
     elif FLAGS.layer == 'LSTM':
         model.add(LSTM(lstm_units,
                        return_sequences=True,
+                       kernel_initializer=tf.keras.initializers.glorot_uniform,
                        kernel_regularizer=l2(regularization_factor),
                        input_shape=ds_info['features_shape']))
 
     elif FLAGS.layer == 'Bidirectional GRU':
         model.add(Bidirectional(GRU(lstm_units,
                                     return_sequences=True,
+                                    kernel_initializer=tf.keras.initializers.glorot_uniform,
                                     kernel_regularizer=l2(regularization_factor),
                                     input_shape=ds_info['features_shape'])))
 
     elif FLAGS.layer == 'GRU':
         model.add(GRU(lstm_units,
                       return_sequences=True,
+                      kernel_initializer=tf.keras.initializers.glorot_uniform,
                       kernel_regularizer=l2(regularization_factor),
                       input_shape=ds_info['features_shape']))
 
@@ -56,6 +59,7 @@ def create_rnn(ds_info, lstm_units, dense_units, dropout_rate, regularization_fa
     # Dense layer
     model.add(Dense(dense_units,
                     activation='relu',
+                    kernel_initializer=tf.keras.initializers.glorot_uniform,
                     kernel_regularizer=l2(regularization_factor)))
 
     # Output layer

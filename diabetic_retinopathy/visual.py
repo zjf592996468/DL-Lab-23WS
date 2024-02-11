@@ -3,13 +3,12 @@ from deep_visualization.cam import grad_cam, overlay_heatmap
 from input_pipeline.datasets import load
 from utils import utils_params, utils_misc
 from models.architectures import vgg_like
-import train
 from models.cnnmodel import create_cnn_nets
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from absl import flags, app
 from train import Trainer
-import matplotlib
+
 
 FLAGS = flags.FLAGS
 flags.DEFINE_boolean('multi_class', False, 'Specify whether to take multi_classification')
