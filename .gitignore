@@ -10,8 +10,6 @@ __pycache__/
 experiments/
 wandb/
 *.tfrecord
-checkpoint/
-results/
 
 # C extensions
 *.so

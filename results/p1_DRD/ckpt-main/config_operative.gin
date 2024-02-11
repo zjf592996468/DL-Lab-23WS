@@ -1,0 +1,62 @@
+# Macros:
+# ==============================================================================
+GLOBAL_SEED = 2023
+l2_lambda = 0.00283172914609603
+
+# Parameters for augment:
+# ==============================================================================
+augment.seed = %GLOBAL_SEED
+
+# Parameters for cnn_block:
+# ==============================================================================
+cnn_block.l2_lambda = %l2_lambda
+cnn_block.seed = %GLOBAL_SEED
+
+# Parameters for create_cnn_nets:
+# ==============================================================================
+create_cnn_nets.dense_units = 29
+create_cnn_nets.dropout_rate = 0.5184290348221623
+create_cnn_nets.filters = 11
+create_cnn_nets.kernel_size = (3, 3)
+create_cnn_nets.l2_lambda = %l2_lambda
+create_cnn_nets.num_blocks = 3
+create_cnn_nets.seed = %GLOBAL_SEED
+
+# Parameters for load:
+# ==============================================================================
+load.data_dir = 'C:\\DL-lab\\IDRID_dataset'
+load.name = 'idrid'
+load.seed = %GLOBAL_SEED
+load.split_frac = 0.142857
+
+# Parameters for plot_augment:
+# ==============================================================================
+plot_augment.seed = %GLOBAL_SEED
+
+# Parameters for prepare:
+# ==============================================================================
+prepare.batch_size = 32
+prepare.caching = True
+prepare.seed = %GLOBAL_SEED
+
+# Parameters for preprocess:
+# ==============================================================================
+preprocess.img_height = 256
+preprocess.img_width = 256
+
+# Parameters for Trainer:
+# ==============================================================================
+Trainer.ckpt_interval = 1000.0
+Trainer.log_interval = 1000.0
+Trainer.total_steps = 45000.0
+
+# Parameters for vgg_block:
+# ==============================================================================
+vgg_block.kernel_size = (3, 3)
+
+# Parameters for vgg_like:
+# ==============================================================================
+vgg_like.base_filters = 8
+vgg_like.dense_units = 32
+vgg_like.dropout_rate = 0.4
+vgg_like.n_blocks = 3
