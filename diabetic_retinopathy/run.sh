@@ -10,4 +10,4 @@
 module load cuda/11.8
 
 # Run your python code
-python3 main.py --train=True --multi_class=False --model='cnn' --wandb='idrid' --l2_loss=True
+python3 main.py --train=True --multi_class=False --Classification=True --model='cnn' --l2_loss=True

@@ -50,7 +50,7 @@ class Trainer(object):
         self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
         self.train_loss(loss)
         if FLAGS.multi_class:
-            predictions = tf.cast(tf.clip_by_value(predictions + 0.5, 0, 4), tf.int32)
+            predictions = tf.cast(tf.clip_by_value(predictions + 0.5, 0, 4), tf.int32)  # round for Acc calculation
         self.train_accuracy(labels, predictions)
 
     # this is train step with l2
@@ -70,7 +70,7 @@ class Trainer(object):
         self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
         self.train_loss(total_loss)
         if FLAGS.multi_class and not FLAGS.classification:
-            predictions = tf.cast(tf.clip_by_value(predictions + 0.5, 0, 4), tf.int32)
+            predictions = tf.cast(tf.clip_by_value(predictions + 0.5, 0, 4), tf.int32)  # round for Acc calculation
         self.train_accuracy(labels, predictions)
 
     @tf.function
@@ -81,7 +81,7 @@ class Trainer(object):
         v_loss = self.loss_object(labels, predictions)
         self.val_loss(v_loss)
         if FLAGS.multi_class:
-            predictions = tf.cast(tf.clip_by_value(predictions + 0.5, 0, 4), tf.int32)
+            predictions = tf.cast(tf.clip_by_value(predictions + 0.5, 0, 4), tf.int32)  # round for Acc calculation
         self.val_accuracy(labels, predictions)
 
     def train(self):
