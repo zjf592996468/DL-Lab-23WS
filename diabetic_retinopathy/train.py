@@ -49,11 +49,12 @@ class Trainer(object):
         gradients = tape.gradient(loss, self.model.trainable_variables)
         self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
         self.train_loss(loss)
-        if FLAGS.multi_class:
-            predictions = tf.cast(tf.clip_by_value(predictions + 0.5, 0, 4), tf.int32)  # round for Acc calculation
+        if FLAGS.multi_class and not FLAGS.classification:
+            # round for Acc calculation
+            predictions = tf.cast(tf.clip_by_value(predictions + 0.5, 0, 4), tf.int32)
         self.train_accuracy(labels, predictions)
 
-    # this is train step with l2
+    # this is train step with l2 regularization
     @tf.function
     def train_step_l2(self, images, labels):
         with tf.GradientTape() as tape:
@@ -70,7 +71,8 @@ class Trainer(object):
         self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
         self.train_loss(total_loss)
         if FLAGS.multi_class and not FLAGS.classification:
-            predictions = tf.cast(tf.clip_by_value(predictions + 0.5, 0, 4), tf.int32)  # round for Acc calculation
+            # round for Acc calculation
+            predictions = tf.cast(tf.clip_by_value(predictions + 0.5, 0, 4), tf.int32)
         self.train_accuracy(labels, predictions)
 
     @tf.function
@@ -81,7 +83,8 @@ class Trainer(object):
         v_loss = self.loss_object(labels, predictions)
         self.val_loss(v_loss)
         if FLAGS.multi_class:
-            predictions = tf.cast(tf.clip_by_value(predictions + 0.5, 0, 4), tf.int32)  # round for Acc calculation
+            # round for Acc calculation
+            predictions = tf.cast(tf.clip_by_value(predictions + 0.5, 0, 4), tf.int32)
         self.val_accuracy(labels, predictions)
 
     def train(self):
