@@ -89,7 +89,7 @@ Train RNN model with other RNN layer:
 
 | Model                 | CNN-Classification | CNN-Regression |
 |-----------------------|--------------------|----------------|
-| **Test Accuracy (%)** | 57                 | 43             |
+| **Test Accuracy (%)** | 57                 | 40             |
 
 *_The best record of EfficientNet was achieved by
 splitting the first 20% of the original Train set into the Validation set._\
