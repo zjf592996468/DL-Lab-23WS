@@ -36,7 +36,7 @@ class Trainer(object):
 
         # Checkpoint Manager, save up to 10 checkpoints
         self.ckpt = tf.train.Checkpoint(model=self.model, optimizer=self.optimizer)
-        self.manager = tf.train.CheckpointManager(self.ckpt, self.run_paths['path_ckpts_train'], max_to_keep=10)
+        self.manager = tf.train.CheckpointManager(self.ckpt, self.run_paths['path_ckpts_train'], max_to_keep=20)
 
     @tf.function
     def train_step(self, images, labels):
@@ -50,11 +50,10 @@ class Trainer(object):
         self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
         self.train_loss(loss)
         if FLAGS.multi_class:
-            # round for Acc calculation
-            predictions = tf.cast(tf.clip_by_value(predictions + 0.5, 0, 4), tf.int32)
+            predictions = tf.cast(tf.clip_by_value(predictions + 0.5, 0, 4), tf.int32)  # round for Acc calculation
         self.train_accuracy(labels, predictions)
 
-    # this is train step with l2 regularization
+    # this is train step with l2
     @tf.function
     def train_step_l2(self, images, labels):
         with tf.GradientTape() as tape:
@@ -71,8 +70,7 @@ class Trainer(object):
         self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
         self.train_loss(total_loss)
         if FLAGS.multi_class and not FLAGS.classification:
-            # round for Acc calculation
-            predictions = tf.cast(tf.clip_by_value(predictions + 0.5, 0, 4), tf.int32)
+            predictions = tf.cast(tf.clip_by_value(predictions + 0.5, 0, 4), tf.int32)  # round for Acc calculation
         self.train_accuracy(labels, predictions)
 
     @tf.function
@@ -82,9 +80,8 @@ class Trainer(object):
         predictions = self.model(images, training=False)
         v_loss = self.loss_object(labels, predictions)
         self.val_loss(v_loss)
-        if FLAGS.multi_class and not FLAGS.classification:
-            # round for Acc calculation
-            predictions = tf.cast(tf.clip_by_value(predictions + 0.5, 0, 4), tf.int32)
+        if FLAGS.multi_class:
+            predictions = tf.cast(tf.clip_by_value(predictions + 0.5, 0, 4), tf.int32)  # round for Acc calculation
         self.val_accuracy(labels, predictions)
 
     def train(self):
