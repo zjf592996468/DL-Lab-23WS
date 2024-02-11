@@ -1,6 +1,6 @@
 # Global Parameters
 GLOBAL_SEED = 2023
-l2_lambda = 0.0010277395172481724
+l2_lambda = 0.00283172914609603
 
 # Architectures vgg model need 1.2e5 train steps
 vgg_like.base_filters = 8
@@ -13,10 +13,10 @@ vgg_block.kernel_size = (3, 3)
 
 # cnn Models
 create_cnn_nets.num_blocks = 3
-create_cnn_nets.filters = 9
+create_cnn_nets.filters = 11
 create_cnn_nets.kernel_size = (3, 3)
-create_cnn_nets.dense_units = 132
-create_cnn_nets.dropout_rate = 0.24326375025005023
+create_cnn_nets.dense_units = 29
+create_cnn_nets.dropout_rate = 0.5184290348221623
 create_cnn_nets.l2_lambda = %l2_lambda
 cnn_block.l2_lambda = %l2_lambda
 cnn_block.seed = %GLOBAL_SEED
@@ -29,9 +29,9 @@ Trainer.ckpt_interval = 1e3
 
 # Input pipeline
 load.name = 'idrid'
-load.data_dir = r'/home/data/IDRID_dataset'
+#load.data_dir = r'/home/data/IDRID_dataset'
 #load.data_dir = r'C:\DL-lab\IDRID_dataset'
-#load.data_dir = r'D:\idrid\IDRID_dataset'
+load.data_dir = r'D:\idrid\IDRID_dataset'
 load.split_frac = 0.142857
 load.seed = %GLOBAL_SEED
 prepare.seed = %GLOBAL_SEED

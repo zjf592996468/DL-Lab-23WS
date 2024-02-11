@@ -45,52 +45,81 @@ def main(argv):
     else:
         print("No checkpoint found at:", run_paths['path_ckpts_train'])
 
-    # Find 30 images from the test dataset that match a specified category index
-    layer_name = 'max_pooling2d_2'  # Replace the max pooling layer
-    category_index_1 = 1  # The label we're interested in
-    images_found = 0  # Counter for images processed
+        # Find images from the test dataset that match label 0
+    layer_name = 'max_pooling2d_2'  # Replace the global max pooling layer
+    category_index_0 = 0  # Specified category index
 
+    image_count = 0
+    found = False
     for images, labels in ds_test:
         for i, label in enumerate(labels):
-            if label.numpy() == category_index_1 and images_found < 30:
-                # Prepare the image
-                image = images[i]  # Get the i-th image from the batch
-                image_expanded = tf.expand_dims(image, axis=0)  # Expand dims to fit model input
-
-                # Generate Grad-CAM heatmap
-                heatmap = grad_cam(model, image_expanded, category_index_1, layer_name)
-
-                # Overlay heatmap
-                original_image = image.numpy()
-                overlay_image = overlay_heatmap(original_image, heatmap, 0.35, 0.5)
-
-                # Plotting
-                fig, axs = plt.subplots(1, 3, figsize=(15, 5))  # Create a 1x3 subplot
-
-                # Original Image
-                axs[0].imshow(original_image)
-                axs[0].set_title(f'Original Image {images_found + 1}')
-                axs[0].axis('off')
-
-                # Grad-CAM Heatmap
-                axs[1].imshow(heatmap)
-                axs[1].set_title(f'Grad-CAM {images_found + 1}')
-                axs[1].axis('off')
-
-                # Overlay Image
-                axs[2].imshow(overlay_image)
-                axs[2].set_title(f'Overlay Grad-CAM {images_found + 1}')
-                axs[2].axis('off')
-
-                plt.tight_layout()
-                plt.show()
-
-                images_found += 1  # Increment the counter
-
-                if images_found >= 30:  # Break if we've found 10 images
+            if label.numpy() == category_index_0:
+                image_count += 1
+                if image_count == 3:
+                    image_0 = images[i]
+                    image_0 = tf.expand_dims(image_0, axis=0)  # Extending dimensions to match model inputs
+                    found = True
                     break
-        if images_found >= 30:  # Check again to ensure we stop searching
+        if found:
             break
+
+    # Find images from the test dataset that match label 1
+    category_index_1 = 1  # Specified category index
+    image_count = 0
+    found = False
+    for images, labels in ds_test:
+        for i, label in enumerate(labels):
+            if label.numpy() == category_index_1:
+                image_count += 1
+                if image_count == 3:
+                    image_1 = images[i]
+                    image_1 = tf.expand_dims(image_1, axis=0)  # Extending dimensions to match model inputs
+                    found = True
+                    break
+        if found:
+            break
+
+    # Get the heatmap and original img
+    heatmap_cam_0 = grad_cam(model, image_0, category_index_0, layer_name)
+    heatmap_cam_1 = grad_cam(model, image_1, category_index_1, layer_name)
+    original_image_0 = image_0[0].numpy()
+    original_image_1 = image_1[0].numpy()
+
+    # Overlay the heatmap on original img
+    overlay_image = overlay_heatmap(original_image_0, heatmap_cam_0, 0.4, 0.6)
+    overlay_image1 = overlay_heatmap(original_image_1, heatmap_cam_1, 0.4, 0.6)
+
+    # Create a 2x3 subplot
+    fig, axs = plt.subplots(2, 3, figsize=(15, 10))
+
+    # Displays the original image and the superimposed heat map on the first line
+    axs[0, 0].imshow(original_image_0)
+    axs[0, 0].set_title('Original Image_0')
+    axs[0, 0].axis('off')
+
+    axs[0, 1].imshow(heatmap_cam_0)
+    axs[0, 1].set_title('Grad-CAM_0')
+    axs[0, 1].axis('off')
+
+    axs[0, 2].imshow(overlay_image)
+    axs[0, 2].set_title('Overlayed Grad-CAM_0')
+    axs[0, 2].axis('off')
+
+    # Displays the original image, the Grad-CAM, and the superimposed Grad-CAM in the second row.
+    axs[1, 0].imshow(original_image_1)
+    axs[1, 0].set_title('Original Image_1')
+    axs[1, 0].axis('off')
+
+    axs[1, 1].imshow(heatmap_cam_1)
+    axs[1, 1].set_title('Grad-CAM_1')
+    axs[1, 1].axis('off')
+
+    axs[1, 2].imshow(overlay_image1)
+    axs[1, 2].set_title('Overlayed Grad-CAM_1')
+    axs[1, 2].axis('off')
+
+    plt.tight_layout()
+    plt.show()
 
 
 if __name__ == "__main__":
