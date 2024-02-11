@@ -25,7 +25,7 @@ Train other model:
 
 * vgg(need to raise train steps to **12e4**):
 
-  `python3 main.py --train=True --multi_class=False --Classification=True --model='vgg' --l2_loss=False`
+  `python3 main.py --train=True --multi_class=False --classification=True --model='vgg' --l2_loss=False`
 
 Tune hyperparameters:
 
@@ -39,7 +39,7 @@ Transfer learning:
 
 * EfficientNet:
 
-  `python3 main.py --train=True --multi_class=False --Classification=True --model='effnet' --l2_loss=False`
+  `python3 main.py --train=True --multi_class=False --classification=True --model='effnet' --l2_loss=False`
 
 Train '**cnn**' model for multi-class classification:
 
