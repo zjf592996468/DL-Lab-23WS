@@ -29,9 +29,9 @@ Trainer.ckpt_interval = 1e3
 
 # Input pipeline
 load.name = 'idrid'
-#load.data_dir = r'/home/data/IDRID_dataset'
+load.data_dir = r'/home/data/IDRID_dataset'
 #load.data_dir = r'C:\DL-lab\IDRID_dataset'
-load.data_dir = r'D:\idrid\IDRID_dataset'
+#load.data_dir = r'D:\idrid\IDRID_dataset'
 load.split_frac = 0.142857
 load.seed = %GLOBAL_SEED
 prepare.seed = %GLOBAL_SEED

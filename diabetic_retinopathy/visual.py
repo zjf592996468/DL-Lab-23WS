@@ -46,7 +46,7 @@ def main(argv):
         print("No checkpoint found at:", run_paths['path_ckpts_train'])
 
         # Find images from the test dataset that match label 0
-    layer_name = 'max_pooling2d_2'  # Replace the global max pooling layer
+    layer_name = 'max_pooling2d_2'  # Replace the max pooling layer
     category_index_0 = 0  # Specified category index
 
     image_count = 0
@@ -55,7 +55,7 @@ def main(argv):
         for i, label in enumerate(labels):
             if label.numpy() == category_index_0:
                 image_count += 1
-                if image_count == 3:
+                if image_count == 4:
                     image_0 = images[i]
                     image_0 = tf.expand_dims(image_0, axis=0)  # Extending dimensions to match model inputs
                     found = True
@@ -71,7 +71,7 @@ def main(argv):
         for i, label in enumerate(labels):
             if label.numpy() == category_index_1:
                 image_count += 1
-                if image_count == 3:
+                if image_count == 22:
                     image_1 = images[i]
                     image_1 = tf.expand_dims(image_1, axis=0)  # Extending dimensions to match model inputs
                     found = True
@@ -87,7 +87,7 @@ def main(argv):
 
     # Overlay the heatmap on original img
     overlay_image = overlay_heatmap(original_image_0, heatmap_cam_0, 0.4, 0.6)
-    overlay_image1 = overlay_heatmap(original_image_1, heatmap_cam_1, 0.4, 0.6)
+    overlay_image1 = overlay_heatmap(original_image_1, heatmap_cam_1, 0.3, 0.6)
 
     # Create a 2x3 subplot
     fig, axs = plt.subplots(2, 3, figsize=(15, 10))
