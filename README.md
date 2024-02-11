@@ -7,12 +7,11 @@
 
 ## Attention!
 
-The checkpoint logic of our code is different from the original code.
-We are, if there is a checkpoint it is loaded.
+The checkpoint mechanism in our code differs from the original implementation. In our case, if a checkpoint exists, it is automatically loaded. So it's important to note that the code cannot be run consecutively due to the need to prevent the automatic loading of checkpoint files.
 
-So please rename the `ckpt` file before running it if you don't want to use checkpoint.
-Equally, if you want to use a good checkpoint just drag the file into `experiments`
-and rename it to '**ckpt**', for P2 is '**har-ckpt**'.
+Therefore, if you prefer not to utilize a checkpoint, please rename the checkpoint file before execution. Conversely, if you wish to use a specific, high-quality checkpoint, simply drag the file into the 'experiments' directory and rename it to 'ckpt'. For project P2, rename it to 'har-ckpt'.
+
+
 
 ## P1: Diabetic Retinopathy Detection
 
@@ -22,46 +21,41 @@ Run batch file: `sbatch run.sh`
 
 Train other model:
 
-* vgg(need raise train steps to 12e4):
+* vgg(need to raise train steps to 12e4):
 
-  `python3 main.py --train=True --multi_class=False --classification=False --model='vgg'
-   --l2_loss=flase`
+  `python3 main.py --train=True --multi_class=False --classification=False --model='vgg' --l2_loss=flase`
 
 * Tune hyperparameters:
 
-  `python3 main.py --train=True --multi_class=False --classification=False --model='cnn'
-   --l2_loss=True`
+  `python3 main.py --train=True --multi_class=False --classification=False --model='cnn' --l2_loss=True`
 
 * Deep visualization(need ckpt in `experiments`):
 
-    `python3 visual.py`
+  `python3 visual.py`
 
 * Transfer learning:
 
-    `python3 main.py --train=True --multi_class=False --classification=False --model='effnet'
-      --l2_loss=False`
-
+  `python3 main.py --train=True --multi_class=False --classification=False --model='effnet' --l2_loss=False`
 
 Train '**cnn**' model for multi-class classification:
 
 * Use classification:
 
-  `python3 main.py --train=True --multi_class=True --classification=True --model='cnn'
-   --l2_loss=True`
+  `python3 main.py --train=True --multi_class=True --classification=True --model='cnn' --l2_loss=True`
 
 * Use regression:
 
-  `python3 main.py --train=True --multi_class=True --classification=False --model='cnn'
-   --l2_loss=True`
+  `python3 main.py --train=True --multi_class=True --classification=False --model='cnn' --l2_loss=True`
+
 * Use evaluation(use the corresponding model):
 
-   `python3 main.py --train=False...`
+  `python3 main.py --train=False...`
 
 ## P2: Human Activity Recognition
 
 Train RNN model with '**Bidirectional LSTM**' layer on HAPT dataset:
 
-    python3 main.py --train=True
+`python3 main.py --train=True`
 
 Train RNN model with other RNN layer:
 
@@ -95,13 +89,12 @@ Train RNN model with other RNN layer:
 
 | Model                 | CNN-Classification | CNN-Regression |
 |-----------------------|--------------------|----------------|
-| **Test Accuracy (%)** | 57                 | 43             |
+| **Test Accuracy (%)** | 57                 | 40             |
 
 *_The best record of EfficientNet was achieved by
 splitting the first 20% of the original Train set into the Validation set._\
 *_The results of this project vary greatly because the test set is small.
 We took the highest record and uploaded the ckpt file to result._
-
 
 ## P2: Human Activity Recognition
 
