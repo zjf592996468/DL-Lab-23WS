@@ -1,6 +1,6 @@
 # Global Parameters
 GLOBAL_SEED = 2023
-l2_lambda = 0.0010013742262131263
+l2_lambda =  0.0010277395172481724
 
 # Architectures vgg model need 1.2e5 train steps
 vgg_like.base_filters = 8
@@ -13,9 +13,9 @@ vgg_block.kernel_size = (3, 3)
 
 # cnn Models
 create_cnn_nets.num_blocks = 3
-create_cnn_nets.filters = 19
+create_cnn_nets.filters = 9
 create_cnn_nets.kernel_size = (3, 3)
-create_cnn_nets.dense_units = 33
+create_cnn_nets.dense_units = 132
 create_cnn_nets.dropout_rate = 0.24326375025005023
 create_cnn_nets.l2_lambda = %l2_lambda
 cnn_block.l2_lambda = %l2_lambda
