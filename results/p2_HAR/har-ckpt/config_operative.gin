@@ -1,0 +1,39 @@
+# Macros:
+# ==============================================================================
+GLOBAL_SEED = 2024
+WIN_LEN = 250
+WIN_SHIFT = 125
+
+# Parameters for create_rnn:
+# ==============================================================================
+create_rnn.dense_units = 68
+create_rnn.dropout_rate = 0.3903972586663371
+create_rnn.lstm_units = 206
+create_rnn.regularization_factor = 0.009087564681451336
+
+# Parameters for load:
+# ==============================================================================
+load.data_dir = '/home/data/HAPT_dataset'
+load.name = 'hapt'
+load.show_exp_id = 50
+
+# Parameters for parse_tfrecord_function:
+# ==============================================================================
+parse_tfrecord_function.win_len = %WIN_LEN
+
+# Parameters for prepare:
+# ==============================================================================
+prepare.batch_size = 32
+prepare.caching = True
+prepare.seed = %GLOBAL_SEED
+
+# Parameters for slide_window:
+# ==============================================================================
+slide_window.win_len = %WIN_LEN
+slide_window.win_shift = %WIN_SHIFT
+
+# Parameters for Trainer:
+# ==============================================================================
+Trainer.ckpt_interval = 5000.0
+Trainer.log_interval = 5000.0
+Trainer.total_steps = 55000.0
