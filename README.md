@@ -17,67 +17,67 @@ rename it to '**ckpt**'. For project 2, rename it to '**har-ckpt**'.
 
 ## P1: Diabetic Retinopathy Detection
 
-Train '**cnn**' model with **L2-regularization** on IDRID dataset for **binary classification**:
+- Train '**cnn**' model with **L2-regularization** on IDRID dataset for **binary classification**:
 
-Run batch file: `sbatch run.sh`
+  Run batch file: `sbatch run.sh`
 
-Train other model:
+- Train other model:
 
-* vgg(need to raise train steps to **12e4**):
+    * vgg(need to raise train steps to **12e4**):
 
-  `python3 main.py --train=True --multi_class=False --classification=True --model='vgg' --l2_loss=False`
+      `python3 main.py --train=True --multi_class=False --classification=True --model='vgg' --l2_loss=False`
 
-Tune hyperparameters:
+- Tune hyperparameters:
 
-Run batch file: `sbatch tune.sh`
+  Run batch file: `sbatch tune.sh`
 
-Deep visualization (need ckpt in `experiments`):
+- Deep visualization (need ckpt in `experiments`):
 
-`python3 visual.py`
+  `python3 visual.py`
 
-Transfer learning:
+- Transfer learning:
 
-* EfficientNet:
+    * EfficientNet:
 
-  `python3 main.py --train=True --multi_class=False --classification=True --model='effnet' --l2_loss=False`
+      `python3 main.py --train=True --multi_class=False --classification=True --model='effnet' --l2_loss=False`
 
-Train '**cnn**' model for multi-class classification:
+- Train '**cnn**' model for multi-class classification:
 
-* Regression:
+    * Regression:
 
-  `python3 main.py --train=True --multi_class=True --classification=False --model='cnn' --l2_loss=True`
+      `python3 main.py --train=True --multi_class=True --classification=False --model='cnn' --l2_loss=True`
 
-* Classification:
+    * Classification:
 
-  `python3 main.py --train=True --multi_class=True --classification=True --model='cnn' --l2_loss=True`
+      `python3 main.py --train=True --multi_class=True --classification=True --model='cnn' --l2_loss=True`
 
-Evaluation (use the corresponding model):
+- Evaluation (use the corresponding model):
 
-`python3 main.py --train=False ...`
+  `python3 main.py --train=False ...`
 
 ## P2: Human Activity Recognition
 
-Train '**myRNN**' model with '**Bidirectional LSTM**' layer on HAPT dataset:
+- Train '**myRNN**' model with '**Bidirectional LSTM**' layer on HAPT dataset:
 
-Run batch file: `sbatch run.sh`
+  Run batch file: `sbatch run.sh`
 
-Train model with other RNN layer:
+- Train model with other RNN layer:
 
-* LSTM:
+    * LSTM:
 
-  `python3 main.py -- train=True --layer='LSTM'`
+      `python3 main.py -- train=True --layer='LSTM'`
 
-* Bidirectional GRU:
+    * Bidirectional GRU:
 
-  `python3 main.py --train=True --layer='Bidirectional GRU'`
+      `python3 main.py --train=True --layer='Bidirectional GRU'`
 
-* GRU:
+    * GRU:
 
-  `python3 main.py --train=True --layer='GRU'`
+      `python3 main.py --train=True --layer='GRU'`
 
-Evaluation:
+- Evaluation:
 
-`python3 main.py --train=False`
+  `python3 main.py --train=False`
 
 # Results
 
