@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 from absl import flags, app
 from train import Trainer
 
-
 FLAGS = flags.FLAGS
 flags.DEFINE_boolean('multi_class', False, 'Specify whether to take multi_classification')
 flags.DEFINE_string('model', 'cnn', 'The name of the model')
@@ -55,7 +54,7 @@ def main(argv):
         for i, label in enumerate(labels):
             if label.numpy() == category_index_0:
                 image_count += 1
-                if image_count == 4:
+                if image_count == 3:
                     image_0 = images[i]
                     image_0 = tf.expand_dims(image_0, axis=0)  # Extending dimensions to match model inputs
                     found = True
@@ -86,8 +85,8 @@ def main(argv):
     original_image_1 = image_1[0].numpy()
 
     # Overlay the heatmap on original img
-    overlay_image = overlay_heatmap(original_image_0, heatmap_cam_0, 0.4, 0.6)
-    overlay_image1 = overlay_heatmap(original_image_1, heatmap_cam_1, 0.3, 0.6)
+    overlay_image = overlay_heatmap(original_image_0, heatmap_cam_0, 0.5, 0.6)
+    overlay_image1 = overlay_heatmap(original_image_1, heatmap_cam_1, 0.2, 0.6)
 
     # Create a 2x3 subplot
     fig, axs = plt.subplots(2, 3, figsize=(15, 10))

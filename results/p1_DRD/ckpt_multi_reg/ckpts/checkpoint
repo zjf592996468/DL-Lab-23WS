@@ -1,0 +1,13 @@
+model_checkpoint_path: "ckpt-22"
+all_model_checkpoint_paths: "ckpt-22"
+all_model_checkpoint_timestamps: 1707707614.8703873
+all_model_checkpoint_timestamps: 1707707631.0180275
+all_model_checkpoint_timestamps: 1707707647.1341183
+all_model_checkpoint_timestamps: 1707707663.2588542
+all_model_checkpoint_timestamps: 1707707679.3165636
+all_model_checkpoint_timestamps: 1707707695.550627
+all_model_checkpoint_timestamps: 1707707711.706086
+all_model_checkpoint_timestamps: 1707707727.8073938
+all_model_checkpoint_timestamps: 1707707743.9861267
+all_model_checkpoint_timestamps: 1707707744.0271943
+last_preserved_timestamp: 1707707326.244285

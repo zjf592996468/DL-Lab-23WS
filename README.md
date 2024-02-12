@@ -43,13 +43,13 @@ Transfer learning:
 
 Train '**cnn**' model for multi-class classification:
 
-* Classification:
-
-  `python3 main.py --train=True --multi_class=True --classification=True --model='cnn' --l2_loss=True`
-
 * Regression:
 
   `python3 main.py --train=True --multi_class=True --classification=False --model='cnn' --l2_loss=True`
+
+* Classification:
+
+  `python3 main.py --train=True --multi_class=True --classification=True --model='cnn' --l2_loss=True`
 
 Evaluation (use the corresponding model):
 
@@ -85,15 +85,15 @@ Evaluation:
 
 ### Binary Model Test Accuracy
 
-| Model                 | CNN | VGG | EfficientNet* |
-|-----------------------|-----|-----|---------------|
-| **Test Accuracy (%)** | 89  | 74  | 88            |
+| Model                 | CNN  | VGG  | EfficientNet* |
+|-----------------------|------|------|---------------|
+| **Test Accuracy (%)** | 89.3 | 74.1 | 88.3          |
 
 ### Multi-Classification Model Test Accuracy
 
 | Model                 | CNN-Classification | CNN-Regression |
 |-----------------------|--------------------|----------------|
-| **Test Accuracy (%)** | 57                 | 40             |
+| **Test Accuracy (%)** | 57.2               | 45.6           |
 
 *_The best record of EfficientNet was achieved by
 splitting the first 20% of the original Train set into the Validation set._\
@@ -104,8 +104,8 @@ We took the highest record and uploaded the ckpt file to result._
 
 | Model                     | RNN with bidirectional LSTM |
 |---------------------------|-----------------------------|
-| **Test Accuracy (%)**     | 95                          |
-| **Balanced Accuracy (%)** | 83                          |
+| **Test Accuracy (%)**     | 95.1                        |
+| **Balanced Accuracy (%)** | 83.6                        |
 
 Our model achieved great success in basic activities, but need improvement when it comes to
 postural transition.

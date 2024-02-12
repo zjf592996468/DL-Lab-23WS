@@ -54,7 +54,7 @@ sweep_config = {
     },
     'parameters': {
         'Trainer.total_steps': {
-            'values': [35000, 40000, 45000]
+            'values': [25000, 30000, 35000, 40000, 45000]
         },
         'create_cnn_nets.filters': {
             'distribution': 'q_log_uniform',
