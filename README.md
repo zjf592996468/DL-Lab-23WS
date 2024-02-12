@@ -37,7 +37,7 @@ rename it to '**ckpt**'. For project 2, rename it to '**har-ckpt**'.
 
 - Transfer learning:
 
-    * EfficientNet:
+    * EfficientNet(**4e4** may be better):
 
       `python3 main.py --train=True --multi_class=False --classification=True --model='effnet' --l2_loss=False`
 
@@ -47,7 +47,7 @@ rename it to '**ckpt**'. For project 2, rename it to '**har-ckpt**'.
 
       `python3 main.py --train=True --multi_class=True --classification=False --model='cnn' --l2_loss=True`
 
-    * Classification:
+    * Classification(**6e4** may be better):
 
       `python3 main.py --train=True --multi_class=True --classification=True --model='cnn' --l2_loss=True`
 
