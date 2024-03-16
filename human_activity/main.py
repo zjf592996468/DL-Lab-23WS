@@ -28,7 +28,7 @@ def main(argv):
     utils_params.save_config(run_paths['path_gin'], gin.config_str())
 
     # setup wandb
-    wandb.login(key="f27c584f9e444901abf85615134f27d2da6e411d")
+    wandb.login(key="5aa34be742c563b8db6d03e8722deccc9bc0a91a")
     wandb.init(project=FLAGS.wandb, name=run_paths['model_id'],
                config=utils_params.gin_config_to_readable_dictionary(gin.config._CONFIG))
     logging.info("Wandb logged in.")
