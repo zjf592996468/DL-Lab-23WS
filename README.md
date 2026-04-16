@@ -109,3 +109,7 @@ We took the highest record and uploaded the ckpt file to result._
 
 Our model achieved great success in basic activities, but need improvement when it comes to
 postural transition.
+
+# License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
